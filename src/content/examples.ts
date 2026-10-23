@@ -1,0 +1,197 @@
+export type Method = 'Classification' | 'Clustering' | 'Association' | 'Outliers' | 'Recommendation' | 'Prediction' | 'Pitfalls'
+
+export type Example = {
+  title: string
+  year: string
+  methods: Method[]
+  topics: string[]
+  what: string
+  lesson: string
+  sources: { label: string; url: string }[]
+}
+
+export const METHODS: Method[] = ['Classification', 'Clustering', 'Association', 'Outliers', 'Recommendation', 'Prediction', 'Pitfalls']
+
+export const EXAMPLES: Example[] = [
+  {
+    title: 'Target predicts pregnancies from shopping baskets',
+    year: '2012',
+    methods: ['Classification', 'Pitfalls'],
+    topics: ['evaluation', 'naive-bayes'],
+    what: 'Target statisticians found that buying patterns of about 25 products, such as unscented lotion and supplements, could score how likely a shopper was pregnant and roughly when the baby was due. The store used it to time baby-product coupons.',
+    lesson: 'A classifier built from ordinary purchase data can infer very sensitive facts. Accuracy is not the only question; how a prediction is used matters too.',
+    sources: [{ label: 'New York Times Magazine, 2012', url: 'https://www.nytimes.com/2012/02/19/magazine/shopping-habits.html' }],
+  },
+  {
+    title: 'Walmart stocks strawberry Pop-Tarts before hurricanes',
+    year: '2004',
+    methods: ['Association'],
+    topics: ['apriori'],
+    what: 'Before Hurricane Frances, Walmart looked at sales from earlier storms and found that, besides flashlights, strawberry Pop-Tarts and beer sold far above normal. Trucks with those items were sent to stores in the storm path.',
+    lesson: 'Frequent pattern mining on transaction data turns past behavior into a concrete stocking decision. The surprising items are the valuable ones.',
+    sources: [{ label: 'New York Times, 2004', url: 'https://www.nytimes.com/2004/11/14/business/yourmoney/what-walmart-knows-about-customers-habits.html' }],
+  },
+  {
+    title: 'The Netflix Prize',
+    year: '2006 to 2009',
+    methods: ['Recommendation', 'Prediction'],
+    topics: ['knn', 'regression', 'evaluation'],
+    what: 'Netflix offered one million dollars to anyone who could beat its rating predictor by 10%. Teams combined neighborhood methods, matrix factorization and large ensembles. BellKor\'s Pragmatic Chaos won in 2009.',
+    lesson: 'Blending many models wins competitions, but the most accurate model is not always the one worth running in production.',
+    sources: [{ label: 'Wikipedia: Netflix Prize', url: 'https://en.wikipedia.org/wiki/Netflix_Prize' }],
+  },
+  {
+    title: 'Anonymous Netflix ratings were not anonymous',
+    year: '2006',
+    methods: ['Pitfalls'],
+    topics: ['integration'],
+    what: 'Researchers showed that a few ratings and rough dates were enough to match users in the released Netflix data to public IMDb profiles.',
+    lesson: 'Removing names is not anonymization. Integration with another source can re-identify people.',
+    sources: [{ label: 'Narayanan and Shmatikov, arXiv', url: 'https://arxiv.org/abs/cs/0610105' }],
+  },
+  {
+    title: 'AOL search logs identify a user',
+    year: '2006',
+    methods: ['Pitfalls'],
+    topics: ['cleaning'],
+    what: 'AOL released about 20 million search queries with user names replaced by numbers. Journalists identified a specific person from the content of her searches.',
+    lesson: 'The data itself can be identifying. Think about privacy before releasing or mining personal logs.',
+    sources: [{ label: 'Wikipedia: AOL search log release', url: 'https://en.wikipedia.org/wiki/AOL_search_log_release' }],
+  },
+  {
+    title: 'Amazon item-to-item recommendations',
+    year: '2003',
+    methods: ['Recommendation'],
+    topics: ['knn', 'clustering-basics'],
+    what: 'Instead of comparing customers, Amazon compared items: two items are similar when the same customers buy both. Similar-item tables are built offline, so recommendations are fast even with millions of customers.',
+    lesson: 'Choosing what to compare (items vs users) and precomputing similarities makes a nearest-neighbor idea scale.',
+    sources: [{ label: 'Linden, Smith and York, IEEE Internet Computing (PDF)', url: 'https://www.cs.umd.edu/~samir/498/Amazon-Recommendations.pdf' }],
+  },
+  {
+    title: 'Google Flu Trends',
+    year: '2009 and 2013',
+    methods: ['Prediction', 'Pitfalls'],
+    topics: ['regression', 'reduction'],
+    what: 'Google estimated flu activity from search query volumes and matched official data with a much shorter delay. In the 2012 to 2013 season it badly overestimated the peak.',
+    lesson: 'A model picked from millions of candidate features can fit by coincidence, and it breaks when the behavior behind the data changes.',
+    sources: [
+      { label: 'Ginsberg et al., Nature 2009', url: 'https://www.nature.com/articles/nature07634' },
+      { label: 'Nature news: When Google got flu wrong', url: 'https://www.nature.com/articles/494155a' },
+      { label: 'Lazer et al., Science 2014', url: 'https://www.science.org/doi/10.1126/science.1248506' },
+    ],
+  },
+  {
+    title: 'John Snow maps the 1854 cholera outbreak',
+    year: '1854',
+    methods: ['Clustering'],
+    topics: ['clustering-basics', 'dbscan'],
+    what: 'John Snow plotted cholera deaths in Soho, London, on a map. The deaths clustered around the Broad Street water pump, which supported his theory that cholera spread through water.',
+    lesson: 'Spatial clustering of events can reveal a cause. A simple visual summary did the mining.',
+    sources: [{ label: 'Wikipedia: 1854 Broad Street cholera outbreak', url: 'https://en.wikipedia.org/wiki/1854_Broad_Street_cholera_outbreak' }],
+  },
+  {
+    title: 'Finding exoplanets in Kepler data',
+    year: '2018',
+    methods: ['Classification'],
+    topics: ['neural-networks', 'evaluation'],
+    what: 'A neural network trained on labeled light curves learned to tell planet transits from false signals. Applied to weaker candidates, it found new planets, including an eighth planet around Kepler-90.',
+    lesson: 'Train on labeled examples, then rank unlabeled candidates so experts check the most likely ones first.',
+    sources: [{ label: 'Shallue and Vanderburg, arXiv', url: 'https://arxiv.org/abs/1712.05044' }],
+  },
+  {
+    title: 'Beer and diapers: the famous rule that is mostly a myth',
+    year: '1992 and 2006',
+    methods: ['Association', 'Pitfalls'],
+    topics: ['apriori'],
+    what: 'The story that a supermarket found beer and diapers bought together on Friday evenings and moved them side by side is repeated in many textbooks. Tracing it back shows a real early analysis but no evidence of the shelf change.',
+    lesson: 'A catchy rule is not a validated finding. Check support, confidence and lift, and whether anyone acted on it.',
+    sources: [{ label: 'The Register, 2006', url: 'https://www.theregister.com/2006/08/15/beer_diapers/' }],
+  },
+  {
+    title: 'Credit card fraud detection',
+    year: 'Ongoing',
+    methods: ['Classification', 'Outliers'],
+    topics: ['evaluation', 'outliers'],
+    what: 'A public dataset of European card transactions has 284,807 transactions and only 492 frauds, about 0.17%. A model that always says "legitimate" is 99.8% accurate and useless.',
+    lesson: 'With heavy class imbalance, use precision, recall and PR curves, not accuracy.',
+    sources: [{ label: 'Kaggle: Credit Card Fraud Detection dataset', url: 'https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud' }],
+  },
+  {
+    title: 'Spotify Discover Weekly',
+    year: '2015 onward',
+    methods: ['Recommendation', 'Clustering'],
+    topics: ['clustering-basics', 'knn'],
+    what: 'Every Monday each user gets a personal playlist of songs they have not played, picked from what listeners with similar taste enjoy.',
+    lesson: 'Similarity between users (who listens like you) is a practical way to recommend without knowing anything about the songs.',
+    sources: [{ label: 'Spotify: Discover Weekly', url: 'https://www.spotify.com/us/discoverweekly/' }],
+  },
+  {
+    title: 'Galaxy Zoo',
+    year: '2007 onward',
+    methods: ['Classification'],
+    topics: ['evaluation'],
+    what: 'Volunteers labeled the shapes of hundreds of thousands of galaxies from the Sloan Digital Sky Survey. The labels later trained automatic classifiers.',
+    lesson: 'Good labels are the bottleneck for classification. Crowdsourcing is one way to get them, with agreement between labelers as a quality check.',
+    sources: [
+      { label: 'Zooniverse: Galaxy Zoo', url: 'https://www.zooniverse.org/projects/zookeeper/galaxy-zoo' },
+      { label: 'Wikipedia: Galaxy Zoo', url: 'https://en.wikipedia.org/wiki/Galaxy_Zoo' },
+    ],
+  },
+  {
+    title: 'Clustering gene expression',
+    year: '1998',
+    methods: ['Clustering'],
+    topics: ['hierarchical'],
+    what: 'Eisen and colleagues applied hierarchical clustering to gene expression measurements and showed the result as a colored heatmap with a dendrogram. Genes with related functions grouped together.',
+    lesson: 'A dendrogram next to a heatmap became a standard way to explore biological data.',
+    sources: [{ label: 'Eisen et al., PNAS 1998', url: 'https://www.pnas.org/doi/10.1073/pnas.95.25.14863' }],
+  },
+  {
+    title: 'DBSCAN: a 1996 paper that won test of time',
+    year: '1996',
+    methods: ['Clustering', 'Outliers'],
+    topics: ['dbscan'],
+    what: 'Ester, Kriegel, Sander and Xu proposed clustering by density: grow clusters from core points and leave sparse points as noise. It finds clusters of any shape and was given the SIGKDD Test of Time award in 2014.',
+    lesson: 'A simple definition of density gave a method still used everywhere for spatial data.',
+    sources: [
+      { label: 'Original paper (PDF)', url: 'https://cdn.aaai.org/KDD/1996/KDD96-037.pdf' },
+      { label: 'SIGKDD Test of Time award 2014', url: 'https://www.kdd.org/News/view/2014-sigkdd-test-of-time-award' },
+    ],
+  },
+  {
+    title: 'The Apriori algorithm',
+    year: '1994',
+    methods: ['Association'],
+    topics: ['apriori'],
+    what: 'Agrawal and Srikant used one observation, that every subset of a frequent itemset must be frequent, to prune candidates level by level. It made association rule mining practical on large retail data.',
+    lesson: 'A single monotonic property can cut an exponential search down to something feasible.',
+    sources: [{ label: 'Agrawal and Srikant, VLDB 1994 (PDF)', url: 'https://www.vldb.org/conf/1994/P487.PDF' }],
+  },
+  {
+    title: 'k-means++ seeding',
+    year: '2007',
+    methods: ['Clustering'],
+    topics: ['kmeans'],
+    what: 'Arthur and Vassilvitskii picked initial centroids with probability proportional to squared distance from the centers already chosen. This simple change gave provably better expected results and is now the default in scikit-learn.',
+    lesson: 'Initialization matters for local-search algorithms.',
+    sources: [{ label: 'Wikipedia: k-means++', url: 'https://en.wikipedia.org/wiki/K-means%2B%2B' }],
+  },
+  {
+    title: 'Moneyball and sabermetrics',
+    year: '2002',
+    methods: ['Prediction'],
+    topics: ['regression', 'integration'],
+    what: 'The Oakland Athletics used statistics such as on-base percentage, which predicted runs better than the metrics scouts relied on, to build a competitive team on a small budget.',
+    lesson: 'Checking which attributes actually correlate with the outcome can beat expert intuition.',
+    sources: [{ label: 'Wikipedia: Sabermetrics', url: 'https://en.wikipedia.org/wiki/Sabermetrics' }],
+  },
+  {
+    title: 'Local Outlier Factor',
+    year: '2000',
+    methods: ['Outliers'],
+    topics: ['outliers'],
+    what: 'LOF scores each point by how much sparser its neighborhood is than its neighbors neighborhoods. It catches outliers next to dense clusters that a global distance rule would miss.',
+    lesson: 'An outlier is relative to its surroundings, not just far from everything.',
+    sources: [{ label: 'Wikipedia: Local outlier factor', url: 'https://en.wikipedia.org/wiki/Local_outlier_factor' }],
+  },
+]

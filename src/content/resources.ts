@@ -1,0 +1,67 @@
+export type Resource = { name: string; url: string; by?: string; note: string }
+
+export const RESOURCE_GROUPS: { title: string; kicker: string; items: Resource[] }[] = [
+  {
+    title: 'Books',
+    kicker: 'Read',
+    items: [
+      { name: 'Data Mining: Concepts and Techniques, 3rd ed.', by: 'Han, Kamber and Pei', url: 'https://hanj.cs.illinois.edu/bk3/', note: 'The course textbook. The site has slides and chapter material.' },
+      { name: 'Introduction to Data Mining', by: 'Tan, Steinbach, Kumar', url: 'https://www-users.cse.umn.edu/~kumar001/dmbook/index.php', note: 'Clear second textbook with free sample chapters and slides.' },
+      { name: 'Mining of Massive Datasets', by: 'Leskovec, Rajaraman, Ullman', url: 'http://www.mmds.org/', note: 'Free book on mining data that does not fit in memory: frequent itemsets, clustering, recommender systems.' },
+      { name: 'An Introduction to Statistical Learning', by: 'James, Witten, Hastie, Tibshirani', url: 'https://www.statlearning.com/', note: 'Free PDF with Python labs. Best for regression, classification and resampling.' },
+      { name: 'The Elements of Statistical Learning', by: 'Hastie, Tibshirani, Friedman', url: 'https://hastie.su.domains/ElemStatLearn/', note: 'Free PDF. The deeper, more mathematical follow-up.' },
+      { name: 'Machine Learning', by: 'Tom Mitchell', url: 'https://www.cs.cmu.edu/~tom/mlbook.html', note: 'Classic treatment of decision trees, perceptrons and Bayesian learning.' },
+    ],
+  },
+  {
+    title: 'Library documentation',
+    kicker: 'Look things up',
+    items: [
+      { name: 'scikit-learn: Clustering', url: 'https://scikit-learn.org/stable/modules/clustering.html', note: 'k-means, DBSCAN, hierarchical and a chart comparing them on toy data.' },
+      { name: 'scikit-learn: Decision Trees', url: 'https://scikit-learn.org/stable/modules/tree.html', note: 'Criteria, pruning and how to plot a tree.' },
+      { name: 'scikit-learn: Naive Bayes', url: 'https://scikit-learn.org/stable/modules/naive_bayes.html', note: 'Gaussian, multinomial and categorical variants.' },
+      { name: 'scikit-learn: Nearest Neighbors', url: 'https://scikit-learn.org/stable/modules/neighbors.html', note: 'kNN classification and regression, distance weighting.' },
+      { name: 'scikit-learn: PCA and decomposition', url: 'https://scikit-learn.org/stable/modules/decomposition.html', note: 'PCA and related methods with examples.' },
+      { name: 'scikit-learn: Model evaluation', url: 'https://scikit-learn.org/stable/modules/model_evaluation.html', note: 'Precision, recall, F1, averaging options and cross-validation scoring.' },
+      { name: 'scikit-learn: Neural networks', url: 'https://scikit-learn.org/stable/modules/neural_networks_supervised.html', note: 'MLPClassifier and MLPRegressor.' },
+    ],
+  },
+  {
+    title: 'Visual explainers',
+    kicker: 'See it',
+    items: [
+      { name: 'Visualizing k-means clustering', by: 'Naftali Harris', url: 'https://www.naftaliharris.com/blog/visualizing-k-means-clustering/', note: 'Step through k-means on many shapes.' },
+      { name: 'Visualizing DBSCAN clustering', by: 'Naftali Harris', url: 'https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/', note: 'Watch DBSCAN grow clusters point by point.' },
+      { name: 'Principal Component Analysis explained visually', by: 'Setosa', url: 'https://setosa.io/ev/principal-component-analysis/', note: 'Drag points and see the components move.' },
+      { name: 'MLU-Explain', by: 'Amazon Machine Learning University', url: 'https://mlu-explain.github.io/', note: 'Scrolling visual essays on decision trees, precision and recall, cross-validation and more.' },
+      { name: 'TensorFlow Playground', url: 'https://playground.tensorflow.org/', note: 'Train a small neural network in the browser and watch the boundary form.' },
+    ],
+  },
+  {
+    title: 'Videos and courses',
+    kicker: 'Watch',
+    items: [
+      { name: 'StatQuest with Josh Starmer', url: 'https://www.youtube.com/@statquest', note: 'Short, clear videos on almost every topic here: trees, PCA, naive Bayes, k-means.' },
+      { name: '3Blue1Brown: Neural networks', url: 'https://www.youtube.com/@3blue1brown', note: 'The best visual introduction to how networks and backpropagation work.' },
+      { name: 'Stanford CS246: Mining Massive Data Sets', url: 'https://web.stanford.edu/class/cs246/', note: 'Lecture slides that go further into scale: MapReduce, frequent itemsets, recommender systems.' },
+      { name: 'Machine Learning Specialization (Coursera)', url: 'https://www.coursera.org/learn/machine-learning', note: 'A gentle course on regression, classification and neural networks.' },
+      { name: 'Kaggle Learn', url: 'https://www.kaggle.com/learn', note: 'Free short courses on pandas, data cleaning and intro machine learning.' },
+    ],
+  },
+  {
+    title: 'Tools',
+    kicker: 'Work',
+    items: [
+      { name: 'Anaconda', url: 'https://www.anaconda.com/download', note: 'Python plus the scientific libraries in one install.' },
+      { name: 'Jupyter', url: 'https://jupyter.org/', note: 'Notebooks: code, output and notes in one file.' },
+      { name: 'Google Colab', url: 'https://colab.research.google.com/', note: 'Notebooks in the browser with nothing to install. Download your files before the session ends.' },
+      { name: 'pandas', url: 'https://pandas.pydata.org/', note: 'Tables in Python: load, clean, group and join.' },
+      { name: 'NumPy', url: 'https://numpy.org/', note: 'Fast arrays and linear algebra.' },
+      { name: 'Matplotlib', url: 'https://matplotlib.org/', note: 'The standard plotting library.' },
+      { name: 'SciPy', url: 'https://scipy.org/', note: 'Statistics and tests, including chi2_contingency.' },
+      { name: 'scikit-learn', url: 'https://scikit-learn.org/', note: 'Almost every algorithm in this course with one consistent interface.' },
+      { name: 'Orange', url: 'https://orangedatamining.com/', note: 'Visual drag-and-drop data mining. Good for quick checks without code.' },
+      { name: 'Weka', url: 'https://ml.cms.waikato.ac.nz/weka/', note: 'Classic Java workbench with many classifiers and association rule miners.' },
+    ],
+  },
+]
