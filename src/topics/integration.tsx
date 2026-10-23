@@ -44,7 +44,7 @@ function strength(r: number) {
 
 function CorrLab() {
   const W = 520
-  const H = 400
+  const H = 380
   const [preset, setPreset] = useState<Preset>('pos')
   const [pts, setPts] = useState<Pt[]>(() => makePreset('pos'))
   const [drag, setDrag] = useState(-1)
@@ -63,7 +63,7 @@ function CorrLab() {
   return (
     <Lab
       title="Drag points, watch Pearson r"
-      desc="Drag any point, click empty space to add one, or switch to remove mode. The dashed line is the best straight-line fit."
+      desc="Drag a point, or click empty space to add one. Dashed line: least-squares fit."
       controls={
         <>
           <Seg
@@ -86,9 +86,9 @@ function CorrLab() {
         </>
       }
       notes={[
-        'Ring and X shape give r close to 0, yet y clearly depends on x. r only measures straight-line relationships.',
-        'On "One outlier", the cloud has no relation, but one far point creates a large r. Drag it into the cloud and r collapses.',
-        'Drag points into a perfect line and r reaches exactly 1 or -1.',
+        'Pick Ring or X shape: r is near 0 though B clearly depends on A. r only measures straight-line relations.',
+        'Pick "One outlier", then drag the far point into the cloud: r collapses.',
+        'Drag points onto a perfect line: r reaches exactly 1 or -1.',
       ]}
     >
       <Plot
@@ -167,16 +167,16 @@ function RedundancyLab() {
   return (
     <Lab
       title="Find redundant attributes"
-      desc="60 companies, 5 attributes. Profit is derived from revenue and expenses. Click any cell of the correlation matrix to see that pair."
+      desc="60 companies. Click a matrix cell to plot that pair."
       controls={<Slider label="Flag pairs with |r| at least" value={t} min={0.3} max={0.99} step={0.01} onChange={setT} fmt={(v) => fmt(v, 2)} />}
       notes={[
-        'Revenue, expenses and employees are strongly correlated. Keeping all three adds little new information.',
-        'Profit is computed from two other columns, so it is redundant by definition, even though its r with each one alone is not perfect.',
-        'Rating is unrelated to everything: r near 0 on its whole row.',
+        'Click revenue vs expenses: strongly correlated, so keeping both adds little.',
+        'Profit = revenue - expenses, so it is redundant even though its r with each alone is not 1.',
+        'Look at the rating row: r near 0 everywhere, so it carries separate information.',
       ]}
     >
       <div className="grid c2">
-        <svg viewBox={`0 0 ${cell * 5 + 90} ${cell * 5 + 30}`} className="plot" role="img" aria-label="Correlation matrix">
+        <svg viewBox={`0 0 ${cell * 5 + 90} ${cell * 5 + 30}`} className="plot" style={{ maxWidth: 420 }} role="img" aria-label="Correlation matrix">
           {ATTRS.map((n, i) => (
             <text key={'r' + n} x={84} y={30 + i * cell + cell / 2 + 4} textAnchor="end" fontSize={11} fill="var(--ink-3)">
               {n}
@@ -251,7 +251,7 @@ function ChiLab() {
   return (
     <Lab
       title="Chi-square test, cell by cell"
-      desc="Type observed counts into the contingency table. Expected counts, each cell's contribution, the test statistic and the decision update as you type."
+      desc="Type observed counts. Expected counts are in brackets."
       controls={
         <>
           <Slider label="Rows" value={nr} min={2} max={4} onChange={setNr} />
@@ -260,9 +260,9 @@ function ChiLab() {
         </>
       }
       notes={[
-        'The default is the classic reading example: 1500 people, fiction vs non-fiction by gender. χ² = 507.93 is far above 10.828, so the attributes are dependent.',
-        'Make the rows proportional (for example 100, 200 in one row and 50, 100 in the other). χ² drops to 0: the counts match independence exactly.',
-        'Change α. A smaller α moves the critical value right, so you need stronger evidence to reject independence.',
+        'The default is the textbook reading example: χ² = 507.94 (507.93 when each term is rounded first), far above 10.828, so dependent.',
+        'Make the rows proportional (100, 200 and 50, 100): χ² drops to 0.',
+        'Lower α: the critical value moves right and rejecting needs stronger evidence.',
       ]}
     >
       <div className="table-wrap">
@@ -310,9 +310,9 @@ function ChiLab() {
       <p style={{ marginTop: 10, fontSize: 13.5 }}>
         Contributions <M>{'(o-e)^2/e'}</M>: {contrib.map((r, i) => r.map((v, j) => `${rowNames[i]}/${colNames[j]} ${fmt(v, 2)}`).join(', ')).join(' | ')}
       </p>
-      <Plot w={600} h={230} x={[0, xmax]} y={[0, ymax]} xLabel="χ² value" yLabel="density" label="Chi-square distribution with rejection region">
+      <Plot w={560} h={230} x={[0, xmax]} y={[0, ymax]} xLabel="χ² value" yLabel="density" label="Chi-square distribution with rejection region">
         <Area pts={tail} base={0} color={seriesColor(1)} opacity={0.35} />
-        <Line pts={curve.map((q) => ({ x: q.x, y: Math.min(q.y, ymax) }))} color="var(--ink-2)" />
+        <Line pts={curve.filter((q) => q.y <= ymax)} color="var(--ink-2)" />
         <VLine x={crit} color={seriesColor(1)} label={`critical ${fmt(crit, 3)}`} />
         {chi <= xmax ? <VLine x={chi} color={seriesColor(0)} dash="0" width={2.5} label={`χ² ${fmt(chi, 2)}`} /> : <Label x={xmax} y={ymax * 0.6} anchor="end" color="var(--ink)">{`your χ² = ${fmt(chi, 2)} is far to the right`}</Label>}
       </Plot>
@@ -333,17 +333,16 @@ export default function Page() {
       <TopicHeader
         group="Preprocessing"
         title="Integration, correlation and chi-square"
-        lede="Integration combines several data sources into one. The hard parts are matching the same entity across sources, resolving conflicting values, and spotting attributes that say the same thing twice."
-        minutes={30}
+        lede="Combining data sources into one: match entities, resolve conflicting values, and find attributes that say the same thing twice."
       />
 
       <Plain>
         <p>
-          Two shops merge their customer lists. One calls the column <code>customer_id</code>, the other <code>cust_num</code>. One stores weight in kilograms, the other in pounds. Both lists include the same people, and one list has both "age" and "birth year". Integration is untangling all of that into one clean table.
+          Two shops merge customer lists. One says <code>customer_id</code>, the other <code>cust_num</code>; one uses kilograms, the other pounds; and one list has both "age" and "birth year". Integration untangles this into one table.
         </p>
       </Plain>
 
-      <Section id="issues" title="Three integration problems" kicker="What goes wrong">
+      <Section id="issues" title="Three integration problems">
         <Table
           head={['Problem', 'Example', 'How to handle it']}
           rows={[
@@ -354,33 +353,31 @@ export default function Page() {
         />
       </Section>
 
-      <Section id="corr" title="Correlation for numeric attributes" kicker="Pearson r">
+      <Section id="corr" title="Correlation for numeric attributes">
         <Formula>
           <MB>{'r_{A,B} = \\frac{\\sum_{i=1}^{N} a_i b_i - N\\bar{A}\\bar{B}}{N\\,\\sigma_A \\sigma_B} = \\frac{\\sum (a_i - \\bar{A})(b_i - \\bar{B})}{N\\,\\sigma_A \\sigma_B}, \\qquad -1 \\le r_{A,B} \\le 1'}</MB>
           <p>
-            <M>{'r > 0'}</M>: when A goes up, B tends to go up. <M>{'r < 0'}</M>: B tends to go down. <M>{'r = 0'}</M>: no linear relation. A large <M>{'|r|'}</M> means one of the two attributes may be redundant.
+            <M>{'r > 0'}</M>: A up, B up. <M>{'r < 0'}</M>: A up, B down. <M>{'r = 0'}</M>: no linear relation. A large <M>{'|r|'}</M> suggests one attribute is redundant.
           </p>
         </Formula>
       </Section>
       <CorrLab />
       <RedundancyLab />
 
-      <Section id="chi" title="Chi-square test for categorical attributes" kicker="Independence">
+      <Section id="chi" title="Chi-square test for categorical attributes">
         <Plain title="The idea">
           <p>
-            If gender had nothing to do with reading taste, then the share of fiction readers would be the same among men and women. The test computes what each cell would hold under that assumption (the expected count) and measures how far the real counts are from it.
+            If gender had nothing to do with reading taste, men and women would read fiction in the same proportion. The test computes each cell under that assumption (expected count) and measures how far the real counts are.
           </p>
         </Plain>
         <Formula>
           <MB>{'e_{ij} = \\frac{count(A = a_i) \\times count(B = b_j)}{N} \\qquad \\chi^2 = \\sum_{i=1}^{r}\\sum_{j=1}^{c}\\frac{(o_{ij} - e_{ij})^2}{e_{ij}} \\qquad df = (r-1)(c-1)'}</MB>
-          <p>
-            If <M>{'\\chi^2'}</M> is larger than the critical value for the chosen significance level and df, reject the hypothesis that A and B are independent.
-          </p>
+          <p>If <M>{'\\chi^2'}</M> exceeds the critical value for your α and df, reject independence.</p>
         </Formula>
       </Section>
       <ChiLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <p>1500 people: 250 men and 200 women prefer fiction, 50 men and 1000 women prefer non-fiction.</p>
         <Table
           head={['', 'male', 'female', 'total']}
@@ -396,7 +393,7 @@ export default function Page() {
         </p>
         <MB>{'\\chi^2 = \\frac{(250-90)^2}{90} + \\frac{(50-210)^2}{210} + \\frac{(200-360)^2}{360} + \\frac{(1000-840)^2}{840} = 284.44 + 121.90 + 71.11 + 30.48 = 507.93'}</MB>
         <p>
-          df = (2 - 1)(2 - 1) = 1. The critical value at the 0.001 level is 10.828. Since 507.93 &gt; 10.828, reject independence: gender and preferred reading are correlated in this group.
+          df = 1. The critical value at 0.001 is 10.828. Since 507.93 &gt; 10.828, reject independence: gender and reading preference are related.
         </p>
       </Section>
 

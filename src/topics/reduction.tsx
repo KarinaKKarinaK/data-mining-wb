@@ -16,7 +16,7 @@ function CurseLab() {
   return (
     <Lab
       title="How big a cube do you need?"
-      desc="Points fill a d-dimensional unit cube evenly. To capture a fraction r of them with a smaller cube, its edge must be r to the power 1/d."
+      desc="Edge of a sub-cube holding a fraction r of evenly spread data in d dimensions."
       controls={
         <>
           <Slider label="Fraction of data r" value={e} min={-3} max={-0.3} step={0.05} onChange={setE} fmt={(v) => `${fmt(10 ** v * 100, 2)}%`} />
@@ -24,11 +24,11 @@ function CurseLab() {
         </>
       }
       notes={[
-        'r = 1% and d = 10 gives an edge of 0.63: to reach just 1% of the data you need 63% of the range of every attribute. "Local" stops being local.',
-        'At d = 1 the edge equals r. Every extra dimension pushes the curve toward 1.',
+        'Set r = 1% and d = 10: the edge is 0.63, so 1% of the data needs 63% of every attribute range.',
+        'Set d = 1: the edge equals r. Each extra dimension pushes it toward 1.',
       ]}
     >
-      <Plot w={600} h={280} x={[1, 100]} y={[0, 1]} xLabel="dimensions d" yLabel="edge length l" label="Edge length needed versus dimensions">
+      <Plot w={560} h={280} x={[1, 100]} y={[0, 1]} xLabel="dimensions d" yLabel="edge length l" label="Edge length needed versus dimensions">
         <Line pts={curve} color={seriesColor(0)} />
         <Dot x={d} y={l} r={7} color={seriesColor(1)} shape={1} />
       </Plot>
@@ -62,14 +62,14 @@ function ConcentrationLab() {
   return (
     <Lab
       title="Distances stop meaning much"
-      desc="300 random points and one query point. The histogram shows each point's distance to the query, divided by the largest distance."
+      desc="Distances from 300 random points to one query, divided by the largest."
       controls={<Slider label="Dimensions d" value={di} min={0} max={DIMS.length - 1} onChange={setDi} fmt={(i) => String(DIMS[i])} />}
       notes={[
-        'In 2 dimensions some points are very close and some very far. The bars spread across the whole axis.',
-        'In 500 dimensions every point is roughly the same distance away. The nearest neighbor is barely nearer than the farthest, so kNN and clustering lose their footing.',
+        'Set d = 2: distances spread across the whole axis.',
+        'Set d = 500: every point is about equally far, so the nearest neighbor barely differs from the farthest and kNN and clustering suffer.',
       ]}
     >
-      <Plot w={600} h={250} x={[0, 1]} y={[0, Math.max(...counts) * 1.15]} xLabel="distance / largest distance" yLabel="points" label="Histogram of relative distances">
+      <Plot w={560} h={250} x={[0, 1]} y={[0, Math.max(...counts) * 1.15]} xLabel="distance / largest distance" yLabel="points" label="Histogram of relative distances">
         {counts.map((c, b) => (
           <Rect key={b} x0={b / nb + 0.004} x1={(b + 1) / nb - 0.004} y0={0} y1={c} color={seriesColor(0)} rx={2} />
         ))}
@@ -78,7 +78,7 @@ function ConcentrationLab() {
         <Stat k="d" v={d} />
         <Stat k="Nearest" v={fmt(mn, 3)} />
         <Stat k="Farthest" v={fmt(mx, 3)} />
-        <Stat k="(far - near) / near" v={fmt((mx - mn) / mn, 2)} sub="contrast, shrinks with d" />
+        <Stat k="(far - near) / near" v={fmt((mx - mn) / mn, 2)} />
       </Readout>
     </Lab>
   )
@@ -97,8 +97,8 @@ function pcaPreset(kind: string): Pt[] {
 const clampPt = (p: Pt) => ({ x: clamp(p.x, 0, 10), y: clamp(p.y, 0, 10) })
 
 function PcaLab() {
-  const W = 520
-  const H = 440
+  const W = 460
+  const H = 448
   const [kind, setKind] = useState('corr')
   const [pts, setPts] = useState<Pt[]>(() => pcaPreset('corr'))
   const [drag, setDrag] = useState(-1)
@@ -114,7 +114,7 @@ function PcaLab() {
   return (
     <Lab
       title="PCA in two dimensions"
-      desc="Drag the points. PC1 (solid) points where the data varies most, PC2 is at right angles. Arrow lengths are 2 standard deviations along each direction."
+      desc="Drag the points. Arrows are 2 standard deviations long."
       controls={
         <>
           <Seg
@@ -136,9 +136,9 @@ function PcaLab() {
         </>
       }
       notes={[
-        'Nearly a line: PC1 explains almost all the variance. Keeping 1 dimension instead of 2 loses almost nothing.',
-        'Round cloud: both eigenvalues are similar, so neither direction is special and dropping one loses about half the information.',
-        'Drag a point far away along PC2. λ2 grows, and so does the information lost when you keep only PC1.',
+        'Pick "Nearly a line": PC1 explains almost everything, so 1 dimension is enough.',
+        'Pick "Round cloud": the eigenvalues are similar and dropping one loses about half.',
+        'Drag a point far along PC2: the eigenvalue of PC2 grows, and so does the loss.',
       ]}
     >
       <Plot
@@ -175,8 +175,8 @@ function PcaLab() {
         ]}
       />
       <Readout>
-        <Stat k="Eigenvalue 1" v={fmt(l1, 3)} sub="variance along PC1" />
-        <Stat k="Eigenvalue 2" v={fmt(l2, 3)} sub="variance along PC2" />
+        <Stat k="Eigenvalue 1" v={fmt(l1, 3)} />
+        <Stat k="Eigenvalue 2" v={fmt(l2, 3)} />
         <Stat k="PC1 explains" v={`${fmt((l1 / total) * 100, 1)}%`} />
         <Stat k="Lost keeping PC1" v={`${fmt((l2 / total) * 100, 1)}%`} />
         <Stat k="PC1 direction" v={`(${fmt(v1[0], 2)}, ${fmt(v1[1], 2)})`} sub={`${fmt(angle, 1)} degrees`} />
@@ -234,7 +234,7 @@ function SamplingLab() {
   return (
     <Lab
       title="Sampling a skewed population"
-      desc="100 customers, a small minority of them in class B. Draw a sample and see if the minority survives."
+      desc="100 customers, a few in class B. Does B survive the sample?"
       controls={
         <>
           <Seg label="Method" value={method} onChange={setMethod} options={[{ v: 'wor', label: 'Random, no replacement' }, { v: 'wr', label: 'Random, with replacement' }, { v: 'strat', label: 'Stratified' }]} />
@@ -244,12 +244,12 @@ function SamplingLab() {
         </>
       }
       notes={[
-        'With 4% class B and a sample of 10, plain random sampling often picks no B at all. Check "samples with no B" below.',
-        'Stratified sampling takes a share from each class separately, so class B is always represented.',
-        'With replacement, the same customer can be picked twice. Those cells show a count.',
+        'Set B to 4% and sample 10: random sampling often picks no B (see "Samples with no B").',
+        'Switch to stratified: each class is sampled separately, so B always appears.',
+        'Switch to with replacement: a customer can be picked twice, shown as a count.',
       ]}
     >
-      <svg viewBox="0 0 500 250" className="plot" role="img" aria-label="Population grid with sampled customers highlighted">
+      <svg viewBox="0 0 500 250" className="plot" style={{ maxWidth: 620 }} role="img" aria-label="Population grid with sampled customers highlighted">
         {counts.map((c, i) => {
           const x = (i % 20) * 25
           const y = Math.floor(i / 20) * 50
@@ -286,19 +286,18 @@ export default function Page() {
       <TopicHeader
         group="Preprocessing"
         title="Data reduction and PCA"
-        lede="Reduction gives a smaller version of the data that produces almost the same mining results. Fewer attributes, fewer records, or both."
-        minutes={35}
+        lede="A smaller version of the data that gives almost the same mining results: fewer attributes, fewer records, or both."
       />
 
       <Plain>
         <p>
-          A photo of a face has millions of pixels, but you can recognize the person from a thumbnail. Most of the pixels are redundant. Data reduction keeps the thumbnail: enough to get the same answer, at a fraction of the size and time.
+          You can recognize a face from a thumbnail, so most of a photo's pixels are redundant. Reduction keeps the thumbnail: the same answer at a fraction of the size.
         </p>
       </Plain>
 
-      <Section id="curse" title="The curse of dimensionality" kicker="Why fewer attributes">
+      <Section id="curse" title="The curse of dimensionality">
         <p>
-          As the number of attributes d grows, the data becomes sparse and distances lose meaning. Reducing dimensions avoids this, removes irrelevant and noisy features, saves time and space, and makes visualization possible.
+          As the number of attributes d grows, data becomes sparse and distances lose meaning. Fewer dimensions also remove noise, save time and space, and allow plots.
         </p>
         <Formula>
           <MB>{'\\ell = r^{1/d}'}</MB>
@@ -310,10 +309,10 @@ export default function Page() {
       <CurseLab />
       <ConcentrationLab />
 
-      <Section id="pca" title="Principal component analysis" kicker="Dimensionality reduction">
+      <Section id="pca" title="Principal component analysis">
         <Plain title="The idea">
           <p>
-            Turn your head until the cloud of points looks as wide as possible. That viewing direction is PC1. PCA rotates the axes so the first one captures the most spread, the second the most of what is left, and so on. Then you keep only the first few.
+            Turn your head until the point cloud looks as wide as possible: that direction is PC1. PCA rotates the axes so each captures the most remaining spread, then keeps the first few.
           </p>
         </Plain>
         <Formula>
@@ -327,7 +326,7 @@ export default function Page() {
       </Section>
       <PcaLab />
 
-      <Section id="pca-worked" title="Worked example" kicker="Exam style">
+      <Section id="pca-worked" title="Worked example">
         <p>Eigenvalues of a covariance matrix: 4.2, 2.1, 0.9, 0.5, 0.3. How many components to explain at least 90%?</p>
         <Table
           head={['k', 'Cumulative λ', 'Proportion']}
@@ -343,7 +342,7 @@ export default function Page() {
         <p style={{ marginTop: 10 }}>Total is 8.0. k = 3 reaches exactly 0.900, so keep 3 components.</p>
       </Section>
 
-      <Section id="subset" title="Feature subset selection" kicker="Keep the useful attributes">
+      <Section id="subset" title="Feature subset selection">
         <p>
           Remove <strong>redundant</strong> attributes (purchase price and sales tax paid say the same thing) and <strong>irrelevant</strong> ones (student ID does not predict GPA). With d attributes there are <M>{'2^d'}</M> subsets, too many to try, so we search greedily.
         </p>
@@ -357,11 +356,11 @@ export default function Page() {
           ]}
         />
         <p style={{ marginTop: 10 }}>
-          Forward adds the best remaining attribute each step. Backward removes the worst. "Best" can be measured by correlation with the target or by the accuracy of a model. The two can be combined.
+          Forward adds the best remaining attribute each step; backward removes the worst. "Best" means highest correlation with the target or best model accuracy. The two can be combined.
         </p>
       </Section>
 
-      <Section id="numerosity" title="Numerosity reduction" kicker="Fewer records">
+      <Section id="numerosity" title="Numerosity reduction">
         <ul>
           <li><strong>Parametric</strong>: fit a model (such as linear regression) and store only its parameters, plus outliers.</li>
           <li><strong>Histograms</strong>: store bucket counts instead of values.</li>

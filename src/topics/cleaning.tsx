@@ -48,7 +48,7 @@ function MissingLab() {
   return (
     <Lab
       title="Five ways to fill a missing income"
-      desc="Three customers have no income recorded (in thousands). Pick a strategy and see what it does to the table and to the statistics."
+      desc="Three of ten customers have no income (in thousands)."
       controls={
         <Seg
           label="Strategy"
@@ -64,10 +64,9 @@ function MissingLab() {
         />
       }
       notes={[
-        'Ignoring records throws away their age and class too. With 3 of 10 missing, you lose 30% of the data.',
-        'A constant like 0 drags the mean down and invents a fake group of "zero income" customers.',
-        'Filling with the overall mean keeps the mean but shrinks the standard deviation, because every filled value sits exactly in the middle.',
-        'Class mean and the age model use other attributes, so the filled values are more plausible.',
+        'Pick "Ignore the record": 30% of the rows go, along with their age and class.',
+        'Pick "Attribute mean": the mean stays, but the std dev shrinks because every filled value sits in the middle.',
+        'Pick "Mean of same class" or "Predict from age": the filled values use other attributes and look more plausible.',
       ]}
     >
       <Table
@@ -143,7 +142,7 @@ function BinningLab() {
   return (
     <Lab
       title="Binning to smooth noise"
-      desc="Sort the values, split them into bins, then replace each value by its bin mean, median or nearest boundary. Edit the numbers to try your own."
+      desc="Edit the values to try your own."
       controls={
         <>
           <label className="ctl">
@@ -156,14 +155,14 @@ function BinningLab() {
         </>
       }
       notes={[
-        'Default setup is the classic price example: 3 equal-depth bins smoothed by means give 9, 9, 9 / 22, 22, 22 / 29, 29, 29.',
-        'Switch to equal width. The bins now have different sizes because the values are not spread evenly.',
-        'Boundaries: each value moves to the closer edge of its bin (ties go to the lower edge here).',
+        'The default is the textbook price example: 3 equal-depth bins by means give 9 / 22 / 29.',
+        'Switch to equal width: bins get different sizes because the values are not spread evenly.',
+        'Pick boundaries: each value moves to the closer edge of its bin (ties go low).',
       ]}
     >
       {ok ? (
         <>
-          <Plot w={600} h={230} x={[lo - pad, hi + pad]} y={[-0.6, 1.6]} xLabel="value" yTickValues={[{ v: 1, label: 'raw' }, { v: 0, label: 'smooth' }]} label="Raw values and smoothed values by bin">
+          <Plot w={560} h={230} x={[lo - pad, hi + pad]} y={[-0.6, 1.6]} xLabel="value" yTickValues={[{ v: 1, label: 'raw' }, { v: 0, label: 'smooth' }]} label="Raw values and smoothed values by bin">
             {bins.map((b, i) =>
               b.items.length ? <Rect key={i} x0={method === 'width' ? b.lo : b.lo - pad * 0.3} x1={method === 'width' ? b.hi : b.hi + pad * 0.3} y0={-0.4} y1={1.4} color={seriesColor(i)} opacity={0.1} rx={6} /> : null,
             )}
@@ -178,6 +177,7 @@ function BinningLab() {
             ))}
             {bins.map((b, i) => (b.items.length ? <Label key={'t' + i} x={(b.items[0] + b.items[b.items.length - 1]) / 2} y={1.4} anchor="middle" dy={-4}>{`bin ${i + 1}`}</Label> : null))}
           </Plot>
+          <Legend items={bins.map((_, i) => ({ label: `Bin ${i + 1}`, color: seriesColor(i), shape: i }))} />
           <Table
             head={['Bin', 'Range', 'Values', `Smoothed by ${how}`]}
             rows={bins.map((b, i) => [
@@ -190,9 +190,8 @@ function BinningLab() {
           <Readout>
             <Stat k="Values" v={vals.length} />
             <Stat k="Bins used" v={bins.filter((b) => b.items.length).length} />
-            <Stat k="Squared change" v={fmt(sse, 2)} sub="how much smoothing moved the data" />
+            <Stat k="Squared change" v={fmt(sse, 2)} />
           </Readout>
-          <Legend items={bins.map((_, i) => ({ label: `Bin ${i + 1}`, color: seriesColor(i), shape: i }))} />
         </>
       ) : (
         <p className="muted">Enter at least two numbers.</p>
@@ -225,7 +224,7 @@ function RulesLab() {
   return (
     <Lab
       title="Catch inconsistencies with domain rules"
-      desc="Metadata and domain knowledge give rules every record must satisfy. Turn rules on and off to see which records each one catches."
+      desc="Turn rules on and off to see which records each one catches."
       controls={
         <div className="stack">
           {RULES.map((r) => (
@@ -238,8 +237,8 @@ function RulesLab() {
         </div>
       }
       notes={[
-        'Turn off "Age matches birth year". Lee now looks fine, even though 42 and 1990 cannot both be right. Cross-attribute rules catch errors that single-attribute ranges miss.',
-        'Rules find the problem but not always the fix. Is Lee 42, or born in 1984? You may need an outside source.',
+        'Turn off "Age matches birth year": Lee now passes, though 42 and 1990 cannot both be right. Cross-attribute rules catch what ranges miss.',
+        'A rule finds the problem, not the fix. Is Lee 42 or born in 1984? That may need an outside source.',
       ]}
     >
       <Table
@@ -263,17 +262,16 @@ export default function Page() {
       <TopicHeader
         group="Preprocessing"
         title="Data cleaning"
-        lede="Real data is dirty: values are missing, wrong or contradict each other. Cleaning fixes this before mining, because no quality data means no quality results."
-        minutes={20}
+        lede="Real data has missing, wrong and contradictory values. No quality data, no quality results."
       />
 
       <Plain>
         <p>
-          Imagine a class sign-up sheet. Some people left the phone number blank (missing). Someone wrote their age as 230 (noise). Someone else wrote a birthday that does not fit their age (inconsistent). Two people signed up twice (redundant). Cleaning is going through the sheet and fixing these before you use it.
+          A sign-up sheet has blank phone numbers (missing), an age of 230 (noise), a birthday that does not fit the age (inconsistent) and two people listed twice (redundant). Cleaning fixes these before you use the sheet.
         </p>
       </Plain>
 
-      <Section id="dirty" title="Four kinds of dirty data" kicker="Why preprocess">
+      <Section id="dirty" title="Four kinds of dirty data">
         <Table
           head={['Problem', 'Example', 'Typical cause']}
           rows={[
@@ -284,11 +282,11 @@ export default function Page() {
           ]}
         />
         <p style={{ marginTop: 12 }}>
-          Preprocessing has four parts: <strong>cleaning</strong>, <strong>integration</strong>, <strong>transformation</strong> and <strong>reduction</strong>. This page covers cleaning.
+          Preprocessing has four parts: <strong>cleaning</strong>, <strong>integration</strong>, <strong>transformation</strong> and <strong>reduction</strong>.
         </p>
       </Section>
 
-      <Section id="missing" title="Missing values" kicker="Cleaning 1">
+      <Section id="missing" title="Missing values">
         <ul>
           <li><strong>Ignore the record.</strong> Usually only when the class label is missing. Wastes the other values.</li>
           <li><strong>Fill in by hand.</strong> Accurate but often impossible at scale.</li>
@@ -300,20 +298,18 @@ export default function Page() {
       </Section>
       <MissingLab />
 
-      <Section id="noise" title="Noise and binning" kicker="Cleaning 2">
+      <Section id="noise" title="Noise and binning">
         <p>
-          Noise is random error in a measured value. One way to smooth it is <strong>binning</strong>: sort the values, split them into bins, and replace each value using its neighbors in the same bin. Other ways: regression (fit a function and use its values) and clustering (values far from every cluster are outliers).
+          Noise is random error in a measured value. <strong>Binning</strong> smooths it: sort, split into bins, and replace each value by its bin mean, median or nearest boundary. Regression and clustering can also smooth noise.
         </p>
         <Formula title="Bin sizes">
           <MB>{'\\text{equal width: } w = \\frac{\\max - \\min}{k} \\qquad \\text{equal depth: about } \\frac{N}{k} \\text{ values per bin}'}</MB>
-          <p>
-            Equal-width bins are easy but a single outlier can leave most bins nearly empty. Equal-depth (equal-frequency) bins hold the same number of values each.
-          </p>
+          <p>One outlier can leave most equal-width bins nearly empty. Equal-depth bins always hold the same number of values.</p>
         </Formula>
       </Section>
       <BinningLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <p>Prices sorted: 4, 8, 15, 21, 21, 24, 25, 28, 34. Three equal-depth bins.</p>
         <Table
           head={['Bin', 'Values', 'By means', 'By medians', 'By boundaries']}
@@ -328,9 +324,9 @@ export default function Page() {
         </p>
       </Section>
 
-      <Section id="inconsistent" title="Inconsistencies" kicker="Cleaning 3">
+      <Section id="inconsistent" title="Inconsistencies">
         <p>
-          Some inconsistencies can be fixed with <strong>metadata</strong> (data about data: type, range, meaning) and domain knowledge, such as "height cannot be negative". Others need an outside source, like checking an address against another database.
+          Some can be fixed with <strong>metadata</strong> (type, range, meaning) and domain knowledge, such as "height cannot be negative". Others need an outside source, like checking an address against another database.
         </p>
       </Section>
       <RulesLab />

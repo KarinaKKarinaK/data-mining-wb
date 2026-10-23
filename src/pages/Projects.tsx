@@ -18,7 +18,7 @@ export default function Projects() {
       <TopicHeader
         group="Explore"
         title="Project ideas"
-        lede="Portfolio-sized projects that use the course methods on real public data. Each has a dataset link, a plan, and a stretch goal for when the basics work."
+        lede="Course methods on real public data. Each has a dataset, a plan and a stretch goal."
       />
       <Plain title="How to make a project worth showing">
         <ul>

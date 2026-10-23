@@ -129,16 +129,16 @@ export const PLAY_TENNIS: { columns: string[]; target: string; rows: Row[] } = {
 }
 
 export const GROCERIES: string[][] = [
-  ['bread', 'milk'],
-  ['bread', 'diapers', 'beer', 'eggs'],
-  ['milk', 'diapers', 'beer', 'cola'],
-  ['bread', 'milk', 'diapers', 'beer'],
-  ['bread', 'milk', 'diapers', 'cola'],
-  ['bread', 'milk', 'eggs'],
-  ['milk', 'diapers', 'beer'],
-  ['bread', 'butter', 'milk'],
-  ['bread', 'butter'],
-  ['diapers', 'beer', 'cola'],
+  ['coffee', 'croissant', 'cookie'],
+  ['coffee', 'croissant'],
+  ['milk tea', 'egg tart'],
+  ['coffee', 'croissant', 'cookie', 'water'],
+  ['milk tea', 'egg tart', 'cookie'],
+  ['sandwich', 'water'],
+  ['coffee', 'croissant', 'cookie'],
+  ['milk tea', 'egg tart', 'sandwich'],
+  ['coffee', 'water'],
+  ['sandwich', 'water', 'cookie'],
 ]
 
 export function series(seed: number, n = 40, shift = 0, amp = 1) {

@@ -12,7 +12,7 @@ export default function Datasets() {
   const list = kind === 'All' ? SOURCES : SOURCES.filter((s) => s.kind === kind)
   return (
     <div className="page">
-      <TopicHeader group="Explore" title="Where to find data" lede="The places to search when you need a dataset for practice, a project or a portfolio, plus a short list of starter datasets matched to course topics." />
+      <TopicHeader group="Explore" title="Where to find data" lede="Where to search for data, plus starter datasets matched to course topics." />
 
       <Plain title="Before you download">
         <ul>
@@ -22,7 +22,7 @@ export default function Datasets() {
         </ul>
       </Plain>
 
-      <Section id="sources" title="Sources" kicker="Search here">
+      <Section id="sources" title="Sources">
         <div className="chips" style={{ margin: '4px 0 18px' }}>
           {['All', ...kinds].map((k) => (
             <button key={k} type="button" className={`chip${kind === k ? ' on' : ''}`} aria-pressed={kind === k} onClick={() => setKind(k)}>
@@ -45,8 +45,8 @@ export default function Datasets() {
         </div>
       </Section>
 
-      <Section id="starters" title="Starter datasets by topic" kicker="Pick one and go">
-        <p>Small to medium datasets with clear documentation. Each is a good fit for the topics listed.</p>
+      <Section id="starters" title="Starter datasets by topic">
+        <p>Small, well documented, and matched to topics.</p>
         <Table
           head={['Dataset', 'Size', 'Good for', 'Why']}
           rows={STARTERS.map((d) => [
@@ -64,13 +64,13 @@ export default function Datasets() {
         />
       </Section>
 
-      <Section id="load" title="Load one in Python" kicker="Two lines">
+      <Section id="load" title="Load one in Python">
         <pre className="code">{`import pandas as pd
 df = pd.read_csv('your_file.csv')
 df.info()
 df.describe()`}</pre>
         <p style={{ marginTop: 12 }}>
-          Many UCI datasets can also be loaded with the <code>ucimlrepo</code> package, and scikit-learn ships small ones such as Iris through <code>sklearn.datasets</code>.
+          UCI datasets load with the <code>ucimlrepo</code> package; Iris and other small ones ship in <code>sklearn.datasets</code>.
         </p>
       </Section>
     </div>

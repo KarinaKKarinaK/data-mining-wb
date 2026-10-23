@@ -12,11 +12,9 @@ export function TxEditor({ tx, onChange, reset, children }: { tx: string[][]; on
   return (
     <section className="card" style={{ margin: '28px 0', padding: 0, overflow: 'hidden' }}>
       <div className="lab-head">
-        <div>
-          <span className="label">Transaction database</span>
-          <h3>Your baskets</h3>
-          <p>One transaction per line, items separated by commas. Click an item chip to remove it. Every lab on this page uses this data.</p>
-        </div>
+        <span className="lab-tag">Data</span>
+        <h3>Cafe baskets</h3>
+        <p>One basket per line, items separated by commas. Click an item to remove it.</p>
       </div>
       <div className="grid c2" style={{ padding: 18, gap: 18 }}>
         <div className="stack">
@@ -32,7 +30,7 @@ export function TxEditor({ tx, onChange, reset, children }: { tx: string[][]; on
             }}
           />
           <div className="row">
-            <Btn sm onClick={reset}>Reset to the default baskets</Btn>
+            <Btn sm onClick={reset}>Reset baskets</Btn>
           </div>
           <div className="readout" style={{ marginTop: 0 }}>
             <Stat k="Transactions" v={tx.length} />
@@ -49,7 +47,7 @@ export function TxEditor({ tx, onChange, reset, children }: { tx: string[][]; on
                   key={it}
                   type="button"
                   className="pill"
-                  style={{ cursor: 'pointer', fontSize: 11.5 }}
+                  style={{ cursor: 'pointer', fontSize: 12, textTransform: 'none', letterSpacing: 0 }}
                   title={`Remove ${it} from T${i + 1}`}
                   onClick={() => onChange(tx.map((x, j) => (j === i ? x.filter((y) => y !== it) : x)).filter((x) => x.length))}
                 >
@@ -87,7 +85,7 @@ export function TreeView({
 }) {
   const [hover, setHover] = useState<number | null>(null)
   const { x, leaves, maxDepth } = layoutTree(nodes)
-  const gx = 92
+  const gx = 112
   const gy = 70
   const W = Math.max(360, leaves * gx + 20)
   const H = maxDepth * gy + 60

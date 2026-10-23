@@ -33,7 +33,7 @@ function MinkowskiLab() {
   return (
     <Lab
       title="Minkowski distance: what a circle looks like"
-      desc="The curve shows every point at distance exactly 1 from the center for the chosen p. Drag the two points A and B to compare distances."
+      desc="The curve is every point at distance 1 for the chosen p. Drag A and B."
       controls={
         <>
           <Slider label="p" value={p} min={0.5} max={8} step={0.1} onChange={(v) => { setP(v); setInf(false) }} fmt={(v) => (inf ? '∞' : v.toFixed(1))} />
@@ -46,8 +46,8 @@ function MinkowskiLab() {
       }
       notes={[
         'p = 1 gives a diamond, p = 2 a circle, p = ∞ a square. A bigger p puts more weight on the single largest coordinate difference.',
-        'Below p = 1 the shape caves in. Then the triangle inequality fails, so it is no longer a proper distance metric.',
-        'Drag A and B onto a horizontal line. All three distances become equal, because only one coordinate differs.',
+        'Below p = 1 the shape caves in and the triangle inequality fails, so it is not a metric.',
+        'Put A and B on a horizontal line: all three distances match, since only one coordinate differs.',
       ]}
     >
       <Plot
@@ -114,10 +114,10 @@ function BinaryLab() {
   return (
     <Lab
       title="Binary attributes: simple matching vs Jaccard"
-      desc="Click the cells to switch symptoms on and off for two patients. The contingency counts and both measures update."
+      desc="Click cells to switch symptoms on and off for two patients."
       notes={[
-        'Switch off every symptom that both share. Simple matching stays high because the 0-0 matches still count, while Jaccard falls.',
-        'For rare positive outcomes (a test result is positive) a shared 0 says almost nothing. That is why asymmetric binary data uses Jaccard.',
+        'Switch off every shared symptom. Simple matching stays high because 0-0 matches count; Jaccard falls.',
+        'For rare positives, a shared 0 says almost nothing. That is why asymmetric binary data uses Jaccard.',
       ]}
     >
       <div className="table-wrap">
@@ -210,7 +210,7 @@ function MixedLab() {
   return (
     <Lab
       title="Mixed attribute types in one distance"
-      desc="Each attribute gets its own dissimilarity in [0, 1]. The overall distance is their average, skipping attributes that should not count."
+      desc="Each attribute gives a dissimilarity in [0, 1]; the distance is their average."
       controls={
         <>
           {editor(o1, setO1, 'Object 1')}
@@ -257,7 +257,7 @@ function SilhouetteLab() {
   return (
     <Lab
       title="Silhouette plot: which points sit well?"
-      desc="k-means groups the points. Each bar is one point's silhouette, sorted inside its cluster. Hover a bar or a point to see a(i) and b(i)."
+      desc="One bar per point, sorted within its cluster. Hover for a(i) and b(i)."
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={setShape} options={[{ v: 'blobs', label: 'Blobs' }, { v: 'varied', label: 'Uneven' }, { v: 'moons', label: 'Moons' }, { v: 'uniform', label: 'No structure' }]} />
@@ -314,50 +314,43 @@ function SilhouetteLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Clustering" title="Clustering basics" lede="Clustering groups objects so that members of a group are alike and different groups are not. No labels are given. Everything depends on how you measure alike." minutes={25} />
+      <TopicHeader group="Clustering" title="Clustering basics" lede="Group objects so members are alike and groups differ, with no labels given. It all depends on how you measure alike." />
 
       <Plain>
         <p>
-          Think of sorting a pile of photos into albums without being told the album names. You decide what counts as similar (same people, same place, same colors), and the albums follow from that choice. Change the notion of similar and you get different albums.
+          Sort a pile of photos into albums with no album names given. What you call similar (same people, same place) decides the albums.
         </p>
         <p>
-          Formally: given n objects and a dissimilarity <M>{'d(i, j)'}</M>, find groups with small distances inside a group (high intra-class similarity) and large distances between groups (low inter-class similarity).
+          Given n objects and a dissimilarity <M>{'d(i, j)'}</M>, find groups with small distances inside and large distances between.
         </p>
       </Plain>
 
-      <Section id="good" title="What makes a clustering good" kicker="Goal">
+      <Section id="good" title="What makes a clustering good">
         <ul>
-          <li><strong>High intra-cluster similarity</strong>: members of one cluster are close to each other.</li>
-          <li><strong>Low inter-cluster similarity</strong>: different clusters are far apart.</li>
-          <li>Quality depends on the similarity measure, the method, and whether the result reveals hidden patterns that someone can use.</li>
+          <li><strong>High intra-cluster similarity</strong>: members are close.</li>
+          <li><strong>Low inter-cluster similarity</strong>: clusters are far apart.</li>
+          <li>Quality depends on the similarity measure and the method.</li>
         </ul>
-        <p>Typical requirements for a clustering method:</p>
-        <ul>
-          <li>Scales to many objects and handles different attribute types.</li>
-          <li>Finds clusters of arbitrary shape, not only round blobs.</li>
-          <li>Needs little domain knowledge for its input parameters.</li>
-          <li>Copes with noise and outliers, and does not depend on the input order.</li>
-          <li>Works in high dimensions and gives results people can interpret.</li>
-        </ul>
+        <p>A good method scales, handles mixed attribute types and any cluster shape, needs few parameters, copes with noise, ignores input order, and gives results people can read.</p>
       </Section>
 
-      <Section id="numeric" title="Distance for numeric attributes" kicker="Dissimilarity">
+      <Section id="numeric" title="Distance for numeric attributes">
         <Formula title="Minkowski distance">
           <MB>{'d(i, j) = \\Big(\\sum_{f=1}^{p} |x_{if} - x_{jf}|^h\\Big)^{1/h}'}</MB>
           <p>
-            <M>{'h = 1'}</M> is Manhattan, <M>{'h = 2'}</M> is Euclidean, <M>{'h \\to \\infty'}</M> is the supremum distance <M>{'\\max_f |x_{if} - x_{jf}|'}</M>. A proper metric is non-negative, zero only for identical objects, symmetric, and satisfies the triangle inequality.
+            <M>{'h = 1'}</M> is Manhattan, <M>{'h = 2'}</M> is Euclidean, <M>{'h \\to \\infty'}</M> is the supremum distance <M>{'\\max_f |x_{if} - x_{jf}|'}</M>. A metric is non-negative, zero only for identical objects, symmetric, and obeys the triangle inequality.
           </p>
         </Formula>
       </Section>
       <MinkowskiLab />
 
-      <Section id="binary" title="Binary, nominal and ordinal attributes" kicker="Other types">
+      <Section id="binary" title="Binary, nominal and ordinal attributes">
         <p>
-          For two objects with binary attributes, count the matches in a 2 by 2 table: <M>{'q'}</M> attributes where both are 1, <M>{'r'}</M> where only i is 1, <M>{'s'}</M> where only j is 1, <M>{'t'}</M> where both are 0.
+          Count a 2 by 2 table: <M>{'q'}</M> both 1, <M>{'r'}</M> only i is 1, <M>{'s'}</M> only j is 1, <M>{'t'}</M> both 0.
         </p>
         <Formula title="Binary dissimilarity">
           <MB>{'d_{sym}(i, j) = \\frac{r + s}{q + r + s + t}, \\qquad d_{asym}(i, j) = \\frac{r + s}{q + r + s}, \\qquad sim_{Jaccard} = \\frac{q}{q + r + s}'}</MB>
-          <p>Symmetric binary: both states matter equally (gender). Asymmetric binary: the 1 outcome is rare and meaningful (positive test), so 0-0 matches are ignored.</p>
+          <p>Symmetric: both states matter equally. Asymmetric: the 1 is rare and meaningful (positive test), so 0-0 matches are ignored.</p>
         </Formula>
       </Section>
       <BinaryLab />
@@ -365,12 +358,12 @@ export default function Page() {
       <Formula title="Nominal and ordinal">
         <MB>{'d_{nominal}(i, j) = \\frac{p - m}{p}, \\qquad z_{if} = \\frac{r_{if} - 1}{M_f - 1}'}</MB>
         <p>
-          Nominal: <M>{'m'}</M> is the number of matching attributes out of <M>{'p'}</M>. Ordinal: replace each value by its rank <M>{'r_{if}'}</M> among <M>{'M_f'}</M> ordered states, map it to [0, 1], then treat it as numeric.
+          Nominal: <M>{'m'}</M> matches out of <M>{'p'}</M> attributes. Ordinal: replace a value by its rank <M>{'r_{if}'}</M> of <M>{'M_f'}</M> states, scale to [0, 1], treat as numeric.
         </p>
       </Formula>
       <MixedLab />
 
-      <Section id="methods" title="Families of clustering methods" kicker="Map of the chapter">
+      <Section id="methods" title="Families of clustering methods">
         <Table
           head={['Family', 'Idea', 'Examples', 'Finds']}
           rows={[
@@ -382,9 +375,9 @@ export default function Page() {
         />
       </Section>
 
-      <Section id="quality" title="Judging a clustering" kicker="Evaluation">
+      <Section id="quality" title="Judging a clustering">
         <p>
-          Without labels you need an internal measure. The silhouette coefficient combines tightness and separation for every object. With known labels (only for checking a method) you can use external measures like purity.
+          Without labels, use an internal measure such as the silhouette. With known labels (only for testing a method), use external ones like purity.
         </p>
         <Formula title="Silhouette">
           <MB>{'s(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}} \\in [-1, 1]'}</MB>
@@ -393,7 +386,7 @@ export default function Page() {
       </Section>
       <SilhouetteLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <p>Objects i = (1, 0, 1, 1, 0, 0) and j = (1, 1, 0, 1, 0, 0), asymmetric binary attributes.</p>
         <ul>
           <li>q = 2 (attributes 1 and 4), r = 1 (attribute 3), s = 1 (attribute 2), t = 2.</li>

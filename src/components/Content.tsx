@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react'
 import { Pill } from './ui'
 
-export function TopicHeader({ group, title, lede, minutes }: { group: string; title: string; lede: ReactNode; minutes?: number }) {
+export function TopicHeader({ group, title, lede }: { group: string; title: string; lede: ReactNode; minutes?: number }) {
   return (
     <header className="topic-head fade-in">
       <div className="row">
         <Pill>{group}</Pill>
-        {minutes && <span className="label">{minutes} min</span>}
       </div>
       <h1>{title}</h1>
       <p className="lede">{lede}</p>
@@ -14,10 +13,9 @@ export function TopicHeader({ group, title, lede, minutes }: { group: string; ti
   )
 }
 
-export function Section({ id, title, kicker, children }: { id: string; title: string; kicker?: string; children: ReactNode }) {
+export function Section({ id, title, children }: { id: string; title: string; kicker?: string; children: ReactNode }) {
   return (
     <section className="section" id={id}>
-      {kicker && <span className="label">{kicker}</span>}
       <h2>{title}</h2>
       {children}
     </section>

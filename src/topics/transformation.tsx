@@ -43,7 +43,7 @@ function NormLab() {
   return (
     <Lab
       title="Normalize incomes, then add an outlier"
-      desc="Ten incomes from 12,000 to 98,000. The highlighted one is 73,600. Choose a method, then use the slider to add one very rich customer."
+      desc="Ten incomes from 12,000 to 98,000; the square is 73,600."
       controls={
         <>
           <Seg label="Method" value={m} onChange={setM} options={[{ v: 'minmax', label: 'Min-max' }, { v: 'z', label: 'z-score' }, { v: 'decimal', label: 'Decimal scaling' }]} />
@@ -52,20 +52,19 @@ function NormLab() {
         </>
       }
       notes={[
-        'With no outlier and min-max to [0, 1], 73,600 maps to 0.716.',
-        'Add a 1,000,000 outlier with min-max. The ten normal incomes get squeezed into a tiny slice near 0. Watch "spread of the normal values" collapse.',
-        'z-score handles the outlier better: values are not forced into a fixed range, so the normal ones keep more room.',
-        'Decimal scaling divides by a power of 10 so every absolute value is below 1. The outlier changes the power and shrinks everything else.',
+        'With min-max to [0, 1] and no outlier, 73,600 maps to 0.716.',
+        'Add a 1,000,000 outlier: min-max squeezes the normal incomes near 0 and their spread collapses.',
+        'Switch to z-score with the outlier: values are not forced into a fixed range, so the normal ones keep more room.',
       ]}
     >
       <span className="label">Original values</span>
-      <Plot w={600} h={110} x={[0, Math.max(...vals) * 1.05]} y={[0, 1]} yTickValues={[]} xFmt={(v) => `${Math.round(v / 1000)}k`} label="Original incomes">
+      <Plot w={560} h={100} x={[0, Math.max(...vals) * 1.05]} y={[0, 1]} yTickValues={[]} xFmt={(v) => `${Math.round(v / 1000)}k`} label="Original incomes">
         {vals.map((v, i) => (
           <Dot key={i} x={v} y={0.5} r={i === idx ? 7 : 5} color={i === idx ? seriesColor(1) : i >= INCOMES.length ? seriesColor(4) : seriesColor(0)} shape={i === idx ? 1 : i >= INCOMES.length ? 2 : 0} />
         ))}
       </Plot>
       <span className="label">After {m === 'minmax' ? 'min-max' : m === 'z' ? 'z-score' : 'decimal scaling'}</span>
-      <Plot w={600} h={120} x={[lo - pad, hi + pad]} y={[0, 1]} yTickValues={[]} xFmt={(v) => fmt(v, 2)} label="Normalized incomes">
+      <Plot w={560} h={110} x={[lo - pad, hi + pad]} y={[0, 1]} yTickValues={[]} xFmt={(v) => fmt(v, 2)} label="Normalized incomes">
         {t.map((v, i) => (
           <Dot key={i} x={v} y={0.5} r={i === idx ? 7 : 5} color={i === idx ? seriesColor(1) : i >= INCOMES.length ? seriesColor(4) : seriesColor(0)} shape={i === idx ? 1 : i >= INCOMES.length ? 2 : 0} />
         ))}
@@ -86,7 +85,7 @@ function NormLab() {
         <Stat k="New max" v={fmt(hi, 3)} />
         <Stat k="New mean" v={fmt(mean(t), 3)} />
         <Stat k="New std" v={fmt(std(t), 3)} />
-        <Stat k="Spread of normal values" v={fmt(spread, 3)} sub="range of the first nine" />
+        <Stat k="Spread of normal values" v={fmt(spread, 3)} />
       </Readout>
     </Lab>
   )
@@ -121,7 +120,7 @@ function DiscLab() {
   return (
     <Lab
       title="Discretize age into intervals"
-      desc="240 customer ages, most of them young. Cut the range into k intervals by equal width or equal frequency."
+      desc="240 customer ages, most of them young. Gray ticks show the raw ages."
       controls={
         <>
           <Seg label="Method" value={m} onChange={setM} options={[{ v: 'width', label: 'Equal width' }, { v: 'freq', label: 'Equal frequency' }]} />
@@ -129,12 +128,12 @@ function DiscLab() {
         </>
       }
       notes={[
-        'Equal width on skewed data: the first interval is packed and the last ones are nearly empty.',
-        'Equal frequency gives every interval the same count, so the young range gets cut into narrow intervals.',
-        'With k = 3, the intervals can be named youth, middle_aged and senior: a concept hierarchy on top of raw numbers.',
+        'Equal width: the first interval is packed and the last ones are nearly empty.',
+        'Switch to equal frequency: every interval holds the same count, so the young range is cut finely.',
+        'Set k = 3: the intervals get names (youth, middle_aged, senior), a simple concept hierarchy.',
       ]}
     >
-      <Plot w={600} h={260} x={[lo - 1, hi + 1]} y={[0, maxN * 1.2]} xLabel="age" yLabel="records per interval" label="Interval counts over the age range">
+      <Plot w={560} h={260} x={[lo - 1, hi + 1]} y={[0, maxN * 1.2]} xLabel="age" yLabel="records per interval" label="Interval counts over the age range">
         {bins.map((b, i) => (
           <Rect key={i} x0={b.a + 0.3} x1={b.b - 0.3} y0={0} y1={b.n} color={seriesColor(i)} opacity={0.75} rx={3} />
         ))}
@@ -164,32 +163,31 @@ export default function Page() {
       <TopicHeader
         group="Preprocessing"
         title="Normalization and discretization"
-        lede="Transformation changes values into a form that mines better: on a common scale, or grouped into a few meaningful intervals."
-        minutes={20}
+        lede="Put attributes on a common scale, or group values into a few intervals."
       />
 
       <Plain>
         <p>
-          Comparing a salary of 60,000 to an age of 35 is like comparing meters to millimeters. Any method that adds up differences, such as distance in kNN or k-means, will only see the salary. Normalization puts every attribute on the same scale so each one gets a fair vote.
+          A salary of 60,000 next to an age of 35: any distance-based method (kNN, k-means) only sees the salary. Normalization gives every attribute a fair vote.
         </p>
       </Plain>
 
-      <Section id="what" title="Kinds of transformation" kicker="Overview">
+      <Section id="what" title="Kinds of transformation">
         <ul>
-          <li><strong>Feature construction</strong>: build new attributes that capture the information better, such as area from length and width, or frequency features from a signal (Fourier, wavelets).</li>
+          <li><strong>Feature construction</strong>: new attributes that capture the information better, such as area from length and width, or frequency features (Fourier, wavelets).</li>
           <li><strong>Normalization</strong>: scale values into a small common range.</li>
-          <li><strong>Discretization</strong>: replace a continuous range by intervals or labels. It also reduces data size.</li>
+          <li><strong>Discretization</strong>: replace a continuous range by intervals or labels. Also reduces data size.</li>
         </ul>
       </Section>
 
-      <Section id="norm" title="Three normalization methods" kicker="Normalization">
+      <Section id="norm" title="Three normalization methods">
         <Formula title="Min-max">
           <MB>{"v' = \\frac{v - \\min_A}{\\max_A - \\min_A}(new\\_max_A - new\\_min_A) + new\\_min_A"}</MB>
-          <p>Keeps the shape and fits values exactly into the new range. A new value outside the old [min, max] falls outside the new range.</p>
+          <p>Keeps the shape. A future value outside the old [min, max] lands outside the new range.</p>
         </Formula>
         <Formula title="z-score">
           <MB>{"v' = \\frac{v - \\bar{A}}{\\sigma_A}"}</MB>
-          <p>Says how many standard deviations a value is from the mean. Use it when min and max are unknown or there are outliers.</p>
+          <p>Standard deviations from the mean. Use it when min and max are unknown or there are outliers.</p>
         </Formula>
         <Formula title="Decimal scaling">
           <MB>{"v' = \\frac{v}{10^j}, \\quad j \\text{ the smallest integer with } \\max |v'| < 1"}</MB>
@@ -197,7 +195,7 @@ export default function Page() {
       </Section>
       <NormLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <Table
           head={['Question', 'Working', 'Answer']}
           rows={[
@@ -208,9 +206,9 @@ export default function Page() {
         />
       </Section>
 
-      <Section id="disc" title="Discretization" kicker="Intervals and labels">
+      <Section id="disc" title="Discretization">
         <p>
-          Split a continuous attribute into intervals, for example age into 0 to 10, 11 to 20 and so on, or into youth, middle_aged and senior. Methods include binning (equal width or equal frequency), histogram analysis, clustering and decision tree splits.
+          Split a continuous attribute into intervals, such as age into 0 to 10, 11 to 20, or youth, middle_aged, senior. Methods: binning, histogram analysis, clustering and decision tree splits.
         </p>
       </Section>
       <DiscLab />

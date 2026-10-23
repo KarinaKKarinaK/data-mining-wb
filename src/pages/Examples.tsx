@@ -14,7 +14,7 @@ export default function Examples() {
       <TopicHeader
         group="Explore"
         title="Data mining in the real world"
-        lede="Cases where these methods changed a business, a science, or went wrong in public. Each one links to a source so you can read the full story."
+        lede="Where these methods worked, and where they failed, with sources."
       />
       <div className="chips" style={{ marginBottom: 22 }}>
         {(['All', ...METHODS] as const).map((m) => (

@@ -94,7 +94,7 @@ export default function Quiz() {
     const count = length === 0 ? pool.length : Math.min(length, pool.length)
     return (
       <div className="page">
-        <TopicHeader group="Practice" title="Practice quiz" lede={`${QUESTIONS.length} questions across every topic: concepts, true or false, and calculations you would do by hand in the exam. Each answer comes with a worked explanation.`} />
+        <TopicHeader group="Practice" title="Practice quiz" lede={`${QUESTIONS.length} questions with worked answers, including exam-style calculations.`} />
         <div className="card" style={{ display: 'grid', gap: 18 }}>
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <span className="label">Topics ({topics.length} selected, {pool.length} questions)</span>
@@ -162,7 +162,7 @@ export default function Quiz() {
     const wrong = qs.filter((x) => !results[x.id]?.correct)
     return (
       <div className="page">
-        <TopicHeader group="Practice" title="Quiz results" lede="Redo the ones you missed, then review the topic pages for anything below 70%." />
+        <TopicHeader group="Practice" title="Quiz results" lede="Redo what you missed. Review any topic below 70%." />
         <div className="grid c3">
           <div className="card" style={{ textAlign: 'center' }}>
             <span className="label">Score</span>
@@ -231,15 +231,17 @@ export default function Quiz() {
           <Rich text={q.q} />
         </div>
         {q.options ? (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div style={{ display: 'grid', gap: 6 }}>
             {q.options.map((o, i) => {
               const cls = res ? (i === q.answer ? ' right' : res.given === o ? ' wrong' : '') : ''
               return (
                 <button key={i} type="button" className={`qz-opt${cls}`} disabled={!!res} onClick={() => answer(o, i === q.answer)}>
                   <span className="key">{i + 1}</span>
-                  <span>
+                  <span style={{ flex: 1 }}>
                     <Rich text={o} />
                   </span>
+                  {cls === ' right' && <span className="qz-tag">Correct</span>}
+                  {cls === ' wrong' && <span className="qz-tag">Your answer</span>}
                 </button>
               )
             })}

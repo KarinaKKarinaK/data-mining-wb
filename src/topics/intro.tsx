@@ -46,20 +46,20 @@ function Pipeline() {
   return (
     <Lab
       title="Walk through a data mining system"
-      desc="Click a stage, or step through them in order. The example follows one online bookstore from raw tables to a recommendation."
+      desc="Click a stage. The example follows one online bookstore from raw tables to a recommendation."
       notes={[
-        'Notice how much happens before the mining engine. In real projects preprocessing often takes most of the time.',
-        'Pattern evaluation is where most patterns are thrown away. Mining finds many patterns, only a few are interesting.',
+        'Step to the mining engine and count the stages before it. Preprocessing usually takes most of a real project.',
+        'Open pattern evaluation: this is where most found patterns are thrown away.',
       ]}
     >
-      <svg viewBox={`0 0 ${W} 120`} className="plot" role="img" aria-label="Pipeline of six stages">
+      <svg viewBox={`0 0 ${W} 120`} className="plot" style={{ maxWidth: 760 }} role="img" aria-label="Pipeline of six stages">
         {STAGES.map((s, k) => {
           const x = 10 + k * (bw + gap)
           const on = k === i
           return (
             <g key={s.name} onClick={() => setI(k)} style={{ cursor: 'pointer' }}>
               {k > 0 && <line x1={x - gap + 2} x2={x - 4} y1={46} y2={46} stroke={k <= i ? 'var(--accent)' : 'var(--ink-4)'} strokeWidth={2} />}
-              <rect x={x} y={20} width={bw} height={52} rx={10} fill={on ? 'rgba(143,140,245,0.16)' : 'var(--surface-2)'} stroke={on ? 'var(--accent)' : 'var(--line-2)'} />
+              <rect x={x} y={20} width={bw} height={52} rx={10} fill={on ? 'var(--accent-soft)' : 'var(--surface-2)'} stroke={on ? 'var(--accent)' : 'var(--line-2)'} />
               <text x={x + bw / 2} y={42} textAnchor="middle" fontSize={10.5} fill="var(--ink-3)" fontFamily="var(--mono)">
                 {String(k + 1).padStart(2, '0')}
               </text>
@@ -128,7 +128,7 @@ function DataKinds() {
   return (
     <Lab
       title="Kinds of data, side by side"
-      desc="The same mining ideas apply to very different data. Pick a type to see what one looks like."
+      desc="Pick a type to see what it looks like."
       controls={
         <>
           <Seg
@@ -170,15 +170,15 @@ function DataKinds() {
         <Table
           head={['TID', 'Items']}
           rows={[
-            ['T1', '{bread, butter, milk, cereal}'],
-            ['T2', '{bread, eggs}'],
-            ['T3', '{milk, cereal, bananas}'],
-            ['T4', '{bread, butter, milk}'],
+            ['T1', '{coffee, croissant, cookie}'],
+            ['T2', '{milk tea, egg tart}'],
+            ['T3', '{coffee, water}'],
+            ['T4', '{sandwich, water, cookie}'],
           ]}
         />
       )}
       {kind === 'graph' && (
-        <svg viewBox="0 0 560 220" className="plot" role="img" aria-label="Small social network graph">
+        <svg viewBox="0 0 560 220" className="plot" style={{ maxWidth: 640 }} role="img" aria-label="Small social network graph">
           {[
             [0, 1], [0, 2], [1, 2], [2, 3], [3, 4], [4, 5], [3, 5], [5, 6], [6, 7], [5, 7],
           ].map(([a, b], k) => {
@@ -252,8 +252,7 @@ function TaskSorter() {
   return (
     <Lab
       title="Which task is this?"
-      desc="Read the scenario and pick the data mining task. You get the reason right away."
-      notes={['The key question: is there a known label? If yes it is classification or regression. If no, it is clustering, outliers or association.', 'Then ask what the output is: a category (classification) or a number (regression).']}
+      notes={['Ask first: is there a known label? Yes means classification or regression; no means clustering, outliers or association.', 'Then ask: is the output a category (classification) or a number (regression)?']}
     >
       <div className="card tight" style={{ minHeight: 86 }}>
         <span className="label">
@@ -324,29 +323,25 @@ export default function Page() {
       <TopicHeader
         group="Foundations"
         title="What data mining is"
-        lede="Data mining is the search for interesting, previously unknown and useful patterns in large amounts of data. This page covers why it exists, the system around it, the kinds of data it works on and its five main tasks."
-        minutes={15}
+        lede="The search for interesting, previously unknown and useful patterns in large amounts of data."
       />
 
       <Plain>
         <p>
-          Think of gold mining. You dig through tons of rock to find a few nuggets. Data mining digs through millions of records to find a few patterns worth acting on: which customers are about to leave, which items sell together, which payment looks like fraud.
+          Like gold mining: dig through tons of rock for a few nuggets. Data mining digs through millions of records for a few patterns worth acting on, such as which customers will leave or which payment looks like fraud.
         </p>
-        <p>The rock is cheap and everywhere. The nuggets are rare, and finding them by hand is impossible at this scale.</p>
       </Plain>
 
-      <Section id="why" title="Why it exists" kicker="Motivation">
+      <Section id="why" title="Why it exists">
         <p>
-          Data grows faster than anyone can read it. Society (news, social networks), business (web shops, transactions, stock trades) and science (sensors, genomes, simulations) all produce data at scales measured in petabytes and zettabytes. The usual phrase: we are drowning in data but starving for knowledge.
+          Society (news, social networks), business (web shops, transactions) and science (sensors, genomes) produce data faster than anyone can read it: we are drowning in data but starving for knowledge.
         </p>
-        <p>
-          Size prefixes in order: kilo, mega, giga, tera, peta, exa, zetta. Each step is 1000 times bigger.
-        </p>
+        <p>Size prefixes: kilo, mega, giga, tera, peta, exa, zetta. Each step is 1000 times bigger.</p>
       </Section>
 
-      <Section id="definition" title="What counts as data mining" kicker="Definition">
+      <Section id="definition" title="What counts as data mining">
         <p>
-          Data mining extracts patterns that are <strong>interesting</strong>: non-trivial, implicit, previously unknown and potentially useful. It works by automatic or semi-automatic means on large data. It draws on statistics, databases, algorithms, machine learning, visualization and pattern recognition.
+          Patterns must be <strong>interesting</strong>: non-trivial, implicit, previously unknown and potentially useful, found by automatic or semi-automatic means. The field draws on statistics, databases, algorithms, machine learning, visualization and pattern recognition.
         </p>
         <Table
           head={['Data mining', 'Not data mining']}
@@ -360,12 +355,12 @@ export default function Page() {
 
       <Pipeline />
 
-      <Section id="data" title="What kinds of data" kicker="Data types">
-        <p>Relational tables are the most common, but the same ideas extend to transactions, graphs, sequences, time series, spatial data, text and multimedia.</p>
+      <Section id="data" title="What kinds of data">
+        <p>Relational tables are the most common. The same ideas extend to transactions, graphs, sequences, time series, spatial data, text and multimedia.</p>
       </Section>
       <DataKinds />
 
-      <Section id="tasks" title="The five main tasks" kicker="Functionalities">
+      <Section id="tasks" title="The five main tasks">
         <Table
           head={['Task', 'Labels?', 'Output', 'Example']}
           rows={[
@@ -377,7 +372,7 @@ export default function Page() {
           ]}
         />
         <p style={{ marginTop: 12 }}>
-          <strong>Supervised</strong> tasks (classification, regression) learn from a training set where the answer is known. <strong>Unsupervised</strong> tasks (clustering, outliers, association) have no answer column and look for structure.
+          <strong>Supervised</strong> tasks (classification, regression) learn from data where the answer is known. <strong>Unsupervised</strong> tasks (clustering, outliers, association) have no answer column.
         </p>
       </Section>
       <TaskSorter />

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Dot, Line, Plot } from '../components/Plot'
-import { Pill, seriesColor } from '../components/ui'
+import { seriesColor } from '../components/ui'
 import { assign, initRandom, update } from '../lib/cluster'
 import { make2D } from '../lib/datasets'
 import type { Pt } from '../lib/stats'
@@ -56,109 +56,83 @@ function HeroViz() {
   )
 }
 
-const STEPS = [
-  { n: '01', t: 'Read it in plain words', d: 'Every idea starts with an everyday explanation, then the formula the exam expects.' },
-  { n: '02', t: 'Change the numbers', d: 'Each algorithm is a lab. Drag points, move sliders, and watch the result update.' },
-  { n: '03', t: 'Test yourself', d: 'Flashcards and practice quizzes with worked explanations for every answer.' },
+const MORE = [
+  { to: '/practice/flashcards', t: 'Flashcards', d: 'By topic, with progress saved' },
+  { to: '/practice/quiz', t: 'Practice quiz', d: 'Calculations and concepts, with worked answers' },
+  { to: '/playground', t: 'Playground', d: 'Any dataset, any algorithm' },
+  { to: '/examples', t: 'Real-world cases', d: 'With sources' },
+  { to: '/projects', t: 'Project ideas', d: 'With datasets to use' },
+  { to: '/datasets', t: 'Where to find data', d: 'Kaggle, UCI, GitHub and more' },
 ]
 
 export default function Home() {
-  const labs = TOPICS.length
   return (
     <div className="page">
       <section className="hero fade-in">
         <div>
-          <Pill>Private study resource for COMP 4331</Pill>
-          <h1 style={{ marginTop: 18 }}>
-            Data mining,
+          <span className="label">COMP 4331 Data Mining</span>
+          <h1 style={{ marginTop: 14 }}>
+            Learn data mining
             <br />
-            <span className="grad-text">one experiment at a time.</span>
+            <span>by changing the numbers.</span>
           </h1>
-          <p className="lede">
-            The full course as interactive labs: preprocessing, classification, clustering and association rules. Every formula comes with a chart you can play with.
-          </p>
+          <p className="lede">Every topic in the course, with the formulas and a lab where you move the inputs and see what happens.</p>
           <div className="row" style={{ marginTop: 22 }}>
             <Link className="btn primary" to="/course">
-              Start with the course guide
+              Course guide
             </Link>
-            <Link className="btn" to="/learn/kmeans">
-              Open a lab
+            <Link className="btn" to="/learn/intro">
+              Start at topic 1
             </Link>
           </div>
-          <div className="hero-stats">
-            <div>
-              <div className="mono big">{labs}</div>
-              <span className="label">topics</span>
-            </div>
-            <div>
-              <div className="mono big">5</div>
-              <span className="label">modules</span>
-            </div>
-            <div>
-              <div className="mono big">70+</div>
-              <span className="label">interactive labs</span>
-            </div>
+          <div className="hero-meta">
+            <span>
+              <b>{TOPICS.length}</b> topics
+            </span>
+            <span>
+              <b>77</b> labs
+            </span>
+            <span>
+              <b>200+</b> flashcards
+            </span>
           </div>
         </div>
         <div className="card hero-card">
-          <div className="row" style={{ justifyContent: 'space-between' }}>
-            <span className="label">Live: k-means, k = 4</span>
-            <Link to="/learn/kmeans" className="label">
-              Try it
+          <div className="row" style={{ justifyContent: 'space-between', padding: '2px 4px 0' }}>
+            <span className="label">k-means, k = 4</span>
+            <Link to="/learn/kmeans" className="label" style={{ textDecoration: 'none' }}>
+              Open lab
             </Link>
           </div>
           <HeroViz />
         </div>
       </section>
 
-      <section className="section">
-        <span className="label">How it works</span>
-        <h2>Three moves per topic</h2>
-        <div className="grid c3" style={{ marginTop: 18 }}>
-          {STEPS.map((s) => (
-            <div className="card step" key={s.n}>
-              <span className="step-n mono">{s.n}</span>
-              <h3>{s.t}</h3>
-              <p style={{ marginTop: 8 }}>{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {GROUPS.map((g) => (
-        <section className="section" key={g}>
-          <span className="label">Module</span>
-          <h2>{g}</h2>
-          <div className="grid c3" style={{ marginTop: 18 }}>
-            {TOPICS.filter((t) => t.group === g).map((t) => (
-              <Link className="card link" to={`/learn/${t.id}`} key={t.id}>
-                <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <span className="label">{t.short}</span>
-                  {t.lecture && <span className="label">{t.lecture}</span>}
-                </div>
-                <h3 style={{ margin: '10px 0 6px' }}>{t.title}</h3>
-                <p style={{ margin: 0, fontSize: 14 }}>{t.blurb}</p>
-              </Link>
-            ))}
+      {GROUPS.map((g, gi) => (
+        <section className="module" key={g}>
+          <div className="module-head">
+            <h2>{g}</h2>
+            <span className="label">Module {gi + 1}</span>
           </div>
+          {TOPICS.filter((t) => t.group === g).map((t) => (
+            <Link className="topic-row" to={`/learn/${t.id}`} key={t.id}>
+              <span className="tr-title">{t.title}</span>
+              <span className="tr-blurb">{t.blurb}</span>
+              <span className="tr-lec">{t.lecture ?? ''}</span>
+            </Link>
+          ))}
         </section>
       ))}
 
-      <section className="section">
-        <span className="label">Beyond the lectures</span>
-        <h2>Practice and explore</h2>
-        <div className="grid c3" style={{ marginTop: 18 }}>
-          {[
-            { to: '/practice/flashcards', t: 'Flashcards', d: 'Flip, shuffle and track what you know, by topic.' },
-            { to: '/practice/quiz', t: 'Practice quiz', d: 'Multiple choice and calculation questions with explanations.' },
-            { to: '/playground', t: 'Dataset playground', d: 'Pick a dataset, pick an algorithm, compare results.' },
-            { to: '/examples', t: 'Real-world cases', d: 'Where these methods changed products and science, with sources.' },
-            { to: '/projects', t: 'Project ideas', d: 'Portfolio projects with datasets and the methods to use.' },
-            { to: '/datasets', t: 'Where to find data', d: 'Kaggle, UCI, GitHub collections and open government data.' },
-          ].map((c) => (
-            <Link className="card link" to={c.to} key={c.to}>
-              <h3>{c.t}</h3>
-              <p style={{ margin: '8px 0 0', fontSize: 14 }}>{c.d}</p>
+      <section className="module">
+        <div className="module-head">
+          <h2>Practice and explore</h2>
+        </div>
+        <div className="grid c3" style={{ marginTop: 14 }}>
+          {MORE.map((c) => (
+            <Link className="card link tight" to={c.to} key={c.to}>
+              <h3 style={{ fontSize: 16 }}>{c.t}</h3>
+              <p style={{ margin: '4px 0 0', fontSize: 13.5, color: 'var(--ink-3)' }}>{c.d}</p>
             </Link>
           ))}
         </div>

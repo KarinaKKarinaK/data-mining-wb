@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useRef, type PointerEvent, type ReactNode } from 'react'
+import { createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 import { shapePath } from './ui'
 import type { Pt } from '../lib/stats'
 
@@ -37,7 +37,7 @@ const defaultFmt = (v: number) => {
   return String(Number(v.toFixed(2)))
 }
 
-export type PlotEvent = Pt & { px: number; py: number; e: PointerEvent<SVGSVGElement> }
+export type PlotEvent = Pt & { px: number; py: number; e: PointerEvent<SVGSVGElement>; ctx: { sx: (v: number) => number; sy: (v: number) => number } }
 
 export function Plot({
   w = 560,
@@ -86,14 +86,26 @@ export function Plot({
   label: string
   children?: ReactNode
 }) {
+  const wrap = useRef<HTMLDivElement>(null)
+  const [cw, setCw] = useState(0)
+  useLayoutEffect(() => {
+    const el = wrap.current
+    if (!el) return
+    setCw(el.clientWidth)
+    const ro = new ResizeObserver((entries) => setCw(entries[0].contentRect.width))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const W = cw > 0 ? Math.max(200, Math.min(cw, w * 1.3)) : w
+  const H = (h * W) / w
   const m = {
     t: pad?.t ?? 14,
     r: pad?.r ?? 16,
     b: pad?.b ?? (axes ? (xLabel ? 46 : 30) : 10),
     l: pad?.l ?? (axes ? (yLabel ? 56 : 40) : 10),
   }
-  const iw = w - m.l - m.r
-  const ih = h - m.t - m.b
+  const iw = W - m.l - m.r
+  const ih = H - m.t - m.b
   const ctx = useMemo<PlotCtx>(
     () => ({
       sx: (v) => ((v - x[0]) / (x[1] - x[0])) * iw,
@@ -114,17 +126,20 @@ export function Plot({
     const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(mtx.inverse())
     const px = p.x - m.l
     const py = p.y - m.t
-    return { px, py, x: x[0] + (px / iw) * (x[1] - x[0]), y: y[0] + ((ih - py) / ih) * (y[1] - y[0]), e }
+    return { px, py, x: x[0] + (px / iw) * (x[1] - x[0]), y: y[0] + ((ih - py) / ih) * (y[1] - y[0]), e, ctx }
   }
 
   const xt = xTickValues ?? niceTicks(x[0], x[1], xTicks).map((v) => ({ v, label: xFmt(v) }))
   const yt = yTickValues ?? niceTicks(y[0], y[1], yTicks).map((v) => ({ v, label: yFmt(v) }))
 
   return (
+    <div ref={wrap} className="plot-wrap">
     <svg
       ref={ref}
       className="plot"
-      viewBox={`0 0 ${w} ${h}`}
+      width={W}
+      height={H}
+      viewBox={`0 0 ${W} ${H}`}
       role="img"
       aria-label={label}
       style={{ cursor }}
@@ -146,6 +161,7 @@ export function Plot({
       onPointerLeave={() => onLeave?.()}
     >
       <g transform={`translate(${m.l},${m.t})`}>
+        {axes && <rect className="frame" width={iw} height={ih} />}
         {grid && (
           <g>
             {yt.map((t) => (
@@ -185,6 +201,7 @@ export function Plot({
         <Ctx.Provider value={ctx}>{children}</Ctx.Provider>
       </g>
     </svg>
+    </div>
   )
 }
 
@@ -368,7 +385,8 @@ export function Heat({ res = 60, fn }: { res?: number; fn: (x: number, y: number
   )
 }
 
-export function nearestIndex(pts: Pt[], p: Pt, ctx: { sx: (v: number) => number; sy: (v: number) => number }, maxPx = 14) {
+export function nearestIndex(pts: Pt[], p: Pt, fallback: { sx: (v: number) => number; sy: (v: number) => number }, maxPx = 14) {
+  const ctx = (p as Partial<PlotEvent>).ctx ?? fallback
   let best = -1
   let bd = maxPx
   pts.forEach((q, i) => {

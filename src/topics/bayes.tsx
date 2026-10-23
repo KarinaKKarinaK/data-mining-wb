@@ -23,7 +23,7 @@ function DiagnosisLab() {
   return (
     <Lab
       title="A positive test: how worried should you be?"
-      desc="1000 people take a test for a rare disease. Each square is one person. P(disease | positive) is the share of sick people among everyone who tests positive."
+      desc="1000 people, one square each. P(disease | +) is the share of sick people among all positives."
       controls={
         <>
           <Slider label="Prevalence P(disease)" value={prev} min={0.001} max={0.3} step={0.001} onChange={setPrev} fmt={(v) => `${(v * 100).toFixed(1)}%`} />
@@ -32,12 +32,12 @@ function DiagnosisLab() {
         </>
       }
       notes={[
-        'With the defaults, a very accurate test still gives only about a 21% chance of disease after a positive result: the healthy majority produces more false alarms than the sick minority produces true positives.',
-        'Raise the prevalence to 20% (for example, testing only people with symptoms). The same test becomes far more convincing. The prior matters.',
-        'Push specificity to 1.000. With no false positives, a positive result means disease for sure.',
+        'Defaults: an accurate test still gives only about 21% after a positive result, because the healthy majority makes more false alarms than the sick make true positives.',
+        'Raise prevalence to 20%. The same test becomes far more convincing: the prior matters.',
+        'Set specificity to 1.000: no false positives, so a positive means disease.',
       ]}
     >
-      <svg viewBox={`0 0 ${cols * 11 + 4} ${Math.ceil(N / cols) * 11 + 4}`} className="plot" role="img" aria-label="1000 people grid by disease and test result">
+      <svg viewBox={`0 0 ${cols * 11 + 4} ${Math.ceil(N / cols) * 11 + 4}`} className="plot" style={{ width: '100%', maxWidth: 640 }} role="img" aria-label="1000 people grid by disease and test result">
         {kinds.map((k, i) => (
           <rect key={i} x={2 + (i % cols) * 11} y={2 + Math.floor(i / cols) * 11} width={9} height={9} rx={2} fill={k < 0 ? 'var(--surface-3)' : seriesColor(k)} />
         ))}
@@ -96,7 +96,7 @@ function NaiveBayesLab() {
   return (
     <Lab
       title="Naive Bayes calculator"
-      desc="Pick a new record. The table shows every probability the classifier multiplies, so you can check an exam answer line by line."
+      desc="Pick a new record. Every factor the classifier multiplies is in the table."
       controls={
         <>
           <Seg label="Dataset" value={ds} onChange={(v) => { setDs(v); setX(DEFAULT_X[v]) }} options={[{ v: 'buys', label: 'buys_computer' }, { v: 'tennis', label: 'play tennis' }]} />
@@ -117,9 +117,9 @@ function NaiveBayesLab() {
         </>
       }
       notes={[
-        'The default buys_computer record is the classic textbook example: P(X|yes)P(yes) = 0.028 and P(X|no)P(no) = 0.007, so it predicts yes.',
-        'Switch to play tennis and set outlook = overcast. No "no" day was overcast, so P(overcast | no) = 0 and the whole no product is 0 whatever the other attributes say. Turn on Laplace correction to fix it.',
-        'Log view: products become sums. The class with the larger (less negative) sum wins, and nothing underflows.',
+        'The default buys_computer record is the textbook example: 0.028 vs 0.007, so it predicts yes.',
+        'Play tennis, outlook = overcast: no "no" day was overcast, so the whole no product is 0. Turn on Laplace correction.',
+        'Turn on the log view: products become sums and the larger sum wins.',
       ]}
     >
       <div className="table-wrap">
@@ -194,14 +194,14 @@ function UnderflowLab() {
   return (
     <Lab
       title="Why real implementations add logs"
-      desc="A long email has hundreds of words. Each P(word | spam) is small. Multiply enough of them and the computer rounds the product to exactly 0."
+      desc="Multiply enough small P(word | class) values and the product rounds to exactly 0."
       controls={
         <>
           <Slider label="Number of words" value={n} min={1} max={400} onChange={setN} />
           <Slider label="P(word | class)" value={p} min={0.001} max={0.2} step={0.001} onChange={setP} fmt={(v) => v.toFixed(3)} />
         </>
       }
-      notes={['With p = 0.01 the product hits 0 at 162 words. After that both classes score 0 and the classifier cannot choose.', 'The log of the product is just n times log p. It never underflows, and the largest sum picks the same class as the largest product.']}
+      notes={['With p = 0.01, push past 162 words: the product becomes 0 and both classes tie. The log sum (n times log p) keeps working.']}
     >
       <Plot w={560} h={240} x={[0, 400]} y={[ymin, 0]} xLabel="number of words" yLabel="log10 of the product" yTicks={4} label="Log of the product falls linearly with the number of words">
         <HLine y={-323.3} color="var(--bad)" label="smallest positive double, about 1e-323" />
@@ -220,15 +220,15 @@ function UnderflowLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Bayes rule and naive Bayes" lede="Bayesian classifiers predict the class with the highest probability given the record. Naive Bayes makes one bold simplification, and it works surprisingly well." minutes={30} />
+      <TopicHeader group="Classification" title="Bayes rule and naive Bayes" lede="Predict the class with the highest probability given the record. Naive Bayes adds one simplification that makes it cheap." />
 
       <Plain>
         <p>
-          A doctor starts with a belief before seeing any test (how common is the disease?). A test result then updates that belief. Bayes rule is the exact recipe for the update: start from the prior, weigh it by how likely the evidence is under each hypothesis, and rescale so the answers add up to 1.
+          A doctor starts with a belief (how common is the disease?) and a test result updates it. Bayes rule is the recipe: weigh the prior by how likely the evidence is under each option, then rescale to sum to 1.
         </p>
       </Plain>
 
-      <Section id="bayes-rule" title="Bayes rule" kicker="Revision first">
+      <Section id="bayes-rule" title="Bayes rule">
         <Formula title="Conditional probability and Bayes rule">
           <MB>{'P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)} \\qquad P(C \\mid X) = \\frac{P(X \\mid C)\\,P(C)}{P(X)}'}</MB>
           <p>
@@ -239,9 +239,9 @@ export default function Page() {
       </Section>
       <DiagnosisLab />
 
-      <Section id="naive" title="The naive assumption" kicker="Conditional independence">
+      <Section id="naive" title="The naive assumption">
         <p>
-          With many attributes, estimating <M>{'P(x_1, \\dots, x_n \\mid C)'}</M> directly needs a count for every combination of values, and most combinations never appear in the training data. Naive Bayes assumes the attributes are <strong>conditionally independent given the class</strong>:
+          Estimating <M>{'P(x_1, \\dots, x_n \\mid C)'}</M> directly needs a count for every combination of values, and most never appear. Naive Bayes assumes the attributes are <strong>conditionally independent given the class</strong>:
         </p>
         <Formula title="Naive Bayes">
           <MB>{'P(X \\mid C_i) = \\prod_{k=1}^{n} P(x_k \\mid C_i) \\qquad \\text{predict } \\arg\\max_i \\; P(C_i)\\prod_{k} P(x_k \\mid C_i)'}</MB>
@@ -250,20 +250,20 @@ export default function Page() {
           </p>
         </Formula>
         <p>
-          Independence and conditional independence are different. Shoe size and reading ability are dependent in children, but given age they are roughly independent. Naive Bayes only needs the second kind, and even when it fails the predicted class is often still right.
+          This is not plain independence. Shoe size and reading ability are dependent in children, but given age they are roughly independent. Even when the assumption fails, the predicted class is often right.
         </p>
       </Section>
       <NaiveBayesLab />
 
-      <Section id="laplace" title="Zero counts and Laplace correction" kicker="Smoothing">
-        <p>If one attribute value never appears with a class in the training data, its conditional probability is 0 and wipes out the entire product, no matter how strong the other evidence is.</p>
+      <Section id="laplace" title="Zero counts and Laplace correction">
+        <p>A value that never appears with a class gets probability 0 and wipes out that class's whole product.</p>
         <Formula title="Laplace correction">
           <MB>{'P(x_k \\mid C_i) = \\frac{n_{x_k, C_i} + 1}{n_{C_i} + |\\text{values of } A_k|}'}</MB>
-          <p>Add 1 to every count, and add the number of distinct values of the attribute to the denominator so the probabilities over all values still sum to 1. The class priors are usually left as they are.</p>
+          <p>Add 1 to every count and the number of distinct values to the denominator, so the probabilities still sum to 1. Priors are usually left unchanged.</p>
         </Formula>
       </Section>
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <p>buys_computer, new record X = (age = youth, income = medium, student = yes, credit_rating = fair).</p>
         <Table
           head={['', 'buys = yes (9 records)', 'buys = no (5 records)']}
@@ -281,9 +281,9 @@ export default function Page() {
         <p style={{ marginTop: 10 }}>0.028 is larger than 0.007, so naive Bayes predicts buys_computer = yes. Normalizing gives P(yes | X) = 0.028 / 0.035 = 0.80.</p>
       </Section>
 
-      <Section id="underflow" title="Underflow and log probabilities" kicker="In practice">
+      <Section id="underflow" title="Underflow and log probabilities">
         <p>
-          Multiplying hundreds of small probabilities produces numbers too small for a computer to store, and they become 0. Since log is increasing, compare <M>{'\\log P(C) + \\sum_k \\log P(x_k \\mid C)'}</M> instead. The winning class is the same.
+          Hundreds of small factors underflow to 0. Compare <M>{'\\log P(C) + \\sum_k \\log P(x_k \\mid C)'}</M> instead; log is increasing, so the same class wins.
         </p>
       </Section>
       <UnderflowLab />

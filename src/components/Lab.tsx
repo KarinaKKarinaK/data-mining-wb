@@ -20,11 +20,9 @@ export function Lab({
   return (
     <section className="card lab fade-in" id={id}>
       <div className="lab-head">
-        <div>
-          <span className="label">Interactive lab</span>
-          <h3>{title}</h3>
-          {desc && <p>{desc}</p>}
-        </div>
+        <span className="lab-tag">Lab</span>
+        <h3>{title}</h3>
+        {desc && <p>{desc}</p>}
       </div>
       <div className={`lab-body${wide || !controls ? ' wide' : ''}`}>
         <div className="lab-viz">{children}</div>
@@ -32,7 +30,7 @@ export function Lab({
       </div>
       {notes && notes.length > 0 && (
         <div className="lab-foot">
-          <span className="label">Try this</span>
+          <span className="label">Try</span>
           <ul>
             {notes.map((n, i) => (
               <li key={i}>{n}</li>

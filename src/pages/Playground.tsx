@@ -238,7 +238,7 @@ function Bench({ d }: { d: ReturnType<typeof useData> }) {
   return (
     <Lab
       title="Lab bench"
-      desc="Choose data, choose an algorithm, change its parameters. Results update immediately."
+      desc="Pick data and an algorithm, then tune it."
       controls={
         <>
           <DataControls d={d} />
@@ -269,7 +269,6 @@ function Bench({ d }: { d: ReturnType<typeof useData> }) {
         'Moons with k-means, then DBSCAN with eps around 0.05: only the density method follows the curves.',
         'Add 15 extra outliers. Compare where k-means and k-medoids put their centers, then see DBSCAN mark them as noise.',
         'Parallel lines: single linkage follows each line (chaining), complete linkage cuts across them.',
-        'Iris with sepal_length and petal_width, kNN with scaling None, then z-score. Watch the leave-one-out accuracy.',
       ]}
     >
       <Plot
@@ -367,7 +366,7 @@ function SideBySide({ d }: { d: ReturnType<typeof useData> }) {
   return (
     <Lab
       title="Same data, four algorithms"
-      desc="Uses the data chosen in the bench above. Each method has its own idea of what a cluster is."
+      desc="The data from the bench above, under four methods."
       controls={
         <>
           <Slider label="k (k-means, linkage)" value={k} min={1} max={8} onChange={setK} />
@@ -404,11 +403,11 @@ export default function Playground() {
       <TopicHeader
         group="Practice"
         title="Dataset playground"
-        lede="A lab bench for every clustering and classification method on this site. Use generated shapes, the Iris flowers, or paste your own CSV, then compare what each algorithm finds."
+        lede="Run any clustering method or kNN on generated shapes, Iris, or your own CSV."
       />
       <Bench d={d} />
       <SideBySide d={d} />
-      <Section id="tips" title="What to look for" kicker="Reading the results">
+      <Section id="tips" title="What to look for">
         <Table
           head={['Number', 'What it tells you']}
           rows={[
@@ -419,7 +418,7 @@ export default function Playground() {
           ]}
         />
         <p style={{ marginTop: 12 }}>
-          Scaling matters whenever the two columns use different units. Without it, the column with the larger range decides every distance on its own.
+          Scale when columns use different units, or the larger range decides every distance.
         </p>
       </Section>
     </div>

@@ -221,12 +221,12 @@ export const QUESTIONS: Question[] = [
   tf('outliers', 'Outliers should always be deleted as errors.', false, 'In fraud or fault detection the outliers are the target.'),
   mc('outliers', '30C in Hong Kong in July is normal, but 30C in January is unusual. This is a:', ['Global outlier', 'Contextual outlier', 'Collective outlier', 'Not an outlier'], 1, 'It is only unusual in its context (the month).'),
 
-  num('apriori', 'In the 10-basket sample (bread, milk, diapers, beer, cola, eggs, butter), support of {diapers, beer}?', sup(['diapers', 'beer']), `${sup(['diapers', 'beer']) * 10} of 10 baskets contain both: ${f(sup(['diapers', 'beer']), 2)}.`),
-  num('apriori', 'Same baskets. Confidence of diapers => beer (3 decimals)?', sup(['diapers', 'beer']) / sup(['diapers']), `${f(sup(['diapers', 'beer']), 2)} / ${f(sup(['diapers']), 2)} = ${f(sup(['diapers', 'beer']) / sup(['diapers']))}.`),
-  num('apriori', 'Same baskets. Lift of diapers and beer (3 decimals)?', sup(['diapers', 'beer']) / (sup(['diapers']) * sup(['beer'])), `${f(sup(['diapers', 'beer']), 2)} / (${f(sup(['diapers']), 2)} x ${f(sup(['beer']), 2)}) = ${f(sup(['diapers', 'beer']) / (sup(['diapers']) * sup(['beer'])))}.`),
+  num('apriori', 'In the 10 cafe baskets (coffee, croissant, cookie, milk tea, egg tart, sandwich, water), support of {coffee, croissant}?', sup(['coffee', 'croissant']), `${Math.round(sup(['coffee', 'croissant']) * 10)} of 10 baskets contain both: ${f(sup(['coffee', 'croissant']), 2)}.`),
+  num('apriori', 'Same baskets. Confidence of coffee => croissant (3 decimals)?', sup(['coffee', 'croissant']) / sup(['coffee']), `${f(sup(['coffee', 'croissant']), 2)} / ${f(sup(['coffee']), 2)} = ${f(sup(['coffee', 'croissant']) / sup(['coffee']))}.`),
+  num('apriori', 'Same baskets. Lift of coffee and croissant (3 decimals)?', sup(['coffee', 'croissant']) / (sup(['coffee']) * sup(['croissant'])), `${f(sup(['coffee', 'croissant']), 2)} / (${f(sup(['coffee']), 2)} x ${f(sup(['croissant']), 2)}) = ${f(sup(['coffee', 'croissant']) / (sup(['coffee']) * sup(['croissant'])))}.`),
   num('apriori', '5 frequent single items. How many candidate 2-itemsets does Apriori generate?', 10, '5 choose 2 = 10.'),
   num('apriori', 'How many non-empty itemsets can be formed from 4 items?', 15, '2^4 - 1 = 15.'),
-  tf('apriori', 'If {milk, bread} is infrequent, then {milk, bread, eggs} cannot be frequent.', true, 'Apriori property: supersets of infrequent itemsets are infrequent.'),
+  tf('apriori', 'If {sandwich, croissant} is infrequent, then {sandwich, croissant, coffee} cannot be frequent.', true, 'Apriori property: supersets of infrequent itemsets are infrequent.'),
   mc('apriori', 'sup(A) = 0.4, sup(B) = 0.9, sup(A and B) = 0.36. Confidence of A => B is 0.9. Lift?', ['1.0, no real association', '2.25, strong', '0.36', '0.9'], 0, '0.36 / (0.4 x 0.9) = 1.0. High confidence only because B is everywhere.'),
 
   num('fp-growth', 'How many full database scans does FP-growth need to build its tree?', 2, 'One to count item supports, one to insert transactions.'),

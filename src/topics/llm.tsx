@@ -77,7 +77,7 @@ function PromptLab() {
   return (
     <Lab
       title="Build the prompt"
-      desc="Pick a preprocessing task, choose zero-shot or few-shot, and edit the input. The exact prompt text updates below."
+      desc="Pick a task and a prompting style, then edit the input."
       controls={
         <>
           <Seg
@@ -99,9 +99,9 @@ function PromptLab() {
         </>
       }
       notes={[
-        'Imputation in zero-shot mode is just "City: Pittsburgh, County:". Without examples the model may not know you want a county name only. A few examples fix the format.',
-        'Error and outlier checks are clear yes or no questions, so zero-shot usually works.',
-        'Few-shot examples cost extra tokens on every call. Use as few as give the right format.',
+        'Set imputation to zero-shot: the prompt is just "City: Pittsburgh, County:", so the model may not know to answer with a county name only.',
+        'Switch to error detection: it is a plain yes or no question, so zero-shot works.',
+        'Raise the example count and watch the prompt grow: every example costs tokens on every call.',
       ]}
     >
       <span className="label">Prompt sent to the model</span>
@@ -141,12 +141,12 @@ function OrdinalLab() {
   return (
     <Lab
       title="Pairwise test for ordinal values"
-      desc="Ask the model, for each neighboring pair, whether A is higher than B and whether B is higher than A. The toggles show the model's answers. Flip them to see how the verdict follows the rule."
+      desc="Toggles are the model's answers for each pair in both directions. Flip them to see the verdict change."
       controls={<Seg label="Value set" value={set} onChange={setSet} options={Object.entries(SETS).map(([k, x]) => ({ v: k, label: x.name }))} />}
       notes={[
-        'Ordinal means exactly one direction is "yes" for every pair. Gold is higher than silver, silver is not higher than gold.',
-        'New York vs Chicago: both directions are "no". There is no order, so the attribute is nominal.',
-        'If both directions come back "yes", the model contradicted itself. Treat that answer as unreliable.',
+        'Pick the metals: one direction is "yes" for every pair, so the set is ordinal.',
+        'Pick the cities: both directions are "no", so the attribute is nominal.',
+        'Turn both toggles on for one pair: the model contradicted itself, so that answer is unreliable.',
       ]}
     >
       <Table
@@ -180,17 +180,16 @@ export default function Page() {
       <TopicHeader
         group="Preprocessing"
         title="LLMs as data preprocessors"
-        lede="Large language models know a lot about the world. That makes them useful for cleaning jobs that pure statistics cannot do, like spotting that 'banana' does not belong in a list of car brands."
-        minutes={15}
+        lede="LLMs bring world knowledge to cleaning jobs statistics cannot do, like spotting that 'banana' is not a car brand."
       />
 
       <Plain>
         <p>
-          Classic cleaning methods only see numbers and counts. They cannot tell that Athens is a city in Georgia or that platinum outranks gold. An LLM has read enough text to know these things. You ask it a short, well-formed question about your data and use its answer as a cleaning decision.
+          Classic methods only see numbers and counts. They cannot tell which county a city is in or that platinum outranks gold. An LLM can, so you ask it a short question and use the answer as a cleaning decision.
         </p>
       </Plain>
 
-      <Section id="prompting" title="Zero-shot and few-shot" kicker="Two ways to ask">
+      <Section id="prompting" title="Zero-shot and few-shot">
         <Table
           head={['Style', 'What the prompt contains', 'Good for']}
           rows={[
@@ -200,7 +199,7 @@ export default function Page() {
         />
       </Section>
 
-      <Section id="tasks" title="Four preprocessing tasks" kicker="Patterns">
+      <Section id="tasks" title="Four preprocessing tasks">
         <Table
           head={['Task', 'Approach', 'Prompt pattern']}
           rows={[
@@ -213,14 +212,14 @@ export default function Page() {
       </Section>
       <PromptLab />
 
-      <Section id="ordinal" title="Detecting ordinal attributes" kicker="Pairwise logic">
+      <Section id="ordinal" title="Detecting ordinal attributes">
         <p>
-          Ask about each pair in both directions. If exactly one direction is "yes" for every pair, the values have an order. If both are "no", there is no order. This turns a fuzzy question into a simple check.
+          Ask about each pair in both directions. Exactly one "yes" for every pair means the values are ordered. Both "no" means no order.
         </p>
       </Section>
       <OrdinalLab />
 
-      <Section id="limits" title="When not to trust it" kicker="Limits">
+      <Section id="limits" title="When not to trust it">
         <Trap title="Watch out">
           <ul>
             <li>LLMs can be confidently wrong. Spot-check answers against a trusted source.</li>

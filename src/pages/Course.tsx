@@ -55,7 +55,7 @@ export default function Course() {
       <TopicHeader
         group="Course guide"
         title="COMP 4331 Introduction to Data Mining"
-        lede="Everything you need to know about the course in one place: what it covers, how it is graded, the tools, the conventions that cost marks, and every formula on one sheet."
+        lede="What the course covers, how it is graded, the tools, the conventions that cost marks, and every formula on one sheet."
       />
 
       <div className="grid c4">
@@ -67,12 +67,11 @@ export default function Course() {
 
       <Plain title="The course in one paragraph">
         <p>
-          Data mining is about finding useful patterns in large data. The course follows the order you would use on a real project: first understand and clean the data (preprocessing), then learn from labeled examples (classification and regression), then find groups without labels (clustering and outliers), and finally find items that occur together (association rules).
+          The course follows the order of a real project: clean and understand the data, learn from labeled examples (classification), find groups without labels (clustering and outliers), then find items that occur together (association rules).
         </p>
       </Plain>
 
-      <Section id="map" title="Course map" kicker="Topics in order">
-        <p>Lecture tags show where a topic has been covered so far this term. Untagged topics are later in the outline.</p>
+      <Section id="map" title="Course map">
         {GROUPS.map((g) => (
           <div key={g} style={{ marginTop: 18 }}>
             <h3 style={{ marginBottom: 10 }}>{g}</h3>
@@ -84,7 +83,7 @@ export default function Course() {
         ))}
       </Section>
 
-      <Section id="assessment" title="How you are assessed" kicker="Grading">
+      <Section id="assessment" title="How you are assessed">
         <Table
           head={['Component', 'Weight', 'What it tests', 'How to prepare']}
           rows={[
@@ -102,8 +101,8 @@ export default function Course() {
         </Trap>
       </Section>
 
-      <Section id="tools" title="Tools" kicker="Environment">
-        <p>The course uses Python. Use Anaconda with JupyterLab, or Google Colab if you do not want to install anything (download your files before the Colab session ends, the runtime is temporary).</p>
+      <Section id="tools" title="Tools">
+        <p>Python with Anaconda and JupyterLab, or Google Colab with no install (download your files before the session ends).</p>
         <Table
           head={['Library', 'Used for']}
           rows={[
@@ -134,7 +133,7 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
         </div>
       </Section>
 
-      <Section id="conventions" title="Conventions that cost marks" kicker="Read twice">
+      <Section id="conventions" title="Conventions that cost marks">
         <ul>
           <li><strong>Standard deviation.</strong> The course divides by N. pandas divides by N - 1 by default, so pass <code>ddof=0</code>. numpy already divides by N.</li>
           <li><strong>Rounding.</strong> If a question asks for 4 decimal places, print with <code>f'{'{'}v:.4f{'}'}'</code>. <code>round()</code> drops trailing zeros (it prints 4.0 instead of 4.0000).</li>
@@ -146,7 +145,7 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
         </ul>
       </Section>
 
-      <Section id="formulas" title="Formula sheet" kicker="All in one place">
+      <Section id="formulas" title="Formula sheet">
         <div className="grid c2">
           {FORMULAS.map((g) => (
             <Formula key={g.group} title={g.group}>
@@ -161,27 +160,27 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
         </div>
       </Section>
 
-      <Section id="plan" title="A study loop that works" kicker="Routine">
+      <Section id="plan" title="A study loop that works">
         <div className="grid c3">
           <div className="card">
             <span className="label">After each lecture</span>
             <h3 style={{ margin: '8px 0' }}>30 minutes</h3>
-            <p>Read the matching topic page. Do one lab in exam mode: write your prediction on paper, then move the slider and check.</p>
+            <p>Read the topic page. Predict a lab result on paper, then check it.</p>
           </div>
           <div className="card">
             <span className="label">Every week</span>
             <h3 style={{ margin: '8px 0' }}>20 minutes</h3>
-            <p>Flashcards for every topic covered so far. Anything you miss goes into the next session.</p>
+            <p>Flashcards for every topic so far. Repeat the ones you miss.</p>
           </div>
           <div className="card">
             <span className="label">Two weeks before the exam</span>
             <h3 style={{ margin: '8px 0' }}>Daily</h3>
-            <p>One full practice quiz per day, then redo every calculation you got wrong by hand using the formula sheet.</p>
+            <p>One practice quiz a day. Redo every wrong calculation by hand.</p>
           </div>
         </div>
       </Section>
 
-      <Section id="textbook" title="Textbook chapters" kicker="Han, Kamber and Pei, 3rd edition">
+      <Section id="textbook" title="Textbook chapters (Han, Kamber and Pei, 3rd ed.)">
         <Table
           head={['Chapter', 'Matches']}
           rows={[

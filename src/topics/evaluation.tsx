@@ -48,7 +48,7 @@ function ThresholdLab() {
   return (
     <Lab
       title="Move the decision threshold"
-      desc="A classifier gives each record a score. Records above the threshold are predicted positive. Move the threshold and watch the four cells of the confusion matrix trade off."
+      desc="Records scoring above the threshold are predicted positive."
       controls={
         <>
           <Slider label="Threshold" value={t} min={0} max={1} step={0.01} onChange={setT} fmt={(v) => v.toFixed(2)} />
@@ -57,9 +57,9 @@ function ThresholdLab() {
         </>
       }
       notes={[
-        'Push the threshold to 0: recall becomes 100% because everything is called positive, but precision collapses to the share of positives.',
-        'Set separation to 0. The ROC curve becomes the diagonal: the scores carry no information, AUC is 0.5.',
-        'Lower the share of positives to 2% and keep the threshold at 0.5. Accuracy stays high while precision drops. That is the imbalance problem.',
+        'Threshold 0: recall hits 100%, precision falls to the share of positives.',
+        'Separation 0: the ROC curve is the diagonal and AUC is 0.5.',
+        'Positives at 2%, threshold 0.5: accuracy stays high while precision drops.',
       ]}
     >
       <span className="label">Score distribution of 1000 records</span>
@@ -121,14 +121,14 @@ function ImbalanceLab() {
   return (
     <Lab
       title="When 99.9% accuracy means nothing"
-      desc="10,000 patients, a few have cancer. Compare a model that always says non_cancer with a screening model that catches 90% of cancer cases but raises 2% false alarms."
+      desc="10,000 patients. The screening model catches 90% of cancer cases with 2% false alarms."
       controls={
         <>
           <Slider label="Cancer cases out of 10,000" value={pos} min={1} max={5000} onChange={setPos} />
           <Seg label="Model" value={model} onChange={setModel} options={[{ v: 'lazy', label: 'Always non_cancer' }, { v: 'screen', label: 'Screening model' }]} />
         </>
       }
-      notes={['With 10 cancer cases, the lazy model scores 99.9% accuracy and catches nobody. Recall exposes it immediately.', 'Raise the number of cancer cases to 5000 (balanced classes). Now accuracy and recall tell the same story.']}
+      notes={['10 cancer cases, always non_cancer: 99.9% accuracy, 0% recall.', 'Raise cases to 5000 (balanced): accuracy and recall now agree.']}
     >
       <Table
         head={['', 'Predicted cancer', 'Predicted non_cancer', 'Recall per class']}
@@ -177,11 +177,10 @@ function MultiClassLab() {
   return (
     <Lab
       title="Macro vs micro averaging"
-      desc="Edit the confusion matrix (rows are actual classes, columns are predictions). Per-class scores and both averages update."
+      desc="Rows are actual classes, columns are predictions. Edit any cell."
       notes={[
-        'Macro averages the per-class F1 scores, so the rare class Boat counts as much as Car. Micro pools all TP, FP and FN first, so every record counts once.',
-        'In single-label multi-class problems, micro precision, micro recall and micro F1 all equal accuracy. Check it in the readout.',
-        'Make Boat perfect (only its diagonal cell nonzero in its row and column). Macro F1 jumps much more than micro F1.',
+        'Compare micro F1 with accuracy: in single-label problems they are always equal.',
+        'Make Boat perfect (only its diagonal cell nonzero). Macro F1 jumps far more than micro F1, because macro weights the rare class like the others.',
       ]}
     >
       <div className="table-wrap">
@@ -279,7 +278,7 @@ function FoldsLab() {
   return (
     <Lab
       title="Which rows train, which rows test"
-      desc="20 records, 6 of them in the minority class (triangles). Step through the rounds and see which records are held out each time."
+      desc="20 records, 6 in the minority class (triangles)."
       controls={
         <>
           <Seg label="Method" value={method} onChange={(v) => { setMethod(v); setRound(0) }} options={[{ v: 'holdout', label: 'Holdout' }, { v: 'kfold', label: 'k-fold' }, { v: 'strat', label: 'Stratified' }, { v: 'loo', label: 'Leave-one-out' }]} />
@@ -288,12 +287,11 @@ function FoldsLab() {
         </>
       }
       notes={[
-        'In k-fold every record is in the validation set exactly once across the k rounds.',
-        'Plain k-fold with k = 5 can give a fold with no triangles at all. Stratified k-fold deals each class out evenly, so every fold mirrors the 30% minority share.',
-        'Holdout uses only one split: about 1/3 of the data never trains the model, and the estimate depends on that one random split.',
+        'Step through k-fold rounds: every record validates exactly once.',
+        'k-fold with k = 5 can leave a fold with no triangles. Switch to Stratified: every fold keeps the 30% minority share.',
       ]}
     >
-      <svg viewBox="0 0 560 120" className="plot" role="img" aria-label="Records colored by train or validation role">
+      <svg viewBox="0 0 560 120" className="plot" style={{ width: '100%', maxWidth: 640 }} role="img" aria-label="Records colored by train or validation role">
         {Array.from({ length: ROWS }, (_, i) => {
           const x = 14 + i * 27
           const v = isVal(i)
@@ -335,15 +333,15 @@ function WorkedExample() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Classification and evaluation" lede="A classifier assigns a class label to a record from its other attributes. Building one is half the job. The other half is measuring honestly how good it is." minutes={30} />
+      <TopicHeader group="Classification" title="Classification and evaluation" lede="A classifier predicts a record's class from its other attributes. This page is about measuring how good it is." />
 
       <Plain>
         <p>
-          Think of a spam filter. You show it thousands of emails that people already marked as spam or not spam (training). It learns a rule. Then you test it on emails it has never seen and count how often it is right. Counting right answers sounds simple, but which mistakes you count matters a lot.
+          A spam filter learns from emails already marked spam or not spam, then gets tested on emails it has never seen. How you count its mistakes decides whether it looks good.
         </p>
       </Plain>
 
-      <Section id="process" title="The three-step process" kicker="How it works">
+      <Section id="process" title="The three-step process">
         <ol>
           <li>
             <strong>Training set.</strong> Archived records with a known value for one categorical <strong>class attribute</strong>. Because the labels are known, this is supervised learning.
@@ -357,7 +355,7 @@ export default function Page() {
         </ol>
       </Section>
 
-      <Section id="metrics" title="Confusion matrix and the four rates" kicker="Measuring">
+      <Section id="metrics" title="Confusion matrix and the four rates">
         <p>
           Rows are the actual class, columns the predicted class. Cell <M>{'c_{ij}'}</M> counts records of class i predicted as class j, so the diagonal holds the correct predictions. For two classes, call the class you care about positive.
         </p>
@@ -365,13 +363,13 @@ export default function Page() {
           <MB>{'Accuracy = \\frac{TP + TN}{N} \\qquad Precision = \\frac{TP}{TP + FP} \\qquad Recall = \\frac{TP}{TP + FN}'}</MB>
           <MB>{'F = \\frac{2 \\cdot Precision \\cdot Recall}{Precision + Recall}'}</MB>
           <p>
-            Precision: of what I flagged, how much was right. Recall: of what was really there, how much did I find. F is their harmonic mean, which stays low unless both are high.
+            Precision: of what I flagged, how much was right. Recall: of what was there, how much I found. F stays low unless both are high.
           </p>
         </Formula>
       </Section>
       <ThresholdLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <p>A classifier for buys_computer is tested on 10,000 records.</p>
         <WorkedExample />
         <p style={{ marginTop: 12 }}>
@@ -379,20 +377,20 @@ export default function Page() {
         </p>
       </Section>
 
-      <Section id="imbalance" title="Class imbalance" kicker="Why accuracy misleads">
-        <p>When one class is rare, a model that always predicts the common class gets high accuracy for free. Always report precision and recall for the rare class too.</p>
+      <Section id="imbalance" title="Class imbalance">
+        <p>When one class is rare, always predicting the common class gives high accuracy for free. Report precision and recall for the rare class.</p>
       </Section>
       <ImbalanceLab />
 
-      <Section id="multiclass" title="More than two classes" kicker="Macro vs micro">
+      <Section id="multiclass" title="More than two classes">
         <Formula title="Two ways to average">
           <MB>{'F1_{macro} = \\frac{1}{C}\\sum_{c=1}^{C} F1_c \\qquad P_{micro} = \\frac{\\sum_c TP_c}{\\sum_c (TP_c + FP_c)}'}</MB>
-          <p>Macro treats every class equally. Micro treats every record equally. In the lecture example macro F1 is 0.58 and micro F1 is 0.60, which equals the accuracy.</p>
+          <p>Macro weights every class equally, micro every record. Lecture example: macro F1 0.58, micro F1 0.60 (equal to accuracy).</p>
         </Formula>
       </Section>
       <MultiClassLab />
 
-      <Section id="methods" title="Holdout and cross-validation" kicker="Evaluation methods">
+      <Section id="methods" title="Holdout and cross-validation">
         <Table
           head={['Method', 'How', 'Good for', 'Weakness']}
           rows={[
@@ -404,7 +402,7 @@ export default function Page() {
           ]}
         />
         <p style={{ marginTop: 12 }}>
-          In k-fold, each round trains on a fraction <M>{'1 - \\frac{1}{k}'}</M> of the data. After evaluation, the model you deploy is trained on the entire data set; cross-validation only estimates how well it will do.
+          Each k-fold round trains on <M>{'1 - \\frac{1}{k}'}</M> of the data. The deployed model is trained on all of it; cross-validation only estimates its accuracy.
         </p>
       </Section>
       <FoldsLab />

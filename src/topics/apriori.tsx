@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Check, Formula, Note, Plain, Section, Table, TopicHeader, Trap } from '../components/Content'
 import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
-import { Dot, HLine, Plot, Rect, Tip } from '../components/Plot'
+import { Dot, HLine, Label, Plot, Rect, Tip } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, Toggle } from '../components/ui'
 import { GROCERIES } from '../lib/datasets'
 import { apriori, closedMaximal, count, itemCounts, key, rules, show, type Level } from '../lib/e-assoc'
@@ -20,7 +20,7 @@ function SupportBars({ tx, minCount }: { tx: string[][]; minCount: number }) {
       <span className="label">Support of each single item</span>
       <Plot
         w={560}
-        h={220}
+        h={230}
         x={[0, Math.max(1, counts.length)]}
         y={[0, 1]}
         yLabel="support"
@@ -30,14 +30,19 @@ function SupportBars({ tx, minCount }: { tx: string[][]; minCount: number }) {
         label="Bar chart of item supports"
       >
         {counts.map(([it, c], i) => (
-          <Rect key={it} x0={i + 0.14} x1={i + 0.86} y0={0} y1={c / n} rx={4} color={c >= minCount ? 'var(--s1)' : 'var(--ink-4)'} onEnter={() => setHover(i)} onLeave={() => setHover(null)} />
+          <Rect key={it} x0={i + 0.2} x1={i + 0.8} y0={0} y1={c / n} rx={3} color={c >= minCount ? 'var(--s1)' : 'var(--ink-4)'} onEnter={() => setHover(i)} onLeave={() => setHover(null)} />
+        ))}
+        {counts.map(([it, c], i) => (
+          <Label key={'v' + it} x={i + 0.5} y={c / n} dy={-6} anchor="middle" size={11}>
+            {String(c)}
+          </Label>
         ))}
         <HLine y={minCount / n} color="var(--s2)" label={`min_sup ${pct(minCount / n)}`} />
         {hover !== null && <Tip x={hover + 0.5} y={counts[hover][1] / n} lines={[counts[hover][0], `count ${counts[hover][1]} of ${tx.length}`, `support ${fmt(counts[hover][1] / n, 2)}`]} />}
       </Plot>
       <Legend
         items={[
-          { label: 'frequent (count reaches min_sup)', color: 'var(--s1)', shape: 1 },
+          { label: 'frequent', color: 'var(--s1)', shape: 1 },
           { label: 'infrequent', color: 'var(--ink-4)', shape: 1 },
         ]}
       />
@@ -55,7 +60,7 @@ function StepLab({ tx, levels, minSup, setMinSup }: { tx: string[][]; levels: Le
   return (
     <Lab
       title="Apriori, level by level"
-      desc="Each level builds candidates C_k from the frequent sets of the level before, throws away any candidate with an infrequent subset, then scans the database once to count the rest."
+      desc="Join, prune, then count. One database scan per level."
       controls={
         <>
           <Slider label="min_sup" value={minSup} min={0.1} max={0.8} step={0.05} fmt={(v) => `${pct(v)} (count ${Math.ceil(v * tx.length - 1e-9)})`} onChange={(v) => { setMinSup(v); setLv(0) }} />
@@ -66,14 +71,14 @@ function StepLab({ tx, levels, minSup, setMinSup }: { tx: string[][]; levels: Le
             </Btn>
           </div>
           <p className="muted" style={{ fontSize: 13, margin: 0 }}>
-            Showing level k = {cur.k} of {levels.length}. {lv >= levels.length - 1 ? 'No more candidates can be built, so Apriori stops here.' : ''}
+            Level {cur.k} of {levels.length}. {lv >= levels.length - 1 ? 'No more candidates: Apriori stops.' : ''}
           </p>
         </>
       }
       notes={[
-        'Lower min_sup to 20%. Level 3 now shows candidates removed by the prune step without ever being counted, because one of their pairs was infrequent.',
-        'Raise min_sup to 50%. Fewer frequent items means far fewer candidates at the next level. This is why support pruning is so effective.',
-        'Count the database scans: one per level. FP-growth needs only two scans in total.',
+        'Set min_sup to 20% and go to level 3. Two candidates are pruned without being counted, because {croissant, water} has count 1.',
+        'Set min_sup to 50%. Only coffee and cookie survive level 1, so level 2 has a single candidate.',
+        'Count the scans: one per level. FP-growth needs two in total.',
       ]}
     >
       <Table
@@ -93,7 +98,6 @@ function StepLab({ tx, levels, minSup, setMinSup }: { tx: string[][]; levels: Le
         </strong>{' '}
         = {cur.frequent.length ? cur.frequent.map((f) => `${show(f.set)}: ${f.count}`).join(', ') : 'empty'}
       </p>
-      {cur.k === 1 && <p className="muted" style={{ fontSize: 13.5 }}>Next, C2 joins every pair of sets in L1. From level 3 on, two sets are joined only when they share all items except the last.</p>}
       <Readout>
         <Stat k="min count" v={minCount} sub={`${pct(minSup)} of ${tx.length}`} />
         <Stat k="Candidates" v={cur.cands.length} sub={`at level ${cur.k}`} />
@@ -118,12 +122,12 @@ function LatticeLab({ tx, levels }: { tx: string[][]; levels: Level[] }) {
     const s = top.filter((_, i) => m & (1 << i))
     rows[s.length - 1].push(s)
   }
-  const W = Math.max(760, Math.max(...rows.map((r) => r.length)) * 96)
+  const W = Math.max(760, Math.max(...rows.map((r) => r.length)) * 104)
   const H = 380
   const rowY = (k: number) => 30 + (k - 1) * ((H - 60) / Math.max(1, top.length - 1))
   const pos = new Map<string, { x: number; y: number }>()
   rows.forEach((r, k) => r.forEach((s, i) => pos.set(key(s), { x: ((i + 0.5) / r.length) * W, y: rowY(k + 1) })))
-  const abbr = (s: string[]) => s.map((i) => i.slice(0, 3)).join(' ')
+  const abbr = (s: string[]) => s.map((i) => i.replace(' ', '').slice(0, 4)).join(' ')
   const cm = closedMaximal(levels)
   const nFreq = cm.length
   const nClosed = cm.filter((c) => c.closed).length
@@ -132,14 +136,14 @@ function LatticeLab({ tx, levels }: { tx: string[][]; levels: Level[] }) {
   return (
     <Lab
       title="The itemset lattice"
-      desc={`Every subset of the ${top.length} most common items, from single items at the top to the full set at the bottom. The coloring comes from the Apriori run above.`}
+      desc={`All subsets of the ${top.length} most common items, colored by the Apriori run above.`}
       notes={[
-        'Every set below a frequent set is a superset. Once a set is infrequent, all sets below it are infrequent too. That is the Apriori property, and why whole branches go grey.',
-        'Hover a dashed node: Apriori never counted it, either because a subset was infrequent or because it was never built from L at the level above.',
-        'Maximal frequent sets are the frequent sets with nothing frequent below them. Closed sets lose no support information: every frequent set and its count can be rebuilt from them.',
+        'Follow any infrequent set downward: every set below it is infrequent too. That is the Apriori property.',
+        'Hover a dashed node to see why Apriori never counted it.',
+        'Find the maximal sets: frequent, with nothing frequent below them.',
       ]}
     >
-      <svg className="plot" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Itemset lattice">
+      <svg className="plot" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Itemset lattice" style={{ width: '100%', maxWidth: W }}>
         {rows.slice(1).flatMap((r) =>
           r.flatMap((s) =>
             s.map((_, i) => {
@@ -187,7 +191,7 @@ function LatticeLab({ tx, levels }: { tx: string[][]; levels: Level[] }) {
       <p className="muted" style={{ fontSize: 13, minHeight: 20 }}>
         {hover
           ? `${show(hover.split(', '))}: ${info?.c !== null && info?.c !== undefined ? `count ${info.c}, ` : `count ${count(tx, hover.split(', '))} if you did count it, `}${info?.why ?? (info ? (info.s === 'frequent' ? 'frequent' : 'counted and below min_sup') : 'not built, since a subset was already infrequent')}`
-          : `Labels use the first three letters: ${top.map((i) => `${i.slice(0, 3)} = ${i}`).join(', ')}.`}
+          : `Labels: ${top.map((i) => `${i.replace(' ', '').slice(0, 4)} = ${i}`).join(', ')}.`}
       </p>
       <Readout>
         <Stat k="Frequent sets" v={nFreq} sub="all items, not only these 5" />
@@ -217,7 +221,7 @@ function RulesLab({ tx, levels, minConf, setMinConf, minSup, setMinSup }: { tx: 
   return (
     <Lab
       title="From frequent itemsets to rules"
-      desc="For every frequent itemset, every way of splitting it into a left side and a right side is a candidate rule. Keep the ones whose confidence reaches min_conf."
+      desc="Split each frequent itemset into a left and a right side. Keep the splits whose confidence reaches min_conf."
       controls={
         <>
           <Slider label="min_sup" value={minSup} min={0.1} max={0.8} step={0.05} fmt={pct} onChange={setMinSup} />
@@ -227,9 +231,9 @@ function RulesLab({ tx, levels, minConf, setMinConf, minSup, setMinSup }: { tx: 
         </>
       }
       notes={[
-        'Rules from the same itemset all share one support value. Only confidence changes, because the left side changes.',
-        'Sort by confidence, then by lift. A rule can have high confidence and still have lift below 1 when the right side is very common anyway.',
-        'Every point above the dashed line is a strong rule. Points in the grey shape have lift below 1.',
+        'Compare croissant => coffee (confidence 1.0) with coffee => croissant (0.8). Same support, different left side.',
+        'Sort by lift. Egg tart and milk tea top the list at 3.333: they are only ever bought together.',
+        'Lower min_conf to 60%. coffee => cookie appears with lift 1.2, only slightly better than chance.',
       ]}
     >
       <Plot
@@ -277,7 +281,7 @@ function RulesLab({ tx, levels, minConf, setMinConf, minSup, setMinSup }: { tx: 
 
 const PRESETS: { name: string; v: [number, number, number, number] }[] = [
   { name: 'Tea and coffee', v: [15, 5, 75, 5] },
-  { name: 'Diapers and beer', v: [5, 1, 0, 4] },
+  { name: 'Egg tart and milk tea', v: [3, 0, 0, 7] },
   { name: 'Independent', v: [16, 24, 24, 36] },
 ]
 
@@ -294,7 +298,7 @@ function LiftLab() {
   return (
     <Lab
       title="When confidence lies: lift"
-      desc="Set the four cells of a 2 x 2 table for items A and B. Compare how often baskets with A contain B (confidence) with how often any basket contains B."
+      desc="Set the four cells of a 2 x 2 table for items A and B, and compare P(B | A) with P(B)."
       controls={
         <>
           <div className="row">
@@ -311,8 +315,8 @@ function LiftLab() {
         </>
       }
       notes={[
-        'Tea and coffee: 75% of tea buyers buy coffee, which sounds like a strong rule. But 90% of all customers buy coffee, so buying tea actually makes coffee less likely. Lift is 0.833.',
-        'Set the four cells so that A and B / A not B equals B not A / Neither. Lift becomes exactly 1: the items are independent.',
+        'Tea and coffee: 75% of tea buyers buy coffee, but 90% of all customers do. Buying tea makes coffee less likely. Lift is 0.833.',
+        'Make A and B / A not B equal B not A / Neither. Lift becomes exactly 1: independent.',
       ]}
     >
       <Plot w={560} h={170} x={[0, 1]} y={[0, 2]} xFmt={pct} yTickValues={[{ v: 0.5, label: 'P(B)' }, { v: 1.5, label: 'P(B | A)' }]} pad={{ l: 70 }} label="Bars comparing P(B) and P(B given A)">
@@ -346,7 +350,7 @@ function Worked() {
   return (
     <>
       <p>
-        Default baskets, 10 transactions, min_sup = 30% (count 3) and min_conf = 70%. Do it on paper first, then compare.
+        The 10 cafe baskets, min_sup = 30% (count 3), min_conf = 70%. Work it on paper first.
       </p>
       <div className="grid c3">
         {lv
@@ -362,7 +366,7 @@ function Worked() {
           ))}
       </div>
       <p>
-        At level 3 the join gives {'{'}beer, diapers, milk{'}'} and {'{'}bread, diapers, milk{'}'}. Both survive the prune step, but the second has count 2, so only the first is frequent. Strong rules:
+        Every item reaches count 3, so L1 has all 7 items. Of the 21 pairs, 4 reach count 3. At level 3 the only join is {'{'}coffee, cookie{'}'} with {'{'}coffee, croissant{'}'}, giving {'{'}coffee, cookie, croissant{'}'}. All three of its pairs are in L2, so it is counted: 3, frequent. Strong rules:
       </p>
       <Table head={['Rule', 'Support', 'Confidence', 'Lift']} num={[1, 2, 3]} rows={strong.map((r) => [`${show(r.lhs)} => ${show(r.rhs)}`, fmt(r.sup, 2), fmt(r.conf, 3), fmt(r.lift, 3)])} />
     </>
@@ -379,20 +383,17 @@ export default function Page() {
   const levels = useMemo(() => apriori(tx, minCount), [tx, minCount])
   return (
     <>
-      <TopicHeader group="Association" title="Frequent itemsets and Apriori" lede="Association analysis finds items that show up together in the same transactions, then turns them into IF-THEN rules. Apriori is the classic algorithm, and its one big idea fits in a sentence." minutes={30} />
+      <TopicHeader group="Association" title="Frequent itemsets and Apriori" lede="Find items that are bought together, then turn them into IF-THEN rules." />
 
       <Plain>
         <p>
-          Picture a pile of supermarket receipts. You want to know which products tend to be bought together, so you can place them nearby or bundle a discount. Counting every possible combination of products is hopeless: 100 products already give about 10<sup>30</sup> possible combinations.
-        </p>
-        <p>
-          Apriori uses a simple shortcut: <strong>if a combination is rare, any bigger combination containing it is rare too</strong>. If hardly anyone buys eggs and cola together, nobody needs to count eggs, cola and bread.
+          A cafe wants to know which items sell together, but counting every combination is hopeless: 100 items give about 10<sup>30</sup> of them. Apriori's shortcut: <strong>if a combination is rare, every bigger combination containing it is rare too</strong>. If hardly anyone buys a sandwich with a croissant, nobody needs to count sandwich, croissant and coffee.
         </p>
       </Plain>
 
-      <Section id="measures" title="Support, confidence and lift" kicker="The three numbers">
+      <Section id="measures" title="Support, confidence and lift">
         <p>
-          An <strong>itemset</strong> is a set of items, such as {'{'}diapers, beer{'}'}. A <strong>rule</strong> <M>{'A \\Rightarrow B'}</M> says that baskets containing A tend to contain B, where A and B share no items.
+          An <strong>itemset</strong> is a set of items, such as {'{'}coffee, croissant{'}'}. A <strong>rule</strong> <M>{'A \\Rightarrow B'}</M> says that baskets containing A tend to contain B, where A and B share no items.
         </p>
         <Formula title="Definitions (N transactions)">
           <MB>{'support(A \\Rightarrow B) = P(A \\cup B) = \\frac{\\text{count}(A \\cup B)}{N}'}</MB>
@@ -403,7 +404,7 @@ export default function Page() {
           </p>
         </Formula>
         <p>
-          Lift compares the rule with chance. Lift above 1: buying A makes B more likely (positive correlation). Lift of 1: independent. Lift below 1: buying A makes B <em>less</em> likely (negative correlation), even if confidence looks high.
+          Lift above 1: A makes B more likely (positive correlation). Lift 1: independent. Lift below 1: A makes B <em>less</em> likely, even when confidence looks high.
         </p>
       </Section>
 
@@ -411,7 +412,7 @@ export default function Page() {
         <SupportBars tx={tx} minCount={minCount} />
       </TxEditor>
 
-      <Section id="algorithm" title="The Apriori algorithm" kicker="Level-wise search">
+      <Section id="algorithm" title="The Apriori algorithm">
         <Formula title="Apriori property (anti-monotone)">
           <p>
             Every subset of a frequent itemset is frequent. Equivalently: if <M>{'X'}</M> is infrequent, every superset of <M>{'X'}</M> is infrequent.
@@ -432,7 +433,7 @@ export default function Page() {
 
       <StepLab tx={tx} levels={levels} minSup={minSup} setMinSup={setMinSup} />
 
-      <Section id="lattice" title="Seeing the search space" kicker="Lattice">
+      <Section id="lattice" title="The search space">
         <p>
           With d items there are <M>{'2^d - 1'}</M> nonempty itemsets. Apriori walks the lattice from the top down and stops descending under any infrequent set.
         </p>
@@ -445,7 +446,7 @@ export default function Page() {
 
       <LatticeLab tx={tx} levels={levels} />
 
-      <Section id="rules" title="Generating rules" kicker="Step two">
+      <Section id="rules" title="Generating rules">
         <p>
           For each frequent itemset <M>{'l'}</M> and each nonempty proper subset <M>{'s'}</M>, output <M>{'s \\Rightarrow (l - s)'}</M> when <M>{'\\frac{support(l)}{support(s)} \\ge min\\_conf'}</M>. Support is already known from the frequent-itemset step, so no new scan is needed.
         </p>
@@ -453,23 +454,17 @@ export default function Page() {
 
       <RulesLab tx={tx} levels={levels} minConf={minConf} setMinConf={setMinConf} minSup={minSup} setMinSup={setMinSup} />
 
-      <Section id="lift" title="Interesting does not mean strong" kicker="Correlation">
-        <p>Support and confidence can both pass and the rule can still be misleading. Lift checks the rule against what you would expect by chance.</p>
+      <Section id="lift" title="Strong is not the same as interesting">
+        <p>A rule can pass both thresholds and still be misleading. Lift checks it against chance.</p>
       </Section>
 
       <LiftLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <Worked />
       </Section>
 
-      <Section id="myth" title="About beer and diapers" kicker="A popular story">
-        <p>
-          Almost every course tells the story that a supermarket found beer and diapers bought together on weekday evenings and moved them next to each other. It is mostly a myth. The pattern came from a small 1990s data analysis, and there is no solid record of a store changing its shelves because of it. It is a good illustration of what a rule looks like, not a real case study. The default baskets above include it on purpose.
-        </p>
-      </Section>
-
-      <Section id="traps" title="Strengths and weaknesses" kicker="Know these cold">
+      <Section id="traps" title="Strengths and weaknesses">
         <Table
           head={['', 'Apriori']}
           rows={[
@@ -494,7 +489,7 @@ export default function Page() {
         <Check q="L2 contains {a, b}, {a, c}, {b, c}, {b, d}. Which C3 candidates survive the prune step?">
           Joining on the first item gives {'{'}a, b, c{'}'} and {'{'}b, c, d{'}'}. {'{'}a, b, c{'}'} has subsets ab, ac, bc, all in L2, so it stays. {'{'}b, c, d{'}'} has subset {'{'}c, d{'}'}, which is not in L2, so it is pruned without counting.
         </Check>
-        <Check q="sup({milk}) = 0.7, sup({bread}) = 0.7, sup({milk, bread}) = 0.5. Find conf(milk => bread) and the lift.">
+        <Check q="sup({latte}) = 0.7, sup({muffin}) = 0.7, sup({latte, muffin}) = 0.5. Find conf(latte => muffin) and the lift.">
           Confidence = 0.5 / 0.7 = 0.714. Lift = 0.5 / (0.7 x 0.7) = 1.020, so the two items are close to independent despite the high confidence.
         </Check>
         <Check q="Why is every maximal frequent itemset also closed?">

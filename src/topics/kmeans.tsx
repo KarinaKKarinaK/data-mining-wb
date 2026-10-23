@@ -9,7 +9,7 @@ import { SHAPES, make2D, type Shape2D } from '../lib/datasets'
 import { dist, fmt, type Pt } from '../lib/stats'
 
 const W = 560
-const H = 420
+const H = 400
 
 function StepLab() {
   const [shape, setShape] = useState<Shape2D>('blobs')
@@ -75,7 +75,7 @@ function StepLab() {
     setPhase('update')
   }
 
-  const sc = scales(W, H, [0, 1], [0, 1], undefined, true)
+  const sc = scales(W, H, [0, 1], [0, 1], undefined, true, true, true)
   const regionFn = useMemo(
     () => (x: number, y: number) => {
       if (!cs.length) return null
@@ -98,7 +98,7 @@ function StepLab() {
   return (
     <Lab
       title="k-means, one step at a time"
-      desc="Each click alternates the two moves of k-means: assign every point to its nearest centroid, then move each centroid to the mean of its points."
+      desc="Each click does one move: assign points, or move centroids."
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={(v) => { setShape(v); const np = make2D(v, 180, 11, 0.06, 3).map(({ x, y }) => ({ x, y })); reset(init, k, seed, np) }} options={SHAPES.filter((s) => s.id !== 'lines').map((s) => ({ v: s.id, label: s.name }))} />
@@ -118,10 +118,9 @@ function StepLab() {
         </>
       }
       notes={[
-        'Press "New random start" a few times with random initialization on Uneven blobs. Different starts can end in different final SSE values: k-means only finds a local minimum.',
-        'Switch to k-means++. It spreads the first centroids apart, so bad starts become much rarer.',
-        'Try Moons or Rings with k = 2. k-means draws straight borders between centroids, so it cannot follow curved shapes. Compare with DBSCAN later.',
-        'Choose "Click to place" and put all centroids in one corner. Watch how many steps it takes to recover.',
+        'Uneven blobs, random start: press "New random start" a few times and compare the final SSE. k-means only finds a local minimum.',
+        'Switch to k-means++. Bad starts become much rarer.',
+        'Moons or Rings with k = 2: the borders stay straight, so curved groups get cut in half.',
       ]}
     >
       <Plot
@@ -130,6 +129,8 @@ function StepLab() {
         x={[0, 1]}
         y={[0, 1]}
         label="Scatter plot of points colored by cluster with centroids"
+        xLabel="attribute 1"
+        yLabel="attribute 2"
         cursor={init === 'manual' && cs.length < k ? 'crosshair' : undefined}
         onDown={(p) => {
           if (init === 'manual' && cs.length < k) {
@@ -172,7 +173,7 @@ function SseChart({ history }: { history: number[] }) {
   return (
     <div style={{ marginTop: 12 }}>
       <span className="label">SSE after every move</span>
-      <Plot w={560} h={150} x={[0, Math.max(1, history.length - 1)]} y={[0, max * 1.1]} xTicks={6} yTicks={3} label="SSE decreasing over steps" yFmt={(v) => fmt(v, 1)}>
+      <Plot w={560} h={150} x={[0, Math.max(1, history.length - 1)]} y={[0, max * 1.1]} xTicks={6} yTicks={3} label="SSE decreasing over steps" xLabel="move" yFmt={(v) => fmt(v, 1)}>
         <Line pts={history.map((v, i) => ({ x: i, y: v }))} color="var(--s1)" />
         {history.map((v, i) => (
           <Dot key={i} x={i} y={v} r={3} color="var(--s1)" />
@@ -200,7 +201,7 @@ function ElbowLab() {
   return (
     <Lab
       title="Choosing k: elbow and silhouette"
-      desc="k-means needs k up front. Run it for k = 1 to 9 and look for the bend where adding a cluster stops paying off."
+      desc="Pick the k where adding another cluster stops paying off."
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={setShape} options={[{ v: 'blobs', label: 'Blobs' }, { v: 'varied', label: 'Uneven' }, { v: 'uniform', label: 'No structure' }]} />
@@ -209,8 +210,8 @@ function ElbowLab() {
         </>
       }
       notes={[
-        'SSE always goes down as k grows (with k = n it reaches 0), so you never pick the k with the smallest SSE. You pick the elbow.',
-        'Silhouette peaks near the true number of groups. On "No structure" there is no clear elbow and silhouette stays low, which is the honest answer.',
+        'SSE always falls as k grows, so pick the elbow, not the minimum.',
+        'Silhouette peaks near the true number of groups. On "No structure" it stays low and there is no elbow.',
       ]}
     >
       <div className="grid c2">
@@ -259,8 +260,8 @@ function MedoidLab() {
   return (
     <Lab
       title="Drag an outlier: means move, medoids stay"
-      desc="Both methods split the same points into 2 groups. Drag the far-away point and compare where the centers go."
-      notes={['A mean is pulled toward every point it averages, including outliers. A medoid must be an actual data point, chosen to minimize total distance, so one stray point barely moves it.', 'The price: k-medoids (PAM) tries many swaps, so it is much slower on large data.']}
+      desc="Drag the far point and watch both centers."
+      notes={['The mean follows the outlier. The medoid must be a real data point, so it barely moves.', 'The cost: PAM tries many swaps, so it is slow on large data.']}
     >
       <Plot
         w={W}
@@ -322,14 +323,14 @@ function OneDLab() {
   return (
     <Lab
       title="Worked by hand: k = 2 on one attribute"
-      desc={<>Data: {'{'}2, 4, 10, 12, 3, 20, 30, 11, 25{'}'}. Pick the two starting means and the table redoes every iteration.</>}
+      desc={<>Data: {'{'}2, 4, 10, 12, 3, 20, 30, 11, 25{'}'}. Set the two starting means.</>}
       controls={
         <>
           <Slider label="Start mean 1" value={m1} min={0} max={30} onChange={setM1} />
           <Slider label="Start mean 2" value={m2} min={0} max={30} onChange={setM2} />
         </>
       }
-      notes={['Ties go to cluster 1 here. In an exam, state how you break ties.', 'Start with means 2 and 4: it converges to {2, 3, 4, 10, 11, 12} and {20, 25, 30}. Try 25 and 30 instead.']}
+      notes={['Ties go to cluster 1 here. In an exam, say how you break ties.', 'Means 2 and 4 end at {2, 3, 4, 10, 11, 12} and {20, 25, 30}. Try 25 and 30.']}
     >
       <Table
         head={['Iteration', 'Cluster 1', 'Cluster 2', 'New mean 1', 'New mean 2']}
@@ -343,15 +344,15 @@ function OneDLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Clustering" title="k-means and k-medoids" lede="Partitioning methods split n objects into exactly k groups. k-means is the most used clustering algorithm in practice, and it fits in two sentences." minutes={25} />
+      <TopicHeader group="Clustering" title="k-means and k-medoids" lede="Split n objects into exactly k groups by repeating two simple moves." />
 
       <Plain>
         <p>
-          Imagine placing k flags on a map, then telling every house to join the nearest flag. Now move each flag to the middle of its houses. Repeat until nobody changes flag. That is k-means.
+          Put k flags on a map and let every house join the nearest flag. Move each flag to the middle of its houses. Repeat until nobody switches.
         </p>
       </Plain>
 
-      <Section id="algorithm" title="The algorithm" kicker="How it works">
+      <Section id="algorithm" title="The algorithm">
         <ol>
           <li>Pick k initial centroids (randomly, or with k-means++).</li>
           <li><strong>Assign</strong>: put every object in the cluster of its nearest centroid.</li>
@@ -368,32 +369,32 @@ export default function Page() {
 
       <StepLab />
 
-      <Section id="by-hand" title="Doing it by hand" kicker="Exam style">
-        <p>Exams like small one-dimensional examples where you write out each iteration. Use the table below to check your own working.</p>
+      <Section id="by-hand" title="Doing it by hand">
+        <p>Exams use small one-dimensional data and ask for every iteration. Check your working here.</p>
       </Section>
       <OneDLab />
 
-      <Section id="choosing-k" title="How to choose k" kicker="Model selection">
+      <Section id="choosing-k" title="How to choose k">
         <p>
-          SSE can be driven to zero by giving every point its own cluster, so it cannot pick k on its own. Two common tools: the <strong>elbow method</strong> (plot SSE against k and look for the bend) and the <strong>silhouette coefficient</strong>.
+          SSE reaches zero when every point is its own cluster, so it cannot choose k. Use the <strong>elbow method</strong> or the <strong>silhouette coefficient</strong>.
         </p>
         <Formula title="Silhouette of one object">
           <MB>{'s(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}}'}</MB>
           <p>
-            <M>{'a(i)'}</M>: average distance to the other members of its own cluster (tightness). <M>{'b(i)'}</M>: smallest average distance to the members of another cluster (separation). Close to 1 is good, near 0 means it sits on a border, negative means it is probably in the wrong cluster.
+            <M>{'a(i)'}</M>: mean distance to its own cluster. <M>{'b(i)'}</M>: smallest mean distance to another cluster. Near 1 is good, near 0 is on a border, negative is likely misassigned.
           </p>
         </Formula>
       </Section>
       <ElbowLab />
 
-      <Section id="medoids" title="k-medoids (PAM)" kicker="Robust variant">
+      <Section id="medoids" title="k-medoids (PAM)">
         <p>
-          k-medoids uses a real data object as each cluster center (the <strong>medoid</strong>) and minimizes the sum of distances instead of squared distances. PAM starts with k medoids, then keeps swapping a medoid with a non-medoid whenever the swap lowers the total cost.
+          Each center is a real object, the <strong>medoid</strong>, and the goal is the sum of distances, not squared distances. PAM swaps a medoid with a non-medoid whenever that lowers the total cost.
         </p>
       </Section>
       <MedoidLab />
 
-      <Section id="compare" title="Strengths and weaknesses" kicker="Know these cold">
+      <Section id="compare" title="Strengths and weaknesses">
         <Table
           head={['', 'k-means', 'k-medoids (PAM)']}
           rows={[

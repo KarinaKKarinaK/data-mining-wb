@@ -32,7 +32,7 @@ function BuilderLab() {
   return (
     <Lab
       title="Build a rule and score it"
-      desc="Choose conditions for the IF part and a class for the THEN part. Coverage and accuracy are computed on the 14 buys_computer tuples."
+      desc="Scored on the 14 buys_computer tuples."
       controls={
         <>
           {ATTRS.map((a) => (
@@ -42,9 +42,9 @@ function BuilderLab() {
         </>
       }
       notes={[
-        'Start with "student = yes THEN yes". It covers half the data with high accuracy.',
-        'Add conditions one by one. Coverage can only go down; accuracy usually goes up. A rule with every attribute fixed covers at most one or two tuples.',
-        'Remove every condition. The rule "IF true THEN yes" covers all 14 tuples and its accuracy is just the share of yes, 9/14.',
+        'Set only student = yes: it covers half the data with high accuracy.',
+        'Add conditions one by one: coverage can only drop, accuracy usually rises.',
+        'Set every attribute to any: "IF true THEN yes" covers all 14 with accuracy 9/14.',
       ]}
     >
       <p className="mono" style={{ color: 'var(--ink)', fontSize: 13.5 }}>{ruleText(rule)}</p>
@@ -93,7 +93,7 @@ function ConflictLab() {
   return (
     <Lab
       title="When several rules fire"
-      desc="Pick a tuple. Every rule whose IF part it satisfies fires. If they disagree, a conflict resolution strategy picks the winner."
+      desc="Pick a tuple. When fired rules disagree, the strategy picks the winner."
       controls={
         <>
           {ATTRS.map((a) => (
@@ -103,9 +103,9 @@ function ConflictLab() {
         </>
       }
       notes={[
-        'The default tuple fires R1 (no), R4 (no) and R6 (yes). Size ordering picks R1 because it has the most conditions, the toughest requirement.',
-        'Switch to rule ordering and move R6 to the top. The same tuple is now classified yes. In rule ordering the list order is part of the model.',
-        'Pick middle_aged, low, no, excellent. No rule fires, so the default rule (the majority class, yes) answers.',
+        'The default tuple fires R1, R4 (no) and R6 (yes). Size ordering picks R1, the most specific.',
+        'Switch to rule ordering and move R6 to the top: the same tuple becomes yes.',
+        'Pick middle_aged, low, no, excellent: nothing fires, so the default rule says yes.',
       ]}
     >
       <Table
@@ -190,7 +190,7 @@ function CoveringLab() {
   return (
     <Lab
       title="Sequential covering, step by step"
-      desc="Learn one rule at a time. Grow each rule by adding the condition with the best FOIL gain until it covers no negatives, then remove the tuples it covers and start the next rule."
+      desc="Grow a rule by best FOIL gain until it covers no negatives, remove what it covers, repeat."
       controls={
         <>
           <Seg label="Learn rules for class" value={target} onChange={(v) => { setTarget(v); setI(0) }} options={[{ v: 'yes', label: 'yes' }, { v: 'no', label: 'no' }]} />
@@ -201,7 +201,7 @@ function CoveringLab() {
           <Btn sm variant="ghost" onClick={() => setI(snaps.length - 1)}>Jump to the end</Btn>
         </>
       }
-      notes={['For class yes the first condition chosen is age = middle_aged: it covers 4 positives and no negatives, so the rule is done in one step.', 'Compare with the decision tree rules below. Covering finds a similar set of rules, but each rule is learned on the tuples the earlier rules left over.']}
+      notes={['Class yes: the first pick is age = middle_aged (4 positives, 0 negatives), finished in one step.', 'Compare the result with the tree rules above: similar, but each rule is learned on what the earlier ones left over.']}
     >
       <p style={{ color: 'var(--ink)' }}>
         Step {Math.min(i, snaps.length - 1) + 1} of {snaps.length}. {s.msg}
@@ -247,17 +247,17 @@ const TREE_RULES: Rule[] = [
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Rule-based classification" lede="A rule-based classifier is a list of IF-THEN rules a person can read. You can write them by hand, read them off a decision tree, or learn them directly from data with sequential covering." minutes={20} />
+      <TopicHeader group="Classification" title="Rule-based classification" lede="A list of readable IF-THEN rules: written by hand, read off a decision tree, or learned with sequential covering." />
 
       <Plain>
         <p>
-          A doctor's checklist works like this: IF fever AND rash THEN measles. Each rule is easy to check and to explain. The questions are how good each rule is, what to do when two rules disagree, and where the rules come from.
+          Like a doctor's checklist: IF fever AND rash THEN measles. The questions are how good each rule is, what to do when rules disagree, and where rules come from.
         </p>
       </Plain>
 
-      <Section id="rules" title="Rules, coverage and accuracy" kicker="The basics">
+      <Section id="rules" title="Rules, coverage and accuracy">
         <p>
-          A rule has an <strong>antecedent</strong> (the IF part, a conjunction of attribute tests) and a <strong>consequent</strong> (the THEN part, a class). A tuple <strong>satisfies</strong> the rule, and the rule <strong>covers</strong> the tuple, when every test in the IF part is true for it.
+          <strong>Antecedent</strong>: the IF part, a conjunction of tests. <strong>Consequent</strong>: the THEN part, a class. A rule <strong>covers</strong> a tuple when every test is true for it.
         </p>
         <Formula title="Quality of a rule R on data D">
           <MB>{'coverage(R) = \\frac{n_{covers}}{|D|}, \\qquad accuracy(R) = \\frac{n_{correct}}{n_{covers}}'}</MB>
@@ -269,19 +269,19 @@ export default function Page() {
 
       <BuilderLab />
 
-      <Section id="conflicts" title="Conflict resolution" kicker="Several rules fire">
+      <Section id="conflicts" title="Conflict resolution">
         <ul>
           <li><strong>Size ordering</strong>: the rule with the most conditions (the most specific one) wins.</li>
-          <li><strong>Rule ordering</strong>: rules are kept in a priority list, the first rule that fires wins. The order can come from rule quality (class-based or rule-based ordering). A list like this is called a decision list.</li>
+          <li><strong>Rule ordering</strong>: a priority list (decision list), first rule that fires wins. The order comes from class or rule quality.</li>
           <li><strong>Default rule</strong>: if no rule fires, predict a default class, usually the majority class.</li>
         </ul>
       </Section>
 
       <ConflictLab />
 
-      <Section id="from-tree" title="Rules from a decision tree" kicker="Extraction">
+      <Section id="from-tree" title="Rules from a decision tree">
         <p>
-          Every path from the root to a leaf gives one rule: the tests along the path form the IF part, the leaf's class is the THEN part. The rules are <strong>mutually exclusive</strong> (no tuple satisfies two of them) and <strong>exhaustive</strong> (every tuple satisfies one), so no conflict resolution is needed. The tree for buys_computer (root age, then student or credit_rating) gives:
+          Each root-to-leaf path is one rule. The rules are <strong>mutually exclusive</strong> and <strong>exhaustive</strong>, so no conflict resolution is needed. The buys_computer tree gives:
         </p>
         <Table
           head={['Rule', 'Coverage', 'Accuracy']}
@@ -291,15 +291,15 @@ export default function Page() {
             return [<span className="mono" style={{ fontSize: 12.5 }}>{shortRule(r)}</span>, `${s.ncov} / 14`, fmt(s.accuracy, 2)]
           })}
         />
-        <p style={{ marginTop: 12 }}>The coverages add up to 14 / 14: exhaustive. After extraction, rules can be pruned by dropping conditions that do not hurt accuracy; then they may overlap and need a conflict strategy again.</p>
+        <p style={{ marginTop: 12 }}>Coverages sum to 14 / 14. Pruning conditions afterwards can make rules overlap again.</p>
       </Section>
 
-      <Section id="covering" title="Sequential covering" kicker="Learning rules directly">
-        <p>Learn rules for one class at a time. Each new rule should cover many tuples of that class and as few others as possible.</p>
+      <Section id="covering" title="Sequential covering">
+        <p>Learn rules for one class at a time, each covering many tuples of that class and few others.</p>
         <Formula title="FOIL gain for adding a condition">
           <MB>{"FOIL\\_Gain = pos' \\times \\Big(\\log_2 \\frac{pos'}{pos' + neg'} - \\log_2 \\frac{pos}{pos + neg}\\Big)"}</MB>
           <p>
-            <M>{'pos, neg'}</M>: positive and negative tuples covered by the current rule. <M>{"pos', neg'"}</M>: covered after adding the condition. The gain rewards conditions that raise accuracy while still covering many positives.
+            <M>{'pos, neg'}</M>: covered by the current rule. <M>{"pos', neg'"}</M>: covered after adding the condition. Rewards higher accuracy that still covers many positives.
           </p>
         </Formula>
       </Section>

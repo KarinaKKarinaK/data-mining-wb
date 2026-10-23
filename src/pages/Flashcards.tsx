@@ -87,7 +87,7 @@ export default function Flashcards() {
 
   return (
     <div className="page">
-      <TopicHeader group="Practice" title="Flashcards" lede="Flip a card, decide honestly if you knew it, and come back to the ones you did not. Your progress stays in this browser." />
+      <TopicHeader group="Practice" title="Flashcards" lede="Flip, mark what you knew, repeat the rest. Progress is saved in this browser." />
 
       <div className="card" style={{ display: 'grid', gap: 14 }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>

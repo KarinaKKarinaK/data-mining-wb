@@ -17,9 +17,9 @@ function ImpurityLab() {
   return (
     <Lab
       title="Three ways to measure impurity"
-      desc="For a node with two classes, p is the fraction in class 1. Every measure is 0 for a pure node and largest at p = 0.5."
+      desc="Two classes, p is the fraction in class 1. All three are 0 for a pure node and peak at p = 0.5."
       controls={<Slider label="p (fraction of class 1)" value={p} min={0} max={1} step={0.01} onChange={setP} fmt={(v) => v.toFixed(2)} />}
-      notes={['Entropy reaches 1 bit at p = 0.5 (a fair coin). Gini peaks at 0.5. Misclassification error is a tent with a sharp corner.', 'Entropy and Gini are smooth, so they still reward splits that improve purity a little. Misclassification error often cannot tell such splits apart.']}
+      notes={['Set p = 0.5: entropy is 1 bit, Gini 0.5. Entropy and Gini are smooth curves, so small purity gains still register; misclassification error often misses them.']}
     >
       <Plot w={560} h={300} x={[0, 1]} y={[0, 1]} xLabel="p" yLabel="impurity" label="Entropy, Gini and misclassification error versus p">
         <Line pts={xs.map((x) => ({ x, y: ent(x) }))} color={seriesColor(0)} />
@@ -129,7 +129,7 @@ function TreeBuilderLab() {
   return (
     <Lab
       title="Build a decision tree by hand"
-      desc="Click a node to select it. The table shows every attribute you could split on next, with its information gain, gain ratio and Gini. Click Split to grow the tree."
+      desc="Click a node, then Split on an attribute from the table."
       controls={
         <>
           <Seg label="Dataset" value={ds} onChange={(v) => { setDs(v); setSplits({}); setSel('root') }} options={[{ v: 'buys', label: 'buys_computer' }, { v: 'tennis', label: 'play tennis' }]} />
@@ -141,12 +141,12 @@ function TreeBuilderLab() {
         </>
       }
       notes={[
-        'At the root of buys_computer, age has the highest gain, which is why ID3 splits on it first. The middle_aged branch is already pure (4 yes, 0 no).',
-        'Try splitting the root on income instead. The tree gets deeper and needs more nodes to reach pure leaves.',
-        'Gain ratio divides by SplitInfo, which is large for attributes with many values. Compare the gain and gain ratio columns on play tennis.',
+        'At the root of buys_computer, age has the highest gain. Split on it: the middle_aged branch is pure right away.',
+        'Split the root on income instead. The tree needs more nodes to reach pure leaves.',
+        'On play tennis, compare the Gain and GainRatio columns for attributes with 2 vs 3 values.',
       ]}
     >
-      <svg viewBox={`0 0 ${W} ${H}`} className="plot" role="img" aria-label="Decision tree diagram">
+      <svg viewBox={`0 0 ${W} ${H}`} className="plot" style={{ width: '100%', maxWidth: 720 }} role="img" aria-label="Decision tree diagram">
         {all.map((n) =>
           n.kids.map((k) => (
             <g key={n.key + k.value}>
@@ -256,7 +256,7 @@ function ThresholdLab() {
   return (
     <Lab
       title="Splitting a continuous attribute"
-      desc="Temperature for 14 days of play tennis. Sort the values, try a cut at every midpoint between neighbors, and keep the cut with the largest gain. Click a point to flip its class."
+      desc="Temperature for 14 days of play tennis. Click a point to flip its class."
       controls={
         <>
           <Slider label="Candidate cut" value={Math.min(pick, evals.length - 1)} min={0} max={evals.length - 1} onChange={setPick} fmt={(i) => `T <= ${evals[i]?.t ?? ''}`} />
@@ -264,7 +264,7 @@ function ThresholdLab() {
           <Btn sm variant="ghost" onClick={() => setData(TEMPS)}>Reset classes</Btn>
         </>
       }
-      notes={['Only cuts between neighbors with different classes can be the best one, so in practice you check far fewer candidates.', 'Flip a few classes and watch the best cut move.']}
+      notes={['Look at the gain bars: the best cut always sits between neighbors of different classes, so those are the only cuts worth checking.', 'Flip a few classes and watch the best cut move.']}
     >
       <Plot
         w={560}
@@ -326,7 +326,7 @@ function OverfitLab() {
   return (
     <Lab
       title="Depth vs overfitting"
-      desc="A tree with axis-parallel splits learns two noisy half-moons. Deeper trees fit the training data better. Do they predict new data better?"
+      desc="A tree learns two noisy half-moons with axis-parallel splits."
       controls={
         <>
           <Slider label="max_depth" value={depth} min={1} max={12} onChange={setDepth} />
@@ -335,8 +335,8 @@ function OverfitLab() {
         </>
       }
       notes={[
-        'Drag max_depth to 12. Training accuracy approaches 100% as the regions wrap around single noisy points, while test accuracy stalls or drops. That gap is overfitting.',
-        'The depth with the best test accuracy is what pre-pruning (early stopping) tries to find, using a validation set rather than the test set.',
+        'Drag max_depth to 12: training accuracy nears 100% while test accuracy stalls or drops. That gap is overfitting.',
+        'Pre-pruning tries to stop at the best test depth, using a validation set instead of the test set.',
       ]}
     >
       <Plot w={560} h={360} x={[0, 1]} y={[0, 1]} label="Decision regions of the tree with data points" onMove={(p) => {
@@ -403,25 +403,25 @@ export default function Page() {
   const all = ['age', 'income', 'student', 'credit_rating'].map((a) => evalSplit(BUYS_COMPUTER.rows, a, 'buys_computer', ['yes', 'no']))
   return (
     <>
-      <TopicHeader group="Classification" title="Decision trees" lede="A decision tree asks one question about one attribute at every node and follows the answer down to a leaf that names the class. The hard part is picking which question to ask first." minutes={35} />
+      <TopicHeader group="Classification" title="Decision trees" lede="Each node tests one attribute, each leaf names a class. The hard part is choosing which attribute to test first." />
 
       <Plain>
         <p>
-          Think of the game 20 questions. A good first question splits the possibilities into groups that are each easy to finish. "Is it alive?" beats "Is it a toaster?". A decision tree picks, at every step, the attribute whose answer leaves the groups as pure as possible: ideally each group holds only one class.
+          Like 20 questions: "Is it alive?" beats "Is it a toaster?" because it splits the options into groups that are easy to finish. A tree picks the attribute that leaves each group as close to one class as possible.
         </p>
       </Plain>
 
-      <Section id="algorithm" title="The basic algorithm" kicker="How it works">
+      <Section id="algorithm" title="The basic algorithm">
         <ol>
           <li>Start with all training records at the root.</li>
           <li>If all records at a node have the same class, make it a leaf with that class.</li>
           <li>If no attributes are left, make it a leaf with the majority class.</li>
           <li>Otherwise pick the best attribute by an attribute selection measure, create a branch for each of its outcomes, and repeat on each branch.</li>
         </ol>
-        <p>This is a greedy, top-down, divide-and-conquer method (ID3, C4.5 and CART are all versions of it). Each choice is made once and never revisited.</p>
+        <p>Greedy, top-down, divide and conquer. ID3, C4.5 and CART all work this way, and no choice is ever revisited.</p>
       </Section>
 
-      <Section id="impurity" title="Measuring purity" kicker="Attribute selection">
+      <Section id="impurity" title="Measuring purity">
         <Formula title="Entropy of a set of records">
           <MB>{'Info(D) = -\\sum_{i=1}^{m} p_i \\log_2 p_i'}</MB>
           <p>
@@ -431,14 +431,14 @@ export default function Page() {
       </Section>
       <ImpurityLab />
 
-      <Section id="gain" title="Information gain and gain ratio" kicker="ID3 and C4.5">
+      <Section id="gain" title="Information gain and gain ratio">
         <Formula title="Information gain (ID3)">
           <MB>{'Info_A(D) = \\sum_{v=1}^{V} \\frac{|D_v|}{|D|} Info(D_v) \\qquad Gain(D, A) = Info(D) - Info_A(D)'}</MB>
-          <p>Split on the attribute with the largest gain: the one that removes the most uncertainty about the class.</p>
+          <p>Split on the attribute with the largest gain.</p>
         </Formula>
         <Formula title="Gain ratio (C4.5)">
           <MB>{'SplitInfo_A(D) = -\\sum_{v=1}^{V} \\frac{|D_v|}{|D|} \\log_2 \\frac{|D_v|}{|D|} \\qquad GainRatio(A) = \\frac{Gain(D, A)}{SplitInfo_A(D)}'}</MB>
-          <p>Information gain favors attributes with many values. An ID attribute gives one pure record per branch and a perfect gain, but predicts nothing. SplitInfo grows with the number of branches, so dividing by it removes that bias.</p>
+          <p>Gain favors attributes with many values: an ID attribute gets perfect gain but predicts nothing. SplitInfo grows with the number of branches, so dividing by it removes that bias.</p>
         </Formula>
         <Formula title="Gini index (CART)">
           <MB>{'Gini(D) = 1 - \\sum_{i=1}^{m} p_i^2 \\qquad Gini_A(D) = \\sum_v \\frac{|D_v|}{|D|} Gini(D_v)'}</MB>
@@ -446,7 +446,7 @@ export default function Page() {
       </Section>
       <TreeBuilderLab />
 
-      <Section id="worked" title="Worked example: the root of buys_computer" kicker="Exam style">
+      <Section id="worked" title="Worked example: the root of buys_computer">
         <p>14 records: 9 yes and 5 no.</p>
         <MB>{'Info(D) = -\\tfrac{9}{14}\\log_2\\tfrac{9}{14} - \\tfrac{5}{14}\\log_2\\tfrac{5}{14} = 0.940'}</MB>
         <WorkedTable />
@@ -458,25 +458,25 @@ export default function Page() {
           rows={all.map((e) => [e.attr, fmt(e.gain, 4), { age: '0.246', income: '0.029', student: '0.151', credit_rating: '0.048' }[e.attr] ?? ''])}
         />
         <p style={{ marginTop: 10 }}>
-          The textbook subtracts values already rounded to 3 decimals, so it writes 0.246 and 0.151 where the exact values are 0.2467 and 0.1518. Either is fine in an exam if you show the steps. age wins and becomes the root.
+          The textbook subtracts rounded values, so it gets 0.246 and 0.151 instead of 0.2467 and 0.1518. Either is fine if you show the steps. age becomes the root.
         </p>
       </Section>
 
-      <Section id="continuous" title="Continuous attributes" kicker="Binary splits">
+      <Section id="continuous" title="Continuous attributes">
         <p>
-          For a numeric attribute A, sort its values, take the midpoint between each pair of neighbors as a candidate split point, compute the gain of the binary split <M>{'A \\le t'}</M> versus <M>{'A > t'}</M> for each, and keep the best. The attribute can be tested again further down the tree with a different threshold.
+          Sort the values of A, take each midpoint between neighbors as a candidate t, compute the gain of <M>{'A \\le t'}</M> versus <M>{'A > t'}</M>, and keep the best. A can be tested again lower in the tree with another t.
         </p>
       </Section>
       <ThresholdLab />
 
-      <Section id="pruning" title="Overfitting and pruning" kicker="Generalization">
-        <p>A fully grown tree memorizes noise: tiny leaves that each fit a handful of training records. Two fixes:</p>
+      <Section id="pruning" title="Overfitting and pruning">
+        <p>A fully grown tree memorizes noise in tiny leaves. Two fixes:</p>
         <ul>
           <li>
-            <strong>Pre-pruning (early stopping).</strong> Stop growing when a node is too small, the tree is too deep, or the best gain is below a threshold. Cheap, but it can stop too early because a weak split may enable strong ones below it.
+            <strong>Pre-pruning (early stopping).</strong> Stop when a node is too small, the tree too deep, or the best gain below a threshold. Cheap, but a weak split can hide strong ones below it.
           </li>
           <li>
-            <strong>Post-pruning.</strong> Grow the full tree, then remove branches. In <strong>reduced-error pruning</strong>, hold out a validation set, evaluate the effect of replacing each subtree with a leaf, remove the one that helps validation accuracy most, and repeat until further pruning hurts.
+            <strong>Post-pruning.</strong> Grow the full tree, then cut. <strong>Reduced-error pruning</strong>: on a validation set, try replacing each subtree with a leaf, remove the one that helps accuracy most, repeat until pruning hurts.
           </li>
         </ul>
       </Section>

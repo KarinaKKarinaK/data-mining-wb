@@ -5,9 +5,9 @@ import '../content/practice.css'
 export default function Resources() {
   return (
     <div className="page">
-      <TopicHeader group="Explore" title="Books, courses and tools" lede="Hand-picked references for going further than the lectures: the textbook, free books, library docs, visual explainers, videos and software." />
+      <TopicHeader group="Explore" title="Books, courses and tools" lede="The textbook, free books, docs, visual explainers, videos and software." />
       {RESOURCE_GROUPS.map((g) => (
-        <Section key={g.title} id={g.title.toLowerCase().replace(/\s+/g, '-')} title={g.title} kicker={g.kicker}>
+        <Section key={g.title} id={g.title.toLowerCase().replace(/\s+/g, '-')} title={g.title}>
           <div className="grid c3">
             {g.items.map((r) => (
               <div className="card res-card" key={r.url}>

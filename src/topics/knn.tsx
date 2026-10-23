@@ -72,7 +72,7 @@ function MainLab() {
   return (
     <Lab
       title="Classify a point by its neighbors"
-      desc="Drag the white query point. The k closest training points vote on its class. The shaded map shows what kNN would predict at every location."
+      desc="Drag the white star. The shading shows the prediction at every location."
       controls={
         <>
           <Seg label="Dataset" value={data} onChange={setData} options={[{ v: 'blobs', label: 'Three blobs' }, { v: 'moons', label: 'Noisy moons' }]} />
@@ -84,15 +84,14 @@ function MainLab() {
         </>
       }
       notes={[
-        'Set k = 1 on Noisy moons. The regions become jagged islands around single noisy points: that is overfitting.',
-        'Push k to 25. The borders smooth out, and small pockets of a class disappear: that is underfitting.',
-        'Switch the distance to Manhattan or Max. The dashed outline shows the "circle" of each metric, a diamond or a square, so different points count as nearest.',
-        'With an even k and two classes, ties can happen. Distance weighting breaks most ties.',
+        'k = 1 on Noisy moons: jagged islands around single noisy points (overfitting). k = 25: smooth borders, small pockets vanish (underfitting).',
+        'Switch to Manhattan or Max. The dashed outline becomes a diamond or a square, so different points count as nearest.',
+        'With an even k and two classes, turn on weighting to break ties.',
       ]}
     >
       <Plot
-        w={560}
-        h={420}
+        w={480}
+        h={456}
         x={[0, 1]}
         y={[0, 1]}
         xLabel="attribute 1"
@@ -133,11 +132,11 @@ function UnitBalls() {
   return (
     <Lab
       title="What a circle looks like under each distance"
-      desc="Every point on a curve is exactly distance 1 from the center. kNN picks neighbors inside the smallest such shape that holds k points."
+      desc="Every point on a curve is at distance 1 from the center."
       controls={<Slider label="Minkowski p" value={p} min={0.5} max={10} step={0.5} onChange={setP} />}
-      notes={['p = 1 gives a diamond (Manhattan), p = 2 a circle (Euclidean), and as p grows the shape turns into a square (the max distance, L∞).', 'Below p = 1 the shape caves in. Minkowski with p < 1 is not a true distance because the triangle inequality fails.']}
+      notes={['Slide p from 1 to 10: diamond, circle, then nearly a square (L∞).', 'Go below p = 1: the shape caves in, because Minkowski with p < 1 breaks the triangle inequality.']}
     >
-      <Plot w={420} h={420} x={[-1.3, 1.3]} y={[-1.3, 1.3]} xTicks={4} yTicks={4} label="Unit balls for several Minkowski p values">
+      <Plot w={380} h={380} x={[-1.3, 1.3]} y={[-1.3, 1.3]} xTicks={4} yTicks={4} label="Unit balls for several Minkowski p values">
         <Line pts={ballPts(1)} color={seriesColor(0)} width={1.5} dash="5 4" />
         <Line pts={ballPts(2)} color={seriesColor(1)} width={1.5} dash="5 4" />
         <Line pts={ballPts(Infinity)} color={seriesColor(2)} width={1.5} dash="5 4" />
@@ -182,7 +181,7 @@ function ScalingLab() {
   return (
     <Lab
       title="Why you scale before measuring distance"
-      desc="Class depends on age here. Income is in tens of thousands, so in raw units a difference of 1 year counts the same as a difference of 1 dollar."
+      desc="Class depends on age. In raw units, 1 year counts the same as 1 dollar of income."
       controls={
         <>
           <Toggle on={scaled} onChange={setScaled}>Min-max scale both attributes to [0, 1]</Toggle>
@@ -190,7 +189,7 @@ function ScalingLab() {
           <Slider label="Query income" value={qi} min={20000} max={100000} step={1000} onChange={setQi} fmt={(v) => v.toLocaleString()} />
         </>
       }
-      notes={['Without scaling, the 5 neighbors line up horizontally: they have similar income and any age. The vote is close to random.', 'Turn scaling on. Now age matters as much as income, and the neighbors cluster around the query in both directions.']}
+      notes={['Unscaled, the 5 neighbors share an income band but have any age, so the vote is close to random. Turn scaling on and they cluster around the query in both directions.']}
     >
       <Plot w={560} h={360} x={[18, 67]} y={[15000, 105000]} xLabel="age (years)" yLabel="income" yFmt={(v) => `${v / 1000}k`} label="Age vs income with the 5 nearest neighbors">
         {nb.map((n) => (
@@ -241,12 +240,12 @@ function ChooseKLab() {
   return (
     <Lab
       title="Choosing k with a validation set"
-      desc="The moons data is split 70 / 30. Train accuracy uses the training points themselves; validation accuracy uses points the classifier never saw. The right panel uses the same k for kNN regression."
+      desc="Moons data split 70 / 30. The right panel uses the same k for kNN regression."
       controls={<Slider label="k" value={k} min={1} max={30} onChange={setK} />}
       notes={[
-        'At k = 1 training accuracy is 100%: each training point is its own nearest neighbor. That number tells you nothing.',
-        `Validation accuracy peaks around k = ${best.k} here. Pick k from the validation curve, never from the training curve.`,
-        'In regression, k = 1 copies the noise of the nearest point; a large k flattens the curve into a constant.',
+        'k = 1: training accuracy is 100% because each point is its own neighbor. It tells you nothing.',
+        `Validation accuracy peaks near k = ${best.k}. Pick k from that curve.`,
+        'Regression at k = 1 copies the noise; at k = 30 the curve flattens.',
       ]}
     >
       <div className="grid c2">
@@ -320,7 +319,7 @@ function DtwLab() {
   return (
     <Lab
       title="Dynamic time warping"
-      desc="Two series with the same shape, but one is shifted in time. Point-by-point distance compares position i with position i. DTW may stretch time so peaks line up with peaks."
+      desc="Same shape, shifted in time. DTW stretches time so peaks match peaks."
       controls={
         <>
           <Slider label="Time shift of series B" value={shift} min={0} max={12} onChange={setShift} />
@@ -328,7 +327,7 @@ function DtwLab() {
           <Slider label="Noise" value={noise} min={0} max={2} step={0.25} onChange={setNoise} />
         </>
       }
-      notes={['Set the shift to 0: DTW and the L1 distance agree, because the best path is the diagonal.', 'Increase the shift. The L1 distance grows fast, the DTW cost stays small: the path bends off the diagonal to match the shifted peaks.', 'Change the amplitude. DTW cannot fix a difference in height, only in timing.']}
+      notes={['Shift 0: DTW equals the L1 distance, the path is the diagonal.', 'Increase the shift: L1 grows fast, DTW stays small as the path bends.', 'Change the amplitude: DTW fixes timing, not height.']}
     >
       <span className="label">Series and DTW alignment (gray lines join matched points)</span>
       <Plot w={560} h={240} x={[0, n - 1]} y={[-4.2, 2.2]} xLabel="time" xTicks={7} yTicks={4} label="Two time series with DTW matches">
@@ -351,8 +350,8 @@ function DtwLab() {
         </div>
         <div>
           <Formula title="DTW recurrence">
-            <MB>{'D(i,j) = |a_i - b_j| + \\min\\{D(i-1,j),\\, D(i,j-1),\\, D(i-1,j-1)\\}'}</MB>
-            <p>Start at cell (0, 0), end at cell (n - 1, m - 1). The answer is the cost in that last cell. Each step moves down, right, or diagonally, so time never runs backward.</p>
+            <MB>{'\\begin{aligned} D(i,j) = {} & |a_i - b_j| \\\\ & + \\min\\{D(i-1,j),\\, D(i,j-1), \\\\ & \\qquad D(i-1,j-1)\\} \\end{aligned}'}</MB>
+            <p>The answer is the cost in the last cell. Steps go down, right or diagonal, so time never runs backward.</p>
           </Formula>
           <Readout>
             <Stat k="DTW cost" v={fmt(cost, 2)} />
@@ -389,7 +388,7 @@ function HandExample() {
         rows={rows.map((r, i) => [i + 1, r.id, `(${r.x}, ${r.y})`, r.c, fmt(r.d, 3), r.d1])}
       />
       <p style={{ marginTop: 12 }}>
-        The 3 nearest are E (red), D (blue) and C (blue), so q is predicted <strong>blue</strong> by majority vote. With <M>{'k = 1'}</M> it would be red. With Manhattan distance the top three are the same (E at 1, D and C at 2). With k = 4 you would hit a tie: B and F are both at Euclidean distance 2.236, so state your tie rule.
+        Nearest three: E (red), D (blue), C (blue), so q is <strong>blue</strong>. With <M>{'k = 1'}</M> it is red. Manhattan gives the same three. With k = 4, B and F tie at 2.236, so state your tie rule.
       </p>
     </>
   )
@@ -398,15 +397,15 @@ function HandExample() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Nearest neighbors" lede="kNN does no training at all. It stores the data and, when a new record arrives, finds the most similar stored records and copies their answer." minutes={25} />
+      <TopicHeader group="Classification" title="Nearest neighbors" lede="No training at all: store the data, then answer a new record with the classes of its most similar stored records." />
 
       <Plain>
         <p>
-          You move to a new city and want to know if a restaurant is good. You ask the 5 people whose taste is most like yours and go with the majority. That is k-nearest neighbors: similar inputs should get similar outputs.
+          To judge a restaurant in a new city, ask the 5 people whose taste is most like yours and go with the majority.
         </p>
       </Plain>
 
-      <Section id="algorithm" title="The algorithm" kicker="How it works">
+      <Section id="algorithm" title="The algorithm">
         <ol>
           <li>Store all training records. This is called a <strong>lazy learner</strong>: no model is built in advance.</li>
           <li>For a new record, compute its distance to every stored record.</li>
@@ -416,7 +415,7 @@ export default function Page() {
         <Formula title="Distances">
           <MB>{'d_p(x, y) = \\Big(\\sum_{i=1}^{n} |x_i - y_i|^p\\Big)^{1/p}'}</MB>
           <p>
-            <M>{'p = 1'}</M> is Manhattan (<M>{'\\ell_1'}</M>), <M>{'p = 2'}</M> is Euclidean (<M>{'\\ell_2'}</M>, the most common), and <M>{'p \\to \\infty'}</M> gives the largest single difference, <M>{'\\max_i |x_i - y_i|'}</M>.
+            <M>{'p = 1'}</M> Manhattan, <M>{'p = 2'}</M> Euclidean (most common), <M>{'p \\to \\infty'}</M> the largest single difference <M>{'\\max_i |x_i - y_i|'}</M>.
           </p>
         </Formula>
       </Section>
@@ -424,37 +423,37 @@ export default function Page() {
       <MainLab />
       <UnitBalls />
 
-      <Section id="by-hand" title="Worked by hand" kicker="Exam style">
+      <Section id="by-hand" title="Worked by hand">
         <HandExample />
       </Section>
 
-      <Section id="weights" title="Weighted votes" kicker="Refinement">
+      <Section id="weights" title="Weighted votes">
         <p>
-          A plain vote gives the 5th neighbor as much say as the 1st. A common fix weights each neighbor by the inverse squared distance, so close neighbors count more. You can also weight <strong>attributes</strong> to give important features more influence in the distance.
+          A plain vote gives the 5th neighbor as much say as the 1st. Weighting by inverse squared distance lets close neighbors count more. You can also weight <strong>attributes</strong> inside the distance.
         </p>
         <MB>{'w_i = \\frac{1}{d(q, x_i)^2}, \\qquad \\hat{y} = \\arg\\max_c \\sum_{i \\in N_k(q),\\, y_i = c} w_i'}</MB>
       </Section>
 
-      <Section id="preprocessing" title="Preprocessing matters" kicker="Scaling and dimensions">
+      <Section id="preprocessing" title="Preprocessing matters">
         <p>
-          kNN trusts the distance completely, so anything that distorts the distance distorts the prediction. Attributes with large ranges dominate, which is why you normalize first (min-max or z-score). Irrelevant attributes add noise to every distance. In high dimensions all points end up roughly equally far apart (the curse of dimensionality), so nearest stops meaning much.
+          kNN trusts the distance completely. Attributes with large ranges dominate, so normalize first (min-max or z-score). Irrelevant attributes add noise, and in high dimensions all points end up about equally far apart.
         </p>
       </Section>
       <ScalingLab />
 
-      <Section id="k" title="Choosing k" kicker="Bias and variance">
-        <p>Small k follows every noisy point (high variance). Large k averages over many points, possibly from other classes (high bias). Choose k with a validation set or cross-validation; for two classes an odd k avoids ties.</p>
+      <Section id="k" title="Choosing k">
+        <p>Small k follows every noisy point (high variance); large k blurs over other classes (high bias). Choose k by validation; with two classes an odd k avoids ties.</p>
       </Section>
       <ChooseKLab />
 
-      <Section id="dtw" title="Distance for time series" kicker="Dynamic time warping">
+      <Section id="dtw" title="Distance for time series">
         <p>
-          For sequences like heartbeats or speech, two series can have the same shape but be out of step in time. Euclidean distance compares position i with position i and punishes the shift. DTW finds the cheapest alignment between the two series, letting one point match several points of the other.
+          Heartbeats or speech can have the same shape but be out of step. Euclidean distance compares position i with position i and punishes the shift. DTW finds the cheapest alignment, letting one point match several of the other.
         </p>
       </Section>
       <DtwLab />
 
-      <Section id="pros-cons" title="Strengths and weaknesses" kicker="Know these">
+      <Section id="pros-cons" title="Strengths and weaknesses">
         <Table
           head={['Strength', 'Weakness']}
           rows={[

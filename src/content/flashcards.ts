@@ -10,10 +10,10 @@ export const CARDS: Card[] = [
     ['Classification vs regression?', 'Classification predicts a categorical class. Regression predicts a numeric value.'],
     ['Supervised vs unsupervised?', 'Supervised learning uses records with known labels (classification). Unsupervised learning has no labels (clustering).'],
     ['What does KDD stand for and what are its main steps?', 'Knowledge Discovery in Databases: cleaning, integration, selection, transformation, data mining, pattern evaluation, knowledge presentation.'],
-    ['Transactional data: what is it?', 'Each record is a transaction holding a set of items, for example TID 1: {bread, butter, milk}.'],
+    ['Transactional data: what is it?', 'Each record is a transaction holding a set of items, for example TID 1: {coffee, croissant, cookie}.'],
     ['Sequence data vs time series data?', 'Both are ordered. A time series is a sequence of repeated measurements over regular time steps, such as daily stock prices.'],
     ['What is an outlier in the clustering view?', 'An object far away from every cluster.'],
-    ['Association analysis finds what?', 'Sets of items that often appear in the same transactions, reported as rules like {diapers} => {beer}.'],
+    ['Association analysis finds what?', 'Sets of items that often appear in the same transactions, reported as rules like {croissant} => {coffee}.'],
   ]),
   ...c('summary', [
     ['Mean formula', '$\\bar{x} = \\frac{1}{N}\\sum_{i=1}^{N} x_i$. Sensitive to extreme values.'],

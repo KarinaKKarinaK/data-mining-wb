@@ -80,7 +80,7 @@ function StepperLab() {
   return (
     <Lab
       title="Agglomerative clustering, one merge at a time"
-      desc="Start with every point as its own cluster. Each step merges the two closest clusters. The table shows the current cluster distances; the two highlighted clusters merge next. Drag points to change the data."
+      desc="Each step merges the two closest clusters (highlighted in the table). Drag points to change the data."
       controls={
         <>
           <Seg label="Linkage" value={link} onChange={(v) => { setLink(v); setStep(0) }} options={LINKS} />
@@ -93,9 +93,9 @@ function StepperLab() {
         </>
       }
       notes={[
-        'Step through with Single, then switch to Complete. The first merges are the same (two single points have one distance), later ones differ.',
-        'Drag point D toward E and F. With single linkage, one close pair is enough to join two groups.',
-        'Watch the merge distances in the dendrogram: they never go down for single, complete, average and Ward. Centroid linkage can produce a lower merge than the one before (an inversion).',
+        'Step with Single, then Complete. The first merges match; later ones differ.',
+        'Drag D toward E and F. Under single linkage one close pair is enough to join two groups.',
+        'Merge heights never drop for single, complete, average and Ward. Centroid can drop (an inversion).',
       ]}
     >
       <Plot
@@ -144,7 +144,7 @@ function StepperLab() {
                 {mat[i].map((d, j) => {
                   const hit = isNext(a) && isNext(sorted[j]) && d !== null
                   return (
-                    <td key={j} className="num" style={hit ? { background: 'rgba(143,140,245,0.22)', color: 'var(--ink)' } : undefined}>
+                    <td key={j} className="num" style={hit ? { background: 'rgba(227,167,79,0.22)', color: 'var(--ink)' } : undefined}>
                       {d === null ? '' : fmt(d, 3)}
                     </td>
                   )
@@ -182,7 +182,7 @@ function CutLab() {
   return (
     <Lab
       title="Cut the dendrogram to get clusters"
-      desc="Every horizontal cut through the tree gives one flat clustering: the branches it crosses become the clusters. Move the cut and watch the scatter."
+      desc="The branches the cut crosses become the clusters."
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={setShape} options={[{ v: 'blobs', label: 'Blobs' }, { v: 'varied', label: 'Uneven' }, { v: 'moons', label: 'Moons' }, { v: 'uniform', label: 'No structure' }]} />
@@ -191,9 +191,8 @@ function CutLab() {
         </>
       }
       notes={[
-        'A long vertical gap in the tree means a natural number of clusters: you can move the cut a lot without changing the result.',
-        'On Moons, compare Single with Ward. Single follows each moon; Ward prefers compact, equal-size groups.',
-        'Cutting at 0% gives n clusters, at 100% one cluster. Hierarchical clustering does not need k in advance.',
+        'A long vertical gap in the tree marks a natural k: the cut can move a lot without changing the result.',
+        'On Moons, compare Single with Ward. Single follows each moon; Ward prefers compact, equal groups.',
       ]}
     >
       <Dendrogram n={pts.length} merges={merges} cut={cut} labels={labels} />
@@ -229,9 +228,9 @@ function ChainLab() {
   return (
     <Lab
       title="The chaining effect of single linkage"
-      desc="Two clear groups joined by a thin bridge of points. Both methods are asked for 2 clusters."
+      desc="Two groups joined by a bridge of points, split into 2 clusters."
       controls={<Slider label="Points on the bridge" value={count} min={0} max={14} onChange={setCount} />}
-      notes={['With a dense bridge, single linkage walks along it link by link and cannot separate the two groups. It ends with one huge cluster and a straggler.', 'Complete linkage looks at the farthest pair, so a bridge does not fool it. Remove the bridge (0 points) and both agree.']}
+      notes={['With a dense bridge, single linkage chains along it and ends with one huge cluster and a straggler.', 'Complete linkage uses the farthest pair, so the bridge does not fool it. Set the bridge to 0 and both agree.']}
     >
       <div className="grid c2">
         {views.map((v) => (
@@ -259,7 +258,7 @@ function WorkedLab() {
   return (
     <Lab
       title="Worked by hand: five values on a line"
-      desc="Points a = 1, b = 2, c = 4, d = 8, e = 13. The table lists every merge and the distance it happens at."
+      desc="Points a = 1, b = 2, c = 4, d = 8, e = 13."
       controls={<Seg label="Linkage" value={link} onChange={setLink} options={LINKS.filter((l) => l.v !== 'ward' && l.v !== 'centroid')} />}
       notes={['Single: {a, b} at 1, then c joins at 2 (distance from c to b), then d at 4, then e at 5.', 'Complete: c joins {a, b} at 3 (distance from c to a), then {d, e} forms at 5, and the last merge happens at 12 (from a to e).', 'Average: c joins {a, b} at (3 + 2) / 2 = 2.5.']}
     >
@@ -275,23 +274,23 @@ function WorkedLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Clustering" title="Hierarchical clustering" lede="Instead of one flat split into k groups, build a whole tree of groups. You choose the number of clusters afterwards by cutting the tree." minutes={25} />
+      <TopicHeader group="Clustering" title="Hierarchical clustering" lede="Build a tree of groups, then choose the number of clusters by cutting it." />
 
       <Plain>
         <p>
-          Think of a family tree read upside down. Each person starts alone. The two closest relatives join first, then families join into clans, clans into tribes, until everyone is one big family. Stop reading the tree at any level and you get a grouping.
+          A family tree read upside down: the closest relatives join first, then families join into clans, until everyone is one family. Stop at any level and you have a grouping.
         </p>
         <p>
-          The tree is called a <strong>dendrogram</strong>. The height where two branches join is the distance at which those clusters merged.
+          The tree is a <strong>dendrogram</strong>. Where two branches join is the distance at which they merged.
         </p>
       </Plain>
 
-      <Section id="two-ways" title="Two directions" kicker="AGNES and DIANA">
+      <Section id="two-ways" title="Two directions">
         <ul>
-          <li><strong>Agglomerative (bottom-up, AGNES)</strong>: start with n singleton clusters, repeatedly merge the closest pair, stop with one cluster.</li>
-          <li><strong>Divisive (top-down, DIANA)</strong>: start with one cluster holding everything, repeatedly split a cluster (for example the one with the largest diameter), stop when every object is alone.</li>
+          <li><strong>Agglomerative (AGNES)</strong>: start with n singletons and merge the closest pair until one cluster is left.</li>
+          <li><strong>Divisive (DIANA)</strong>: start with one cluster and split (for example the widest) until every object is alone.</li>
         </ul>
-        <p>Neither needs k as input, but both need a rule for the distance between two clusters, called the linkage.</p>
+        <p>Neither needs k. Both need a linkage: the distance between two clusters.</p>
         <Formula title="Linkage: distance between clusters A and B">
           <MB>{'d_{single} = \\min_{a \\in A, b \\in B} d(a, b) \\qquad d_{complete} = \\max_{a \\in A, b \\in B} d(a, b)'}</MB>
           <MB>{'d_{average} = \\frac{1}{|A||B|}\\sum_{a \\in A}\\sum_{b \\in B} d(a, b) \\qquad d_{centroid} = d(m_A, m_B)'}</MB>
@@ -300,12 +299,12 @@ export default function Page() {
       </Section>
       <StepperLab />
 
-      <Section id="cut" title="Reading and cutting a dendrogram" kicker="From tree to clusters">
-        <p>Draw a horizontal line across the dendrogram. Every vertical branch it crosses is one cluster. A higher cut gives fewer, bigger clusters.</p>
+      <Section id="cut" title="Reading and cutting a dendrogram">
+        <p>Each branch a horizontal cut crosses is one cluster. Higher cut, fewer clusters.</p>
       </Section>
       <CutLab />
 
-      <Section id="linkage" title="How the linkage changes the result" kicker="Single vs complete">
+      <Section id="linkage" title="How the linkage changes the result">
         <Table
           head={['Linkage', 'Tends to give', 'Weak spot']}
           rows={[
@@ -318,24 +317,24 @@ export default function Page() {
       </Section>
       <ChainLab />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
-        <p>Exams give a small distance matrix and ask you to run single or complete linkage and draw the dendrogram. After each merge, recompute only the row of the new cluster: with single linkage take the minimum of the two old rows, with complete linkage the maximum.</p>
+      <Section id="worked" title="Worked example">
+        <p>Exams give a small distance matrix. After each merge, update only the new cluster's row: the minimum of the two old rows for single linkage, the maximum for complete.</p>
       </Section>
       <WorkedLab />
 
-      <Section id="cost" title="Cost and limits" kicker="Know these">
+      <Section id="cost" title="Cost and limits">
         <ul>
           <li>The distance matrix needs <M>{'O(n^2)'}</M> memory. The naive algorithm takes <M>{'O(n^3)'}</M> time (n merges, each scanning the matrix).</li>
           <li>Merges are greedy and final. A bad early merge can never be undone.</li>
-          <li>Extensions such as BIRCH (summary tree of cluster features) and Chameleon (dynamic modeling of closeness) scale to bigger data.</li>
+          <li>BIRCH and Chameleon extend the idea to bigger data.</li>
         </ul>
       </Section>
 
       <Trap>
         <ul>
           <li>The dendrogram height is the merge distance, not the number of points.</li>
-          <li>Single linkage uses the closest pair; complete uses the farthest pair. Swapping them is the most common exam slip.</li>
-          <li>After merging, update the matrix with min (single) or max (complete) of the two old rows. Do not recompute from the original points unless the question asks for average or centroid linkage.</li>
+          <li>Single uses the closest pair, complete the farthest. Swapping them is the classic slip.</li>
+          <li>Update with min (single) or max (complete) of the old rows. Only average and centroid need the original points.</li>
         </ul>
       </Trap>
 

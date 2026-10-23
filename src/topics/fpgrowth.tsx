@@ -18,11 +18,11 @@ function OrderLab({ tx, minSup, setMinSup }: { tx: string[][]; minSup: number; s
   return (
     <Lab
       title="Scan 1: count items, then reorder every transaction"
-      desc="The first scan counts single items. Infrequent items are dropped, and each transaction is rewritten in descending order of item count."
+      desc="Drop infrequent items and rewrite each basket in descending order of count."
       controls={<Slider label="min_sup" value={minSup} min={0.1} max={0.8} step={0.05} fmt={(v) => `${pct(v)} (count ${Math.max(1, Math.ceil(v * tx.length - 1e-9))})`} onChange={setMinSup} />}
       notes={[
-        'Sorting by count puts the most common items near the root, so many transactions share the same first branches. That sharing is what makes the tree small.',
-        'Ties are broken alphabetically here. Any fixed rule works, as long as every transaction uses the same order.',
+        'Look at T1, T4 and T7: after reordering they all start with coffee, cookie, croissant, so they will share one branch.',
+        'Raise min_sup to 50%. Only coffee and cookie are left, and most baskets shrink to one or two items.',
       ]}
     >
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', alignItems: 'start' }}>
@@ -71,7 +71,7 @@ function BuildLab({ tx, minSup }: { tx: string[][]; minSup: number }) {
   return (
     <Lab
       title="Scan 2: grow the FP-tree"
-      desc="Insert the reordered transactions one at a time. A transaction walks down the existing branch as long as its items match, adding 1 to each count, and starts a new branch at the first difference."
+      desc="Each basket follows the existing branch while its items match, adding 1 to each count, and branches off at the first difference."
       controls={
         <>
           <Slider label="Transactions inserted" value={s} min={0} max={tx.length} onChange={setStep} fmt={(v) => `${v} of ${tx.length}`} />
@@ -86,9 +86,9 @@ function BuildLab({ tx, minSup }: { tx: string[][]; minSup: number }) {
         </>
       }
       notes={[
-        'Step through T1 to T4. T4 shares its first items with earlier baskets, so it only increases counts on an existing branch instead of making new nodes.',
-        'Node-links join every node holding the same item. The header table points to the first one, so the miner can visit all of them without searching the tree.',
-        'A count on a node is how many transactions pass through it, not how many contain the item overall. Add up an item over its node-links to get the overall count.',
+        'Insert up to T4. It reuses coffee > cookie > croissant from T1 and adds only a water node.',
+        'Turn on node-links and follow croissant: two nodes, counts 3 and 1, total 4.',
+        'A node count is how many baskets pass through that node, not the item total.',
       ]}
     >
       <TreeView nodes={tree.nodes} links={tree.links} order={order} highlight={hl} showLinks={links} label="FP-tree" />
@@ -117,19 +117,19 @@ function MineLab({ tx, minSup }: { tx: string[][]; minSup: number }) {
   return (
     <Lab
       title="Mining: conditional pattern base and conditional FP-tree"
-      desc="Pick an item. Collect the prefix paths that lead to it (its conditional pattern base), build a small FP-tree from those paths, and mine that tree recursively."
+      desc="Pick a suffix item to see its prefix paths, its conditional FP-tree and the itemsets it produces."
       controls={
         <>
           <Seg label="Suffix item" value={item} onChange={setPick} options={order.map((i) => ({ v: i, label: i }))} />
           <p className="muted" style={{ fontSize: 13, margin: 0 }}>
-            FP-growth processes items from the bottom of the header table upward. Each item only combines with items above it, so no itemset is found twice.
+            Each item only combines with items above it in the header table, so no itemset is found twice.
           </p>
         </>
       }
       notes={[
-        'Start with the bottom item. Its paths are short and few, so its conditional tree is tiny.',
-        'Counts in the pattern base come from the item node at the end of each path, not from the nodes on the path.',
-        'Change the baskets at the top of the page: the readout keeps checking that FP-growth and Apriori find exactly the same frequent itemsets.',
+        'Pick sandwich. Its three prefix paths share no item 3 times, so it forms only {sandwich}.',
+        'Pick milk tea. The path counts come from the milk tea nodes, giving egg tart a total of 3.',
+        'Edit the baskets above: the readout keeps checking that FP-growth and Apriori agree.',
       ]}
     >
       {item ? (
@@ -172,22 +172,23 @@ function Worked() {
   const minCount = 3
   const order = headerOrder(DEFAULT, minCount).map(([i]) => i)
   const tree = buildTree(DEFAULT.map((t) => orderTx(t, order)).filter((t) => t.length).map((items) => ({ items, count: 1 })))
-  const base = patternBase(tree.nodes, tree.links.get('cola') ?? [])
+  const base = patternBase(tree.nodes, tree.links.get('croissant') ?? [])
   const ct = condTree(base, minCount)
+  const found = fpgrowth(DEFAULT, minCount).filter((f) => f.set.includes('croissant'))
   return (
     <>
-      <p>Default baskets, min_sup = 30% (count 3). Mine the item at the bottom of the header table, cola.</p>
+      <p>The 10 cafe baskets, min_sup = 30% (count 3). Mine croissant.</p>
       <ol>
-        <li>Header order after scan 1: {order.join(', ')}.</li>
+        <li>Header order after scan 1: {order.join(', ')}. Ties are broken alphabetically.</li>
+        <li>Prefix paths ending at a croissant node: {base.map((b) => `${show(b.items)}: ${b.count}`).join(', ')}.</li>
         <li>
-          Prefix paths ending at cola: {base.map((b) => `${show(b.items)}: ${b.count}`).join(', ')}.
+          Counts inside this base: {[...ct.counts.entries()].map(([i, c]) => `${i} ${c}`).join(', ')}. Both reach 3.
         </li>
         <li>
-          Counts inside this base: {[...ct.counts.entries()].map(([i, c]) => `${i} ${c}`).join(', ')}. Only {ct.order.join(', ')} reaches 3.
+          The conditional FP-tree is a single path {ct.nodes.slice(1).map((n) => `${n.item}: ${n.count}`).join(' > ')}. Every combination of its nodes, plus croissant, is frequent, with the smallest count along the way.
         </li>
-        <li>The conditional FP-tree is a single node {ct.order[0]}: 3, so the frequent itemsets ending in cola are {'{'}cola{'}'}: 3 and {'{'}cola, diapers{'}'}: 3.</li>
       </ol>
-      <p>That matches Apriori, which found {'{'}cola, diapers{'}'} in L2 and nothing larger containing cola.</p>
+      <p>Result: {found.map((f) => `${show(f.set)}: ${f.count}`).join(', ')}. Apriori finds the same sets.</p>
     </>
   )
 }
@@ -197,18 +198,15 @@ export default function Page() {
   const [minSup, setMinSup] = useState(0.3)
   return (
     <>
-      <TopicHeader group="Association" title="FP-growth" lede="FP-growth finds the same frequent itemsets as Apriori without generating any candidates. It squeezes the database into a compact tree, then mines the tree piece by piece." minutes={25} />
+      <TopicHeader group="Association" title="FP-growth" lede="The same frequent itemsets as Apriori, with no candidates: compress the baskets into a tree, then mine the tree." />
 
       <Plain>
         <p>
-          Think of the autocomplete tree in your phone contacts. Names that start the same way share the same first letters in the tree, and only branch where they differ. FP-growth does the same with shopping baskets: baskets that start with the same popular items share a branch, and each branch keeps a counter of how many baskets went through it.
-        </p>
-        <p>
-          Once all baskets are in the tree, you never touch the raw data again. To find everything that goes with cola, you only look at the branches that end in cola.
+          Think of contact names in a phone: names that start the same way share their first letters and branch only where they differ. FP-growth stores baskets the same way, with a counter on each branch. To find what sells with croissants, you only read the branches that end in croissant.
         </p>
       </Plain>
 
-      <Section id="idea" title="Two scans, no candidates" kicker="How it works">
+      <Section id="idea" title="Two scans, no candidates">
         <ol>
           <li>
             <strong>Scan 1</strong>: count every item. Keep the frequent ones, sorted by descending count (the header table).
@@ -233,11 +231,11 @@ export default function Page() {
       <BuildLab key={tx.length} tx={tx} minSup={minSup} />
       <MineLab tx={tx} minSup={minSup} />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <Worked />
       </Section>
 
-      <Section id="compare" title="Apriori vs FP-growth" kicker="Know these cold">
+      <Section id="compare" title="Apriori vs FP-growth">
         <Table
           head={['', 'Apriori', 'FP-growth']}
           rows={[

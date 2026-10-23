@@ -62,8 +62,8 @@ const PRESETS: Record<string, { vals: number[]; dom: [number, number]; name: str
 }
 
 function Explorer() {
-  const W = 600
-  const H = 300
+  const W = 560
+  const H = 320
   const [preset, setPreset] = useState('trim')
   const [vals, setVals] = useState<number[]>(PRESETS.trim.vals)
   const [mode, setMode] = useState<'move' | 'remove'>('move')
@@ -89,7 +89,7 @@ function Explorer() {
   return (
     <Lab
       title="Drag the data, watch every statistic"
-      desc="Each dot is one value. Drag a dot along the line, click empty space to add a value, or switch to remove mode. The boxplot underneath redraws from the same values."
+      desc="Drag a dot, click empty space to add a value, or switch to remove mode."
       controls={
         <>
           <Seg
@@ -106,9 +106,9 @@ function Explorer() {
         </>
       }
       notes={[
-        'Start from "One outlier" and drag 48 further right. The mean and standard deviation chase it, the median and IQR do not move.',
-        'On the trimmed mean example, a 10% trim drops one value from each end (0 and 18) and gives 7.25.',
-        'Drag values until mean, median and mode are equal. You have made the distribution symmetric.',
+        'On "One outlier", drag 48 further right. Mean and std dev follow it; median and IQR stay put.',
+        'On the trimmed mean example, a 10% trim drops 0 and 18 and gives 7.25.',
+        'Drag values until mean, median and mode are equal: the data is now symmetric.',
       ]}
     >
       <Plot
@@ -187,11 +187,11 @@ function BinsLab() {
   return (
     <Lab
       title="Histogram: how many bins?"
-      desc="300 exam scores, split into equal-width buckets. The data never changes, only the bucket count."
+      desc="300 exam scores. Only the bucket count changes."
       controls={<Slider label="Number of bins" value={bins} min={2} max={40} onChange={setBins} />}
-      notes={['With 2 or 3 bins the two peaks merge into one hump. You would miss that there are two groups of students.', 'With 40 bins the shape gets noisy and every bar is small. Somewhere around 10 to 20 tells the real story here.']}
+      notes={['Set 3 bins: the two peaks merge into one hump and the two groups disappear.', 'Set 40 bins: the shape turns noisy. Around 10 to 20 shows the real shape.']}
     >
-      <Plot w={600} h={300} x={[0, 100]} y={[0, maxC * 1.15]} xLabel="score" yLabel="count" label="Histogram of scores" onLeave={() => setHover(-1)}>
+      <Plot w={560} h={300} x={[0, 100]} y={[0, maxC * 1.15]} xLabel="score" yLabel="count" label="Histogram of scores" onLeave={() => setHover(-1)}>
         {counts.map((c, b) => (
           <Rect key={b} x0={b * w + w * 0.04} x1={(b + 1) * w - w * 0.04} y0={0} y1={c} color={seriesColor(0)} opacity={hover === b ? 1 : 0.8} rx={2} onEnter={() => setHover(b)} onLeave={() => setHover(-1)} />
         ))}
@@ -232,11 +232,11 @@ function SkewLab() {
   return (
     <Lab
       title="Skew pulls the mean"
-      desc="Slide the skew. The long tail drags the mean furthest, the median a little, and the mode stays at the peak."
+      desc="The tail drags the mean furthest, the median a little, the mode not at all."
       controls={<Slider label="Skew" value={s} min={-1} max={1} step={0.05} onChange={setS} fmt={(x) => fmt(x, 2)} />}
-      notes={['Right skew (long tail to the right, like incomes): mode < median < mean.', 'Left skew (long tail to the left, like scores on an easy exam): mean < median < mode.', 'At skew 0 all three meet. The mode here is estimated as the middle of the tallest bar.']}
+      notes={['Slide right (tail to the right, like incomes): mode < median < mean.', 'Slide left (tail to the left, like an easy exam): mean < median < mode.', 'At 0 all three meet. The mode is the middle of the tallest bar.']}
     >
-      <Plot w={600} h={290} x={[lo, hi]} y={[0, Math.max(...counts) * 1.2]} xLabel="value" yLabel="count" label="Histogram with mean, median and mode marked">
+      <Plot w={560} h={290} x={[lo, hi]} y={[0, Math.max(...counts) * 1.2]} xLabel="value" yLabel="count" label="Histogram with mean, median and mode marked">
         {counts.map((c, b) => (
           <Rect key={b} x0={lo + b * bw + bw * 0.06} x1={lo + (b + 1) * bw - bw * 0.06} y0={0} y1={c} color="var(--ink-4)" opacity={0.75} rx={2} />
         ))}
@@ -273,14 +273,14 @@ function SameBoxLab() {
   return (
     <Lab
       title="Same boxplot, different data"
-      desc="All three datasets have 21 values with exactly the same five-number summary: 0, 25, 50, 75, 100. Switch between them."
+      desc="Three datasets of 21 values, all with five-number summary 0, 25, 50, 75, 100."
       controls={<Seg label="Dataset" value={k} onChange={setK} options={Object.entries(SAME).map(([key, d]) => ({ v: key, label: d.name }))} />}
-      notes={['The boxplot never moves. The histogram changes completely.', 'The standard deviation does change, which is a hint that the five-number summary is not the whole story.']}
+      notes={['Switch datasets: the boxplot never moves, the histogram changes completely, and so does the std dev.']}
     >
-      <Plot w={600} h={110} x={[0, 100]} y={[0, 1]} yTickValues={[]} label="Boxplot, identical for all three datasets">
+      <Plot w={560} h={110} x={[0, 100]} y={[0, 1]} yTickValues={[]} label="Boxplot, identical for all three datasets">
         <BoxMarks vals={vals} y0={0.25} y1={0.75} color={seriesColor(0)} />
       </Plot>
-      <Plot w={600} h={220} x={[0, 100]} y={[0, Math.max(...counts) * 1.15]} xLabel="value" yLabel="count" label="Histogram of the selected dataset">
+      <Plot w={560} h={220} x={[0, 100]} y={[0, Math.max(...counts) * 1.15]} xLabel="value" yLabel="count" label="Histogram of the selected dataset">
         {counts.map((c, b) => (
           <Rect key={b} x0={b * 10 + 0.5} x1={(b + 1) * 10 - 0.5} y0={0} y1={c} color={seriesColor(2)} rx={2} />
         ))}
@@ -303,17 +303,16 @@ export default function Page() {
       <TopicHeader
         group="Foundations"
         title="Summarizing data"
-        lede="Before mining anything, describe it: where the center is, how spread out it is, and what shape it has. A few numbers and three plots answer most first questions."
-        minutes={25}
+        lede="Before mining anything, describe the data: its center, its spread and its shape."
       />
 
       <Plain>
         <p>
-          Picture a class of 40 students and their exam scores. The <strong>center</strong> tells you the typical score. The <strong>spread</strong> tells you whether everyone scored about the same or the results were all over the place. The <strong>shape</strong> tells you if most did well with a few failures, or the other way round.
+          Think of 40 exam scores. The <strong>center</strong> is the typical score, the <strong>spread</strong> is how far scores differ, and the <strong>shape</strong> says whether most did well with a few failures or the reverse.
         </p>
       </Plain>
 
-      <Section id="basics" title="Objects and attributes" kicker="Vocabulary">
+      <Section id="basics" title="Objects and attributes">
         <p>
           A dataset is a collection of <strong>objects</strong> (also called records, tuples, samples, instances). Each object is described by <strong>attributes</strong> (features, variables, fields).
         </p>
@@ -328,19 +327,17 @@ export default function Page() {
         />
       </Section>
 
-      <Section id="center" title="Measures of center" kicker="Central tendency">
+      <Section id="center" title="Measures of center">
         <Formula>
           <MB>{'\\bar{x} = \\frac{1}{N}\\sum_{i=1}^{N} x_i \\qquad \\bar{x}_w = \\frac{\\sum_i w_i x_i}{\\sum_i w_i} \\qquad \\text{midrange} = \\frac{\\max + \\min}{2}'}</MB>
           <p>
             The <strong>median</strong> is the middle value of the sorted data. With an even count, average the two middle values. The <strong>mode</strong> is the most frequent value. A <strong>trimmed mean</strong> drops a percentage of the lowest and highest values first, like diving judges ignoring the extreme scores.
           </p>
         </Formula>
-        <p>
-          The mean is sensitive to extreme values. The median is not. That is why house prices and salaries are usually reported with the median.
-        </p>
+        <p>The mean is pulled by extreme values; the median is not. That is why salaries are reported with the median.</p>
       </Section>
 
-      <Section id="spread" title="Measures of spread" kicker="Dispersion">
+      <Section id="spread" title="Measures of spread">
         <Formula>
           <MB>{'\\sigma^2 = \\frac{1}{N}\\sum_{i=1}^{N}(x_i - \\bar{x})^2 = \\frac{1}{N}\\sum x_i^2 - \\bar{x}^2 \\qquad \\sigma = \\sqrt{\\sigma^2}'}</MB>
           <MB>{'IQR = Q_3 - Q_1 \\qquad \\text{outlier if } x < Q_1 - 1.5\\,IQR \\text{ or } x > Q_3 + 1.5\\,IQR'}</MB>
@@ -352,7 +349,7 @@ export default function Page() {
 
       <Explorer />
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
+      <Section id="worked" title="Worked example">
         <Table
           head={['Question', 'Working', 'Answer']}
           rows={[
@@ -364,28 +361,28 @@ export default function Page() {
         />
       </Section>
 
-      <Section id="plots" title="Three plots you must read" kicker="Graphic display">
+      <Section id="plots" title="Three plots you must read">
         <ul>
           <li>
             <strong>Boxplot</strong>: the five-number summary as a picture. The box runs from <M>{'Q_1'}</M> to <M>{'Q_3'}</M> with a line at the median. Whiskers reach the furthest values inside the 1.5 IQR fences. Points beyond are drawn on their own as outliers.
           </li>
           <li>
-            <strong>Histogram</strong>: split the range into buckets (usually equal width) and draw the count in each. It shows shape: one peak or two, skew, gaps.
+            <strong>Histogram</strong>: counts per bucket (usually equal width). Shows shape: peaks, skew, gaps.
           </li>
           <li>
-            <strong>Scatter plot</strong>: one point per object for two numeric attributes. It shows positive, negative or no correlation.
+            <strong>Scatter plot</strong>: two numeric attributes, one point per object. Shows positive, negative or no correlation.
           </li>
         </ul>
       </Section>
       <BinsLab />
 
-      <Section id="shape" title="Skew and the order of mean, median, mode" kicker="Shape">
+      <Section id="shape" title="Skew and the order of mean, median, mode">
         <p>Symmetric data has mean = median = mode. A long tail pulls the mean toward it.</p>
       </Section>
       <SkewLab />
 
-      <Section id="same-box" title="Why one plot is never enough" kicker="Boxplot vs histogram">
-        <p>A boxplot only knows five numbers. Very different datasets can share them.</p>
+      <Section id="same-box" title="Why one plot is never enough">
+        <p>A boxplot only knows five numbers, and very different data can share them.</p>
       </Section>
       <SameBoxLab />
 
@@ -395,7 +392,7 @@ export default function Page() {
             <li>pandas <code>.std()</code> divides by N - 1. The course divides by N, so use <code>ddof=0</code>.</li>
             <li>Different tools compute quartiles differently. This site and pandas use linear interpolation between sorted values. State your method if it matters.</li>
             <li>Forgetting to sort before finding the median.</li>
-            <li>Two datasets with the same boxplot can have completely different distributions. Always look at a histogram too.</li>
+            <li>The same boxplot can hide very different distributions. Check a histogram too.</li>
             <li>The 1.5 IQR rule flags candidates. An outlier may be a real but rare value, not an error.</li>
           </ul>
         </Trap>

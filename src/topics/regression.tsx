@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Check, Formula, Plain, Section, Table, TopicHeader, Trap } from '../components/Content'
 import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
-import { Dot, Line, Plot, Rect, Tip, VLine } from '../components/Plot'
+import { Dot, Line, Plot, Rect, Tip, VLine, usePlot } from '../components/Plot'
 import { Btn, Legend, Readout, Slider, Stat, Toggle, seriesColor } from '../components/ui'
 import { clipSeg } from '../lib/c-geom'
 import { fmt, gauss, mean, rng, type Pt } from '../lib/stats'
@@ -18,10 +18,19 @@ function ols(pts: Pt[]) {
 
 const sseOf = (pts: Pt[], w0: number, w1: number) => pts.reduce((s, p) => s + (p.y - (w0 + w1 * p.x)) ** 2, 0)
 
-const W = 460
-const H = 420
-const PX = (W - 56 - 16) / 10
-const PY = (H - 14 - 46) / 10
+function Squares({ pts, w0, w1 }: { pts: Pt[]; w0: number; w1: number }) {
+  const { sx, sy } = usePlot()
+  const ratio = (sy(0) - sy(1)) / (sx(1) - sx(0))
+  return (
+    <>
+      {pts.map((p, i) => {
+        const r = p.y - (w0 + w1 * p.x)
+        const wx = Math.abs(r) * ratio
+        return <Rect key={i} x0={p.x} x1={p.x + (r > 0 ? -wx : wx)} y0={p.y} y1={p.y - r} color={seriesColor(1)} opacity={0.14} stroke={seriesColor(1)} />
+      })}
+    </>
+  )
+}
 
 const START: Pt[] = [
   { x: 1, y: 2.2 },
@@ -65,7 +74,7 @@ function FitLab() {
   return (
     <Lab
       title="Least squares, live"
-      desc="Drag any point. The line is the one with the smallest possible sum of squared vertical errors. Each square's area is one squared residual."
+      desc="Drag any point. Each square's area is one squared residual; the line minimizes their total."
       controls={
         <>
           <Toggle on={squares} onChange={setSquares}>Draw squared residuals</Toggle>
@@ -83,14 +92,14 @@ function FitLab() {
         </>
       }
       notes={[
-        'Turn on "my own line" and try to beat the least-squares SSE. You cannot: it is the minimum.',
-        'Add the outlier at the bottom right. One point drags the slope down hard, because its residual is squared. The dashed line is the fit without it.',
-        'Pull one point far up in the middle of the x range, then the same distance at the far right. The far-right point tilts the line more: points with extreme x have more leverage.',
+        'Turn on "my own line" and try to beat the least-squares SSE. You cannot.',
+        'Add the outlier: one squared residual drags the slope down. The dashed line is the fit without it.',
+        'Pull a middle point up, then a far-right point by the same amount. The far-right one tilts the line more: extreme x means more leverage.',
       ]}
     >
       <Plot
-        w={W}
-        h={H}
+        w={460}
+        h={420}
         x={[0, 10]}
         y={[0, 10]}
         xLabel="x"
@@ -114,12 +123,7 @@ function FitLab() {
           setHover(null)
         }}
       >
-        {squares &&
-          pts.map((p, i) => {
-            const r = p.y - (fit.w0 + fit.w1 * p.x)
-            const wx = (Math.abs(r) * PY) / PX
-            return <Rect key={'s' + i} x0={p.x} x1={p.x + (r > 0 ? -wx : wx)} y0={p.y} y1={p.y - r} color={seriesColor(1)} opacity={0.14} stroke={seriesColor(1)} />
-          })}
+        {squares && <Squares pts={pts} w0={fit.w0} w1={fit.w1} />}
         {pts.map((p, i) => (
           <Line key={'r' + i} pts={[p, { x: p.x, y: fit.w0 + fit.w1 * p.x }]} color={seriesColor(1)} width={1.2} />
         ))}
@@ -208,7 +212,7 @@ function PolyLab() {
   return (
     <Lab
       title="Polynomial degree and overfitting"
-      desc="12 noisy training points from a smooth curve. Raise the degree of the fitted polynomial and compare the error on training points with the error on 40 new test points."
+      desc="12 noisy training points from a smooth curve, 40 test points."
       controls={
         <>
           <Slider label="Polynomial degree" value={deg} min={0} max={10} onChange={setDeg} />
@@ -216,9 +220,9 @@ function PolyLab() {
         </>
       }
       notes={[
-        'Degree 0 and 1 underfit: both errors are high.',
-        `Training error keeps falling as the degree rises. Test error is lowest around degree ${best.d} and then climbs: the curve starts chasing noise.`,
-        'At degree 10 with 12 points the curve nearly passes through every training point, and swings wildly between them.',
+        'Degree 0 or 1: both errors high (underfitting).',
+        `Raise the degree: training error keeps falling, test error bottoms out near degree ${best.d} and climbs.`,
+        'Degree 10: the curve hits nearly every training point and swings wildly between them.',
       ]}
     >
       <div className="grid c2">
@@ -285,17 +289,17 @@ function Worked() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Regression" lede="Classification predicts a category. Regression predicts a number: a price, a temperature, a grade. The simplest model is a straight line chosen to make the squared errors as small as possible." minutes={20} />
+      <TopicHeader group="Classification" title="Regression" lede="Regression predicts a number instead of a category. The simplest model is the straight line with the smallest squared errors." />
 
       <Plain>
         <p>
-          Stretch a rubber band through a cloud of nails so it sits as close to all of them as possible. Points far from the band pull hard on it. Least squares is that rubber band, where the pull of each point grows with the square of its distance.
+          A rubber band stretched through a cloud of nails, where each nail pulls with the square of its distance. Far points pull hardest.
         </p>
       </Plain>
 
-      <Section id="linear" title="Simple linear regression" kicker="The model">
+      <Section id="linear" title="Simple linear regression">
         <p>
-          One predictor <M>{'x'}</M>, one response <M>{'y'}</M>, model <M>{'\\hat{y} = w_0 + w_1 x'}</M>. The residual of a point is <M>{'y_i - \\hat{y}_i'}</M>, the vertical gap between the point and the line.
+          Model <M>{'\\hat{y} = w_0 + w_1 x'}</M>. The residual <M>{'y_i - \\hat{y}_i'}</M> is the vertical gap between a point and the line.
         </p>
         <Formula title="Least-squares coefficients">
           <MB>{'w_1 = \\frac{\\sum_{i=1}^{N}(x_i - \\bar{x})(y_i - \\bar{y})}{\\sum_{i=1}^{N}(x_i - \\bar{x})^2}, \\qquad w_0 = \\bar{y} - w_1 \\bar{x}'}</MB>
@@ -304,19 +308,19 @@ export default function Page() {
         <Formula title="How good is the fit">
           <MB>{'R^2 = 1 - \\frac{SSE}{SST}, \\qquad SST = \\sum (y_i - \\bar{y})^2'}</MB>
           <p>
-            <M>{'R^2'}</M> is the share of the variation in <M>{'y'}</M> explained by the line. 1 is a perfect fit, 0 means the line does no better than predicting <M>{'\\bar{y}'}</M> for everyone.
+            Share of the variation in <M>{'y'}</M> explained by the line. 1 is a perfect fit, 0 is no better than predicting <M>{'\\bar{y}'}</M>.
           </p>
         </Formula>
       </Section>
 
       <FitLab />
 
-      <Section id="worked" title="Worked by hand" kicker="Exam style">
-        <p>Five points. Build the table column by column, then plug the sums into the formulas.</p>
+      <Section id="worked" title="Worked by hand">
+        <p>Five points. Fill the table column by column, then use the sums.</p>
         <Worked />
       </Section>
 
-      <Section id="beyond" title="Beyond a straight line" kicker="Multiple and nonlinear regression">
+      <Section id="beyond" title="Beyond a straight line">
         <ul>
           <li><strong>Multiple linear regression</strong>: <M>{'\\hat{y} = w_0 + w_1x_1 + \\dots + w_nx_n'}</M>, solved with the same least-squares idea in matrix form.</li>
           <li><strong>Polynomial regression</strong>: add <M>{'x^2, x^3, \\dots'}</M> as extra attributes. The model is still linear in the weights, so least squares still works.</li>

@@ -82,7 +82,7 @@ function TrainLab() {
   return (
     <Lab
       title="Train a small network live"
-      desc="Two inputs, one hidden layer, one sigmoid output. Press Train and watch backpropagation bend the decision boundary."
+      desc="Two inputs, one hidden layer, one sigmoid output."
       controls={
         <>
           <Seg label="Dataset" value={dataId} onChange={(v) => { setDataId(v); reset() }} options={[{ v: 'xor', label: 'XOR' }, { v: 'moons', label: 'Moons' }, { v: 'circles', label: 'Rings' }]} />
@@ -100,10 +100,9 @@ function TrainLab() {
         </>
       }
       notes={[
-        'Set hidden units to 0 on XOR. The model is then plain logistic regression, a single straight boundary, and accuracy stays near 50%.',
-        'With 2 to 4 hidden units XOR is solved: each hidden unit draws one line and the output combines them.',
-        'Raise the learning rate to 2. Loss drops faster at first but can bounce or stall. Very small rates are stable but slow.',
-        'Rings need a closed boundary. Count how many hidden units it takes before the network wraps around the inner ring.',
+        'XOR with 0 hidden units: one straight boundary, accuracy stays near 50%. With 2 to 4 units it is solved.',
+        'Learning rate 2: loss drops fast at first, then may bounce or stall.',
+        'Rings: count how many hidden units it takes to wrap around the inner ring.',
       ]}
     >
       <div className="grid c2">
@@ -114,10 +113,10 @@ function TrainLab() {
           ))}
         </Plot>
         <div>
-          <span className="label">Network (line width = weight size, blue positive, orange negative)</span>
+          <span className="label">Network: width = weight size, blue +, orange -</span>
           <NetDiagram net={net.current} hidden={hidden} lin={lin.current.w} />
           <span className="label">Training loss (cross-entropy)</span>
-          <Plot w={360} h={150} x={[0, Math.max(10, hist.current.length * 5)]} y={[0, maxLoss]} xTicks={4} yTicks={3} label="Loss over epochs" yFmt={(v) => fmt(v, 1)}>
+          <Plot w={360} h={160} x={[0, Math.max(10, hist.current.length * 5)]} y={[0, maxLoss]} xLabel="epoch" yLabel="loss" xTicks={4} yTicks={3} label="Loss over epochs" yFmt={(v) => fmt(v, 1)}>
             <Line pts={hist.current.map((h, i) => ({ x: (i + 1) * 5, y: h.loss }))} color={seriesColor(0)} />
           </Plot>
         </div>
@@ -173,16 +172,16 @@ function ActLab() {
   return (
     <Lab
       title="Activation functions and their slopes"
-      desc="Backpropagation multiplies by the slope of the activation at every layer. Flat regions mean tiny gradients and slow learning."
+      desc="Backprop multiplies by this slope at every layer. Flat regions learn slowly."
       controls={
         <>
           <Seg label="Function" value={a} onChange={setA} options={[{ v: 'sigmoid', label: 'sigmoid' }, { v: 'tanh', label: 'tanh' }, { v: 'relu', label: 'ReLU' }]} />
           <Slider label="Net input z" value={z} min={-6} max={6} step={0.1} onChange={setZ} fmt={(v) => fmt(v, 1)} />
         </>
       }
-      notes={['The sigmoid slope is at most 0.25 (at z = 0). Through many layers those small factors multiply and gradients vanish.', 'ReLU has slope 1 for every positive input, which is one reason deep networks prefer it. For negative input its slope is 0.']}
+      notes={['Sigmoid at z = 0: slope 0.25, its maximum. Many layers of factors this small make gradients vanish.', 'ReLU: slope 1 for any positive z, 0 for negative.']}
     >
-      <Plot w={560} h={280} x={[-6, 6]} y={[-1.2, a === 'relu' ? 6 : 1.2]} xLabel="z" xTicks={6} yTicks={4} label="Activation function and derivative">
+      <Plot w={560} h={300} x={[-6, 6]} y={[-1.2, a === 'relu' ? 6 : 1.2]} xLabel="z" yLabel="value" xTicks={6} yTicks={4} label="Activation function and derivative">
         <VLine x={z} color="var(--ink-4)" />
         <Line pts={xs.map((x) => ({ x, y: act(a, x) }))} color={seriesColor(0)} width={2.5} />
         <Line pts={xs.map((x) => ({ x, y: dact(a, x) }))} color={seriesColor(1)} dash="5 4" />
@@ -215,7 +214,7 @@ function StepLab() {
   return (
     <Lab
       title="One backpropagation step by hand"
-      desc="A single sigmoid neuron with squared error. Every number an exam would ask for is computed below as you change the inputs."
+      desc="One sigmoid neuron with squared error."
       controls={
         <>
           <Slider label="x1" value={x1} min={-1} max={1} step={0.1} onChange={setX1} fmt={(v) => fmt(v, 1)} />
@@ -227,7 +226,7 @@ function StepLab() {
           <Slider label="learning rate η" value={lr} min={0.1} max={2} step={0.1} onChange={setLr} fmt={(v) => fmt(v, 1)} />
         </>
       }
-      notes={['After the step the output always moves toward the target, and the error drops.', 'If the output is already close to 0 or 1, O(1 - O) is tiny, so the update is tiny too even when the answer is wrong.']}
+      notes={['Compare the output before and after: it always moves toward T.', 'Set x1, x2, w1, w2 and b all to 1 with T = 0: O = 0.95, so O(1 - O) is small and the update is small even though the answer is wrong.']}
     >
       <Table
         head={['Quantity', 'Formula', 'Value']}
@@ -251,15 +250,15 @@ function StepLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Neural networks" lede="One perceptron draws one straight line. Put layers of them together, swap the hard threshold for a smooth function, and the network can draw almost any boundary. Backpropagation is how it learns the weights." minutes={30} />
+      <TopicHeader group="Classification" title="Neural networks" lede="Layers of units with smooth activations can draw almost any boundary. Backpropagation learns their weights." />
 
       <Plain>
         <p>
-          A hidden layer is a team of simple detectors. Each one answers a small yes-or-no question, like "is the point above this line?". The output unit combines their answers. With enough detectors the combination can trace curves, rings and islands that no single line could.
+          A hidden layer is a team of simple detectors, each asking something like "is the point above this line?". The output combines their answers, so enough detectors can trace curves and rings.
         </p>
       </Plain>
 
-      <Section id="structure" title="Structure" kicker="Multilayer perceptron">
+      <Section id="structure" title="Structure">
         <ul>
           <li><strong>Input layer</strong>: one unit per attribute. It only passes values on.</li>
           <li><strong>Hidden layers</strong>: each unit computes a weighted sum of the previous layer and applies a nonlinear activation such as sigmoid.</li>
@@ -269,19 +268,19 @@ export default function Page() {
         <Formula title="One unit">
           <MB>{'O_j = f\\Big(\\sum_i w_{ij} O_i + \\theta_j\\Big), \\qquad \\sigma(z) = \\frac{1}{1 + e^{-z}}'}</MB>
           <p>
-            The sigmoid replaces the perceptron's hard step with a smooth S curve. Smooth means it has a derivative, <M>{"\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))"}</M>, and that is what makes gradient-based learning possible.
+            The sigmoid is a smooth version of the perceptron's step. Its derivative <M>{"\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))"}</M> is what makes gradient learning possible.
           </p>
         </Formula>
       </Section>
 
       <TrainLab />
 
-      <Section id="backprop" title="Backpropagation" kicker="How it learns">
+      <Section id="backprop" title="Backpropagation">
         <ol>
-          <li>Initialize all weights to small random values (not all zero, or every hidden unit learns the same thing).</li>
+          <li>Initialize weights to small random values (all zero makes every hidden unit learn the same thing).</li>
           <li><strong>Forward pass</strong>: compute every unit's output, layer by layer.</li>
           <li>Compute the error at the output.</li>
-          <li><strong>Backward pass</strong>: send the error back through the network. Each unit gets a share of blame proportional to its weights.</li>
+          <li><strong>Backward pass</strong>: send the error back; each unit gets blame in proportion to its weights.</li>
           <li>Move every weight a small step against its gradient. Repeat over many epochs.</li>
         </ol>
         <Formula title="Error terms with sigmoid units">
@@ -294,7 +293,7 @@ export default function Page() {
       <StepLab />
       <ActLab />
 
-      <Section id="practice" title="In practice" kicker="Strengths and weaknesses">
+      <Section id="practice" title="In practice">
         <Table
           head={['Strength', 'Weakness']}
           rows={[

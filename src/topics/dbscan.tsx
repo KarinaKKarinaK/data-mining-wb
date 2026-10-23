@@ -60,7 +60,7 @@ function DbscanLab() {
   return (
     <Lab
       title="DBSCAN with two knobs: eps and MinPts"
-      desc="Filled marks are core points, rings are border points, gray crosses are noise. Hover a point to see its eps-neighborhood. Click empty space to add a point."
+      desc="Filled: core. Ring: border. Gray cross: noise. Hover a point for its neighborhood; click empty space to add one."
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={(v) => { setShape(v); setAdded([]) }} options={DATASETS} />
@@ -72,10 +72,9 @@ function DbscanLab() {
         </>
       }
       notes={[
-        'On Moons, DBSCAN finds both moons without being told how many clusters there are. Shrink eps until a moon breaks apart, then grow it until the moons merge.',
-        'Raise MinPts: more points fail the core test, so borders and noise grow. Lower it to 2 and almost every point becomes core, so noise points form tiny clusters.',
-        'Try Uneven blobs. One eps cannot fit a tight and a loose cluster at the same time. This is the main weakness that OPTICS addresses.',
-        'Click a few times between two clusters to build a bridge of points and watch them merge.',
+        'Moons: shrink eps until a moon breaks apart, then grow it until the moons merge.',
+        'Raise MinPts and noise grows. At 2, almost every point is core and noise forms tiny clusters.',
+        'Uneven blobs: one eps cannot fit a tight and a loose cluster at once. OPTICS addresses this.',
       ]}
     >
       <Plot
@@ -134,7 +133,7 @@ function CompareLab() {
   return (
     <Lab
       title="Same data, DBSCAN vs k-means"
-      desc="k-means splits space into convex regions around centroids. DBSCAN follows dense regions of any shape and leaves sparse points out."
+      desc="Same data, two methods."
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={setShape} options={DATASETS} />
@@ -181,7 +180,7 @@ function KDistLab() {
   return (
     <Lab
       title="Picking eps with the sorted k-distance plot"
-      desc={<>For every point, take the distance to its (MinPts - 1)th nearest other point and sort these values from largest to smallest. A point is core exactly when its value is at most eps.</>}
+      desc={<>Each point's distance to its (MinPts - 1)th nearest neighbor, sorted. A point is core when its value is at most eps.</>}
       controls={
         <>
           <Seg label="Dataset" value={shape} onChange={setShape} options={DATASETS} />
@@ -218,7 +217,7 @@ function WorkedLab() {
   return (
     <Lab
       title="Worked by hand: nine points"
-      desc="Euclidean distance. MinPts counts the point itself. Change eps or MinPts and the classification table updates."
+      desc="Euclidean distance; MinPts counts the point itself."
       controls={
         <>
           <Seg label="eps" value={eps} onChange={setEps} options={[{ v: 1, label: '1' }, { v: 1.5, label: '1.5' }, { v: 2, label: '2' }]} />
@@ -252,18 +251,18 @@ function WorkedLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Clustering" title="Density-based clustering" lede="DBSCAN grows clusters through crowded regions and stops where the crowd thins out. It finds clusters of any shape, decides the number of clusters itself, and labels the leftovers as noise." minutes={25} />
+      <TopicHeader group="Clustering" title="Density-based clustering" lede="DBSCAN grows clusters through crowded regions and stops where they thin out. Any shape, no k needed, and leftovers become noise." />
 
       <Plain>
         <p>
-          Picture a festival seen from above. Wherever people stand close together you see a crowd, whatever its shape: a line at a food stall, a circle around a stage. Someone standing alone in the field belongs to no crowd. DBSCAN finds crowds the same way: a point is in a crowd if enough others are within arm's reach.
+          A festival seen from above: wherever people stand close together you see a crowd, whatever its shape. Someone alone belongs to no crowd. A point is in a crowd if enough others are within arm's reach.
         </p>
         <p>
-          Arm's reach is <strong>eps</strong> (the radius). Enough others is <strong>MinPts</strong> (the minimum number of points in the neighborhood).
+          Arm's reach is <strong>eps</strong>. Enough others is <strong>MinPts</strong>.
         </p>
       </Plain>
 
-      <Section id="defs" title="The definitions" kicker="Vocabulary">
+      <Section id="defs" title="The definitions">
         <Formula title="Neighborhood and core point">
           <MB>{'N_{eps}(p) = \\{\\, q \\in D \\mid d(p, q) \\le eps \\,\\}, \\qquad p \\text{ is core} \\iff |N_{eps}(p)| \\ge MinPts'}</MB>
         </Formula>
@@ -271,23 +270,23 @@ export default function Page() {
           <li><strong>Core point</strong>: at least MinPts points (itself included) within eps.</li>
           <li><strong>Border point</strong>: not core, but inside the eps-neighborhood of some core point.</li>
           <li><strong>Noise</strong>: neither core nor border.</li>
-          <li><strong>Directly density-reachable</strong>: q is directly reachable from p if p is core and q is in <M>{'N_{eps}(p)'}</M>. Not symmetric: a border point is reachable from a core point, not the other way round.</li>
-          <li><strong>Density-reachable</strong>: there is a chain <M>{'p = p_1, p_2, \\dots, p_n = q'}</M> where each next point is directly reachable from the previous one.</li>
-          <li><strong>Density-connected</strong>: p and q are both density-reachable from some point o. This one is symmetric.</li>
+          <li><strong>Directly density-reachable</strong>: p is core and q is in <M>{'N_{eps}(p)'}</M>. Not symmetric.</li>
+          <li><strong>Density-reachable</strong>: a chain <M>{'p = p_1, \\dots, p_n = q'}</M> of direct reaches.</li>
+          <li><strong>Density-connected</strong>: both density-reachable from some o. Symmetric.</li>
           <li>A <strong>cluster</strong> is a maximal set of density-connected points.</li>
         </ul>
         <Formula title="The algorithm">
           <ol style={{ marginBottom: 0 }}>
             <li>Pick an unvisited point p and find its eps-neighborhood.</li>
-            <li>If p is core, start a new cluster and keep adding every point density-reachable from p (expand through core points only).</li>
-            <li>If p is not core, mark it as noise for now. It can still become a border point of a later cluster.</li>
+            <li>If p is core, start a cluster and add everything density-reachable from it.</li>
+            <li>Otherwise mark p as noise for now; it may later become a border point.</li>
             <li>Repeat until every point is visited.</li>
           </ol>
         </Formula>
       </Section>
       <DbscanLab />
 
-      <Section id="vs" title="Why not just k-means?" kicker="Comparison">
+      <Section id="vs" title="Why not just k-means?">
         <Table
           head={['', 'k-means', 'DBSCAN']}
           rows={[
@@ -302,21 +301,21 @@ export default function Page() {
       </Section>
       <CompareLab />
 
-      <Section id="eps" title="Choosing the parameters" kicker="Heuristic">
+      <Section id="eps" title="Choosing the parameters">
         <p>
-          Fix MinPts first (a common default is twice the number of dimensions, so 4 for 2D data). Then sort the distance from every point to its <M>{'(MinPts - 1)'}</M>th nearest neighbor and look for the knee.
+          Fix MinPts first (often twice the dimensions, so 4 in 2D). Sort each point's distance to its <M>{'(MinPts - 1)'}</M>th nearest neighbor and pick eps at the knee.
         </p>
       </Section>
       <KDistLab />
 
-      <Section id="optics" title="OPTICS in brief" kicker="Varying density">
+      <Section id="optics" title="OPTICS in brief">
         <p>
-          OPTICS does not output one clustering. It outputs an <strong>ordering</strong> of the points together with each point's reachability distance. Plotting reachability in that order gives valleys for clusters. Cutting the plot at different heights gives the DBSCAN result for different eps values, so clusters of different density show up in one run.
+          OPTICS outputs an <strong>ordering</strong> of the points with each one's reachability distance. Clusters show as valleys in that plot, and cutting it at different heights gives DBSCAN for different eps, so clusters of different density appear in one run.
         </p>
       </Section>
 
-      <Section id="worked" title="Worked example" kicker="Exam style">
-        <p>Exams give a few coordinates with eps and MinPts and ask you to label each point core, border or noise, then list the clusters. Count the point itself in its own neighborhood unless the question says otherwise.</p>
+      <Section id="worked" title="Worked example">
+        <p>Exams give a few points, eps and MinPts: label each point core, border or noise, then list the clusters. Count the point itself unless told otherwise.</p>
       </Section>
       <WorkedLab />
 

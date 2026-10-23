@@ -47,7 +47,7 @@ function ManualLab() {
   return (
     <Lab
       title="Set the weights yourself"
-      desc="A perceptron fires (outputs 1) when the weighted sum of its inputs is above the threshold. The line is where the sum equals the threshold exactly."
+      desc="Output 1 when the weighted sum reaches the threshold. The line is where they are equal."
       controls={
         <>
           <Seg label="Target function" value={fn} onChange={setFn} options={(['AND', 'OR', 'NAND', 'XOR'] as Fn[]).map((f) => ({ v: f, label: f }))} />
@@ -71,14 +71,12 @@ function ManualLab() {
         </>
       }
       notes={[
-        'AND: both weights 1 and threshold 1.5. Only (1, 1) reaches a sum above 1.5.',
-        'OR: keep the weights, drop the threshold to 0.5. Any single 1 is enough.',
-        'NOT with one input: weight -1, threshold -0.5. A negative weight turns a 1 into "do not fire".',
-        'Try XOR for a while. The two 1s sit on opposite corners, and no single straight line separates them from the two 0s.',
+        'AND: weights 1 and 1, threshold 1.5. Only (1, 1) reaches it. OR: drop the threshold to 0.5.',
+        'Try XOR: the two 1s sit on opposite corners, so no straight line separates them from the 0s.',
       ]}
     >
       <div>
-        <Plot w={460} h={380} x={[-0.5, 1.5]} y={[-0.5, 1.5]} xLabel="I1" yLabel="I2" xTicks={4} yTicks={4} label="Inputs, targets and the perceptron decision line">
+        <Plot w={420} h={360} x={[-0.5, 1.5]} y={[-0.5, 1.5]} xLabel="I1" yLabel="I2" xTicks={4} yTicks={4} label="Inputs, targets and the perceptron decision line">
           <Heat res={40} fn={regionFn} />
           <Line pts={boundary(-t, w1, w2, -0.5, 1.5)} color="var(--ink)" width={2} />
           {rows.map((r, i) => (
@@ -94,7 +92,7 @@ function ManualLab() {
           />
           <Readout>
             <Stat k="Correct" v={`${correct} / 4`} />
-            <Stat k="Fires when" v={`sum > ${fmt(t, 1)}`} />
+            <Stat k="Fires when" v={`sum >= ${fmt(t, 1)}`} />
           </Readout>
         </div>
       </div>
@@ -166,7 +164,7 @@ function TrainerLab() {
   return (
     <Lab
       title="Train it with the perceptron learning rule"
-      desc="Weights start at 0. The examples are shown in order. Each wrong output nudges the weights toward the right answer; a correct output changes nothing."
+      desc="Weights start at 0. Only wrong outputs change the weights."
       controls={
         <>
           <Seg label="Target function" value={fn} onChange={(f) => reset(f)} options={(['AND', 'OR', 'NAND', 'XOR'] as Fn[]).map((f) => ({ v: f, label: f }))} />
@@ -190,14 +188,14 @@ function TrainerLab() {
         </>
       }
       notes={[
-        'AND with α = 1 converges after a few epochs. Read the trace: the weights only change on rows where O differs from T.',
-        'Change α to 0.1. The final weights are 10 times smaller, but the line ends up separating the classes the same way.',
-        'XOR never reaches an error-free epoch. The run stops after 50 epochs, and the line keeps jumping between positions.',
+        'AND with α = 1: step through and check that weights change only on highlighted rows.',
+        'α = 0.1: the final weights are 10 times smaller, the line is the same.',
+        'XOR: no error-free epoch ever. The run gives up after 50.',
       ]}
     >
       <div>
         <div>
-          <Plot w={460} h={380} x={[-0.5, 1.5]} y={[-0.5, 1.5]} xLabel="I1" yLabel="I2" xTicks={4} yTicks={4} label="Current decision line during training">
+          <Plot w={420} h={360} x={[-0.5, 1.5]} y={[-0.5, 1.5]} xLabel="I1" yLabel="I2" xTicks={4} yTicks={4} label="Current decision line during training">
             <Heat res={40} fn={regionFn} />
             {history.slice(-6, -1).map((h, i) => (
               <Line key={i} pts={boundary(h[0], h[1], h[2], -0.5, 1.5)} color="var(--ink-4)" width={1} dash="3 3" />
@@ -225,7 +223,7 @@ function TrainerLab() {
           {epochs.length > 0 && (
             <div style={{ marginTop: 12 }}>
               <span className="label">Errors per epoch</span>
-              <Plot w={460} h={140} x={[1, Math.max(2, epochs.length)]} y={[0, 4]} xTicks={5} yTicks={4} label="Errors per epoch">
+              <Plot w={460} h={150} x={[1, Math.max(2, epochs.length)]} y={[0, 4]} xLabel="epoch" yLabel="errors" xTicks={5} yTicks={4} label="Errors per epoch">
                 <Line pts={epochs.map((e, i) => ({ x: i + 1, y: e }))} color={seriesColor(0)} />
                 {epochs.map((e, i) => (
                   <Dot key={i} x={i + 1} y={e} r={3} color={seriesColor(0)} />
@@ -277,7 +275,7 @@ function SeparableLab() {
   return (
     <Lab
       title="When does the perceptron converge?"
-      desc="Two classes of points. Move them apart or push them together, then scrub through the training epochs."
+      desc="Move the classes apart or together, then scrub through the epochs."
       controls={
         <>
           <Slider label="Gap between classes" value={gap} min={-0.05} max={0.3} step={0.01} onChange={setGap} fmt={(v) => fmt(v, 2)} />
@@ -287,7 +285,7 @@ function SeparableLab() {
           </Btn>
         </>
       }
-      notes={['With a clear gap the line stops moving after a few epochs: zero errors, done.', 'Shrink the gap until the classes overlap. Some point is always on the wrong side, so the error count never reaches 0 and the weights keep changing forever.']}
+      notes={['Clear gap: zero errors after a few epochs. Shrink the gap until the classes overlap: the error count never reaches 0 and the weights never settle.']}
     >
       <div className="grid c2">
         <Plot w={360} h={320} x={[0, 1]} y={[0, 1]} xLabel="x1" yLabel="x2" xTicks={4} yTicks={4} label="Two classes and the perceptron line">
@@ -298,7 +296,7 @@ function SeparableLab() {
         </Plot>
         <div>
           <span className="label">Misclassified points per epoch</span>
-          <Plot w={340} h={220} x={[1, Math.max(2, run.errs.length)]} y={[0, Math.max(4, ...run.errs)]} xLabel="epoch" xTicks={5} yTicks={4} label="Errors per epoch">
+          <Plot w={340} h={220} x={[1, Math.max(2, run.errs.length)]} y={[0, Math.max(4, ...run.errs)]} xLabel="epoch" yLabel="errors" xTicks={5} yTicks={4} label="Errors per epoch">
             {e > 0 && <VLine x={e} color="var(--ink-4)" />}
             <Line pts={run.errs.map((v, i) => ({ x: i + 1, y: v }))} color={seriesColor(0)} />
           </Plot>
@@ -314,33 +312,33 @@ function SeparableLab() {
 export default function Page() {
   return (
     <>
-      <TopicHeader group="Classification" title="Perceptrons" lede="A perceptron is the simplest artificial neuron: multiply each input by a weight, add them up, and fire if the total passes a threshold. It is the building block of every neural network." minutes={25} />
+      <TopicHeader group="Classification" title="Perceptrons" lede="The simplest artificial neuron: weight each input, add them up, output 1 if the total reaches a threshold." />
 
       <Plain>
         <p>
-          Think of deciding whether to go outside. Sunshine pushes you toward yes, rain pushes you toward no, and some things barely matter. You weigh each factor, add them up, and go if the total is high enough. The weights are how much each factor matters, and learning means adjusting them after each wrong decision.
+          Deciding whether to go outside: sunshine pushes toward yes, rain toward no. Weigh each factor, add them up, go if the total is high enough. Learning means adjusting the weights after each wrong decision.
         </p>
       </Plain>
 
-      <Section id="model" title="The model" kicker="How it works">
+      <Section id="model" title="The model">
         <p>
-          Inputs <M>{'I_1, \\dots, I_n'}</M>, weights <M>{'w_1, \\dots, w_n'}</M>. It is common to fold the threshold into the weights by adding a constant input <M>{'I_0 = 1'}</M> with weight <M>{'w_0 = -t'}</M>.
+          Inputs <M>{'I_1, \\dots, I_n'}</M>, weights <M>{'w_1, \\dots, w_n'}</M>. Fold the threshold in with a constant input <M>{'I_0 = 1'}</M> and weight <M>{'w_0 = -t'}</M>.
         </p>
         <Formula title="Output">
           <MB>{'O = \\begin{cases} 1 & \\text{if } \\sum_{i=0}^{n} w_i I_i \\ge 0 \\\\ 0 & \\text{otherwise} \\end{cases}'}</MB>
-          <p>The set of points where the sum is exactly 0 is a straight line in 2D (a hyperplane in general). The perceptron outputs 1 on one side and 0 on the other.</p>
+          <p>Where the sum is exactly 0 is a line in 2D (a hyperplane in general): 1 on one side, 0 on the other.</p>
         </Formula>
       </Section>
 
       <ManualLab />
 
-      <Section id="separable" title="What a perceptron can represent" kicker="Linear separability">
+      <Section id="separable" title="What a perceptron can represent">
         <p>
-          A single perceptron can represent a Boolean function only if the inputs where the output is 1 can be separated from those where it is 0 by one straight line. AND, OR, NAND and NOT are <strong>linearly separable</strong>. XOR is not. Stack perceptrons into layers and you can represent any Boolean function, for example XOR = AND(OR, NAND).
+          One perceptron can represent a Boolean function only if a straight line separates the 1s from the 0s. AND, OR, NAND and NOT are <strong>linearly separable</strong>; XOR is not. Layers of perceptrons can represent any Boolean function, for example XOR = AND(OR, NAND).
         </p>
       </Section>
 
-      <Section id="learning" title="Learning the weights" kicker="The update rule">
+      <Section id="learning" title="Learning the weights">
         <ol>
           <li>Start with some initial weights (often all 0).</li>
           <li>Feed one training example. Compute the output O and compare it with the target T.</li>
@@ -350,15 +348,15 @@ export default function Page() {
         <Formula title="Perceptron weight update">
           <MB>{'w_i \\leftarrow w_i + \\alpha\\,(T - O)\\,I_i'}</MB>
           <p>
-            <M>{'\\alpha'}</M> is the learning rate. If the perceptron said 0 but should have said 1, <M>{'T - O = 1'}</M> and each weight moves toward its input, raising the sum next time. If it said 1 but should have said 0, the weights move the other way. Inputs that were 0 do not change their weight.
+            <M>{'\\alpha'}</M> is the learning rate. Output 0 but target 1: <M>{'T - O = 1'}</M>, each weight moves toward its input and the sum rises next time. Output 1 but target 0: the reverse. Weights of inputs that were 0 do not change.
           </p>
         </Formula>
       </Section>
 
       <TrainerLab />
 
-      <Section id="worked" title="Reading a trace by hand" kicker="Exam style">
-        <p>Exams give you the initial weights, α and the order of examples, and ask for the weights after each step. For AND with α = 1 and zero weights, the first rows are:</p>
+      <Section id="worked" title="Reading a trace by hand">
+        <p>Exams give initial weights, α and the order of examples, and ask for the weights after each step. AND, α = 1, zero weights:</p>
         <Table
           head={['#', 'w old (w0, w1, w2)', 'I (1, I1, I2)', 'T', 'O', 'w new']}
           rows={[
@@ -374,7 +372,7 @@ export default function Page() {
         </p>
       </Section>
 
-      <Section id="convergence" title="Convergence theorem" kicker="Guarantee">
+      <Section id="convergence" title="Convergence theorem">
         <p>
           If the training examples are linearly separable, the perceptron learning rule finds weights that classify all of them correctly in a finite number of steps, for any initial weights and any positive learning rate. If they are not separable, there is no such guarantee and the weights never settle.
         </p>
