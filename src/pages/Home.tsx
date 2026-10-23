@@ -95,7 +95,7 @@ export default function Home() {
               <span className="label">modules</span>
             </div>
             <div>
-              <div className="mono big">40+</div>
+              <div className="mono big">70+</div>
               <span className="label">interactive labs</span>
             </div>
           </div>
