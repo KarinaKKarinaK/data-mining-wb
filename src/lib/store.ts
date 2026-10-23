@@ -19,6 +19,8 @@ export function save(key: string, value: unknown) {
 
 export function useStored<T>(key: string, fallback: T) {
   const [v, setV] = useState<T>(() => load(key, fallback))
-  useEffect(() => save(key, v), [key, v])
+  useEffect(() => {
+    save(key, v)
+  }, [key, v])
   return [v, setV] as const
 }

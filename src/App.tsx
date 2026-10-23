@@ -4,6 +4,7 @@ import { GROUPS, TOPICS, topicById } from './topics'
 import { load, save } from './lib/store'
 import Home from './pages/Home'
 import Course from './pages/Course'
+import { Boundary } from './components/Boundary'
 
 const Playground = lazy(() => import('./pages/Playground'))
 const Flashcards = lazy(() => import('./pages/Flashcards'))
@@ -75,7 +76,9 @@ function Search({ onClose }: { onClose: () => void }) {
   const [i, setI] = useState(0)
   const nav = useNavigate()
   const ref = useRef<HTMLInputElement>(null)
-  useEffect(() => ref.current?.focus(), [])
+  useEffect(() => {
+    ref.current?.focus()
+  }, [])
   const hits = useMemo(() => {
     const s = q.toLowerCase().trim()
     const extra = TOPICS.map((t) => ({ to: `/learn/${t.id}`, text: `${t.title} ${t.short} ${t.blurb}` }))
@@ -169,7 +172,9 @@ export default function App() {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState(false)
   const loc = useLocation()
-  useEffect(() => window.scrollTo(0, 0), [loc.pathname])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [loc.pathname])
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -199,6 +204,7 @@ export default function App() {
             Search <kbd>⌘K</kbd>
           </button>
         </header>
+        <Boundary resetKey={loc.pathname}>
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -214,6 +220,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </Boundary>
         <footer className="footer">
           <span>Independent study resource for COMP 4331 Data Mining at HKUST. Not official course material and not endorsed by the course.</span>
           <span className="label">Private resource</span>
