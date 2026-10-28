@@ -355,7 +355,7 @@ export default function Page() {
 
       <Section id="corr" title="Correlation for numeric attributes">
         <Formula>
-          <MB>{'r_{A,B} = \\frac{\\sum_{i=1}^{N} a_i b_i - N\\bar{A}\\bar{B}}{N\\,\\sigma_A \\sigma_B} = \\frac{\\sum (a_i - \\bar{A})(b_i - \\bar{B})}{N\\,\\sigma_A \\sigma_B}, \\qquad -1 \\le r_{A,B} \\le 1'}</MB>
+          <MB note="Pearson correlation: how strongly two numeric attributes move together along a straight line, from -1 to +1. Use it to spot a redundant attribute before merging." syms={[['r_{A,B}', 'correlation of A and B'], ['a_i, b_i', 'values of A and B in record i'], ['N', 'number of records'], ['\\bar{A}, \\bar{B}', 'means of A and B'], ['\\sigma_A, \\sigma_B', 'standard deviations of A and B']]}>{'r_{A,B} = \\frac{\\sum_{i=1}^{N} a_i b_i - N\\bar{A}\\bar{B}}{N\\,\\sigma_A \\sigma_B} = \\frac{\\sum (a_i - \\bar{A})(b_i - \\bar{B})}{N\\,\\sigma_A \\sigma_B}, \\qquad -1 \\le r_{A,B} \\le 1'}</MB>
           <p>
             <M>{'r > 0'}</M>: A up, B up. <M>{'r < 0'}</M>: A up, B down. <M>{'r = 0'}</M>: no linear relation. A large <M>{'|r|'}</M> suggests one attribute is redundant.
           </p>
@@ -371,7 +371,7 @@ export default function Page() {
           </p>
         </Plain>
         <Formula>
-          <MB>{'e_{ij} = \\frac{count(A = a_i) \\times count(B = b_j)}{N} \\qquad \\chi^2 = \\sum_{i=1}^{r}\\sum_{j=1}^{c}\\frac{(o_{ij} - e_{ij})^2}{e_{ij}} \\qquad df = (r-1)(c-1)'}</MB>
+          <MB note="Chi-square test for two nominal attributes. Compare each observed count with the count expected if the attributes were independent; a large total means they are related." syms={[['e_{ij}', 'expected count in cell (i, j) if independent'], ['o_{ij}', 'observed count in cell (i, j)'], ['count(A = a_i)', 'row total: records with value a_i of A'], ['count(B = b_j)', 'column total: records with value b_j of B'], ['N', 'total number of records'], ['r, c', 'number of rows and columns'], ['df', 'degrees of freedom']]}>{'e_{ij} = \\frac{count(A = a_i) \\times count(B = b_j)}{N} \\qquad \\chi^2 = \\sum_{i=1}^{r}\\sum_{j=1}^{c}\\frac{(o_{ij} - e_{ij})^2}{e_{ij}} \\qquad df = (r-1)(c-1)'}</MB>
           <p>If <M>{'\\chi^2'}</M> exceeds the critical value for your α and df, reject independence.</p>
         </Formula>
       </Section>
@@ -391,7 +391,7 @@ export default function Page() {
         <p style={{ marginTop: 10 }}>
           Expected fiction/male: <M>{'\\frac{300 \\times 450}{1500} = 90'}</M>. Then
         </p>
-        <MB>{'\\chi^2 = \\frac{(250-90)^2}{90} + \\frac{(50-210)^2}{210} + \\frac{(200-360)^2}{360} + \\frac{(1000-840)^2}{840} = 284.44 + 121.90 + 71.11 + 30.48 = 507.93'}</MB>
+        <MB note="The chi-square sum for the reading example: one term per cell, each the squared gap between observed and expected count divided by the expected count." syms={[['250, 50, 200, 1000', 'observed counts'], ['90, 210, 360, 840', 'expected counts if gender and reading were independent'], ['\\chi^2', 'the test statistic, compared with the critical value']]}>{'\\chi^2 = \\frac{(250-90)^2}{90} + \\frac{(50-210)^2}{210} + \\frac{(200-360)^2}{360} + \\frac{(1000-840)^2}{840} = 284.44 + 121.90 + 71.11 + 30.48 = 507.93'}</MB>
         <p>
           df = 1. The critical value at 0.001 is 10.828. Since 507.93 &gt; 10.828, reject independence: gender and reading preference are related.
         </p>

@@ -423,7 +423,7 @@ export default function Page() {
 
       <Section id="impurity" title="Measuring purity">
         <Formula title="Entropy of a set of records">
-          <MB>{'Info(D) = -\\sum_{i=1}^{m} p_i \\log_2 p_i'}</MB>
+          <MB note="Entropy measures how mixed the classes in a set of records are, in bits. It is 0 for a pure node and largest when all classes are equally common." syms={[['D', 'the set of records at the node'], ['m', 'number of classes'], ['p_i', 'share of records in class i'], ['\\log_2', 'log base 2, so the answer is in bits']]}>{'Info(D) = -\\sum_{i=1}^{m} p_i \\log_2 p_i'}</MB>
           <p>
             <M>{'p_i'}</M> is the fraction of records in class i. Entropy is 0 when the node is pure and <M>{'\\log_2 m'}</M> at most. A fair coin has entropy 1 bit.
           </p>
@@ -433,25 +433,25 @@ export default function Page() {
 
       <Section id="gain" title="Information gain and gain ratio">
         <Formula title="Information gain (ID3)">
-          <MB>{'Info_A(D) = \\sum_{v=1}^{V} \\frac{|D_v|}{|D|} Info(D_v) \\qquad Gain(D, A) = Info(D) - Info_A(D)'}</MB>
+          <MB note="Info_A(D) is the size-weighted entropy left after splitting D on attribute A. Gain is how much the split lowers the entropy; ID3 picks the attribute with the largest gain." syms={[['A', 'the attribute being tested'], ['V', 'number of distinct values of A'], ['D_v', 'records where A has value v'], ['|D_v| / |D|', 'weight of branch v: its share of the records'], ['Info(D_v)', 'entropy inside branch v']]}>{'Info_A(D) = \\sum_{v=1}^{V} \\frac{|D_v|}{|D|} Info(D_v) \\qquad Gain(D, A) = Info(D) - Info_A(D)'}</MB>
           <p>Split on the attribute with the largest gain.</p>
         </Formula>
         <Formula title="Gain ratio (C4.5)">
-          <MB>{'SplitInfo_A(D) = -\\sum_{v=1}^{V} \\frac{|D_v|}{|D|} \\log_2 \\frac{|D_v|}{|D|} \\qquad GainRatio(A) = \\frac{Gain(D, A)}{SplitInfo_A(D)}'}</MB>
-          <p>Gain favors attributes with many values: an ID attribute gets perfect gain but predicts nothing. SplitInfo grows with the number of branches, so dividing by it removes that bias.</p>
+          <MB note="SplitInfo is the entropy of the branch sizes, large when A splits D into many small branches. C4.5 divides the gain by it so many-valued attributes do not win just by splitting finely." syms={[['SplitInfo_A(D)', 'split information of attribute A'], ['V', 'number of distinct values of A'], ['|D_v| / |D|', 'share of records going down branch v'], ['Gain(D, A)', 'information gain of A']]}>{'SplitInfo_A(D) = -\\sum_{v=1}^{V} \\frac{|D_v|}{|D|} \\log_2 \\frac{|D_v|}{|D|} \\qquad GainRatio(A) = \\frac{Gain(D, A)}{SplitInfo_A(D)}'}</MB>
+          <p>Gain favors attributes with many values: an ID attribute gets perfect gain but predicts nothing. SplitInfo grows with the number of branches, so dividing by it reduces that bias.</p>
         </Formula>
         <Formula title="Gini index (CART)">
-          <MB>{'Gini(D) = 1 - \\sum_{i=1}^{m} p_i^2 \\qquad Gini_A(D) = \\sum_v \\frac{|D_v|}{|D|} Gini(D_v)'}</MB>
+          <MB note="The Gini index is another impurity measure: 0 for a pure node, larger when classes are mixed. CART picks the split with the lowest weighted Gini after the split." syms={[['p_i', 'share of records in class i'], ['m', 'number of classes'], ['Gini_A(D)', 'size-weighted Gini of the branches after splitting on A'], ['D_v', 'records where A has value v']]}>{'Gini(D) = 1 - \\sum_{i=1}^{m} p_i^2 \\qquad Gini_A(D) = \\sum_v \\frac{|D_v|}{|D|} Gini(D_v)'}</MB>
         </Formula>
       </Section>
       <TreeBuilderLab />
 
       <Section id="worked" title="Worked example: the root of buys_computer">
         <p>14 records: 9 yes and 5 no.</p>
-        <MB>{'Info(D) = -\\tfrac{9}{14}\\log_2\\tfrac{9}{14} - \\tfrac{5}{14}\\log_2\\tfrac{5}{14} = 0.940'}</MB>
+        <MB note="Entropy of the whole buys_computer training set before any split." syms={[['\\tfrac{9}{14}', 'share of records with buys_computer = yes'], ['\\tfrac{5}{14}', 'share with buys_computer = no']]}>{'Info(D) = -\\tfrac{9}{14}\\log_2\\tfrac{9}{14} - \\tfrac{5}{14}\\log_2\\tfrac{5}{14} = 0.940'}</MB>
         <WorkedTable />
-        <MB>{'Info_{age}(D) = \\tfrac{5}{14}(0.971) + \\tfrac{4}{14}(0) + \\tfrac{5}{14}(0.971) = 0.694'}</MB>
-        <MB>{'Gain(D, age) = 0.940 - 0.694 = 0.246'}</MB>
+        <MB note="Entropy left after splitting on age: each branch entropy weighted by the share of records in that branch." syms={[['\\tfrac{5}{14}, \\tfrac{4}{14}', '5/14 of records are youth and 5/14 senior, 4/14 middle_aged'], ['0.971', 'entropy of a branch with 2 of one class and 3 of the other'], ['0', 'entropy of the pure middle_aged branch']]}>{'Info_{age}(D) = \\tfrac{5}{14}(0.971) + \\tfrac{4}{14}(0) + \\tfrac{5}{14}(0.971) = 0.694'}</MB>
+        <MB note="Information gain of age: entropy before the split minus entropy after it. It is the largest of the four attributes, so age becomes the root." syms={[['0.940', 'Info(D), entropy before the split'], ['0.694', 'Info_age(D), entropy after splitting on age']]}>{'Gain(D, age) = 0.940 - 0.694 = 0.246'}</MB>
         <Table
           head={['Attribute', 'Gain (exact)', 'Gain (textbook)']}
           num={[1, 2]}

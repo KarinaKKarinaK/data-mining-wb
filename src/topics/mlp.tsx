@@ -266,7 +266,17 @@ export default function Page() {
           <li>Feed-forward: signals go from input to output with no loops.</li>
         </ul>
         <Formula title="One unit">
-          <MB>{'O_j = f\\Big(\\sum_i w_{ij} O_i + \\theta_j\\Big), \\qquad \\sigma(z) = \\frac{1}{1 + e^{-z}}'}</MB>
+          <MB
+            note="Output of one unit: a weighted sum of its inputs plus a bias, passed through an activation function. The sigmoid is the usual choice and squashes any value into (0, 1)."
+            syms={[
+              ['O_j', 'output of unit j'],
+              ['O_i', 'output of unit i in the previous layer (an input to j)'],
+              ['w_{ij}', 'weight on the link from unit i to unit j'],
+              ['\\theta_j', 'bias of unit j'],
+              ['f', 'activation function'],
+              ['\\sigma(z)', 'sigmoid of the net input z'],
+            ]}
+          >{'O_j = f\\Big(\\sum_i w_{ij} O_i + \\theta_j\\Big), \\qquad \\sigma(z) = \\frac{1}{1 + e^{-z}}'}</MB>
           <p>
             The sigmoid is a smooth version of the perceptron's step. Its derivative <M>{"\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))"}</M> is what makes gradient learning possible.
           </p>
@@ -284,9 +294,34 @@ export default function Page() {
           <li>Move every weight a small step against its gradient. Repeat over many epochs.</li>
         </ol>
         <Formula title="Error terms with sigmoid units">
-          <MB>{'\\text{output unit: } Err_j = O_j(1 - O_j)(T_j - O_j)'}</MB>
-          <MB>{'\\text{hidden unit: } Err_j = O_j(1 - O_j)\\sum_k Err_k\\, w_{jk}'}</MB>
-          <MB>{'w_{ij} \\leftarrow w_{ij} + \\eta\\, Err_j\\, O_i, \\qquad \\theta_j \\leftarrow \\theta_j + \\eta\\, Err_j'}</MB>
+          <MB
+            note="Error term of an output unit: how far its output is from the target, scaled by the sigmoid slope. Computed first in the backward pass."
+            syms={[
+              ['Err_j', 'error term of unit j'],
+              ['O_j', 'output of unit j'],
+              ['T_j', 'target (true) value for unit j'],
+              ['O_j(1 - O_j)', 'slope of the sigmoid at this output'],
+            ]}
+          >{'\\text{output unit: } Err_j = O_j(1 - O_j)(T_j - O_j)'}</MB>
+          <MB
+            note="Error term of a hidden unit: the error terms of the next layer, sent back through the weights, times the sigmoid slope. A unit gets blame in proportion to its weights."
+            syms={[
+              ['Err_j', 'error term of hidden unit j'],
+              ['Err_k', 'error term of unit k in the next layer'],
+              ['w_{jk}', 'weight from unit j to unit k'],
+              ['O_j(1 - O_j)', 'slope of the sigmoid at this output'],
+            ]}
+          >{'\\text{hidden unit: } Err_j = O_j(1 - O_j)\\sum_k Err_k\\, w_{jk}'}</MB>
+          <MB
+            note="Update rule: after the error terms are known, nudge every weight and bias a small step in the direction that lowers the error."
+            syms={[
+              ['w_{ij}', 'weight from unit i to unit j'],
+              ['\\theta_j', 'bias of unit j'],
+              ['\\eta', 'learning rate (step size)'],
+              ['Err_j', 'error term of unit j'],
+              ['O_i', 'output of unit i, the input on that link'],
+            ]}
+          >{'w_{ij} \\leftarrow w_{ij} + \\eta\\, Err_j\\, O_i, \\qquad \\theta_j \\leftarrow \\theta_j + \\eta\\, Err_j'}</MB>
         </Formula>
       </Section>
 

@@ -182,15 +182,15 @@ export default function Page() {
 
       <Section id="norm" title="Three normalization methods">
         <Formula title="Min-max">
-          <MB>{"v' = \\frac{v - \\min_A}{\\max_A - \\min_A}(new\\_max_A - new\\_min_A) + new\\_min_A"}</MB>
+          <MB note="Min-max normalization: rescale attribute A in a straight line so its smallest value becomes new_min and its largest becomes new_max, often 0 and 1." syms={[['v', 'original value'], ["v'", 'normalized value'], ['\\min_A, \\max_A', 'smallest and largest value of A'], ['new\\_min_A, new\\_max_A', 'the target range']]}>{"v' = \\frac{v - \\min_A}{\\max_A - \\min_A}(new\\_max_A - new\\_min_A) + new\\_min_A"}</MB>
           <p>Keeps the shape. A future value outside the old [min, max] lands outside the new range.</p>
         </Formula>
         <Formula title="z-score">
-          <MB>{"v' = \\frac{v - \\bar{A}}{\\sigma_A}"}</MB>
+          <MB note="z-score normalization: how many standard deviations a value lies above (+) or below (-) the mean of A." syms={[['v', 'original value'], ["v'", 'the z-score'], ['\\bar{A}', 'mean of A'], ['\\sigma_A', 'standard deviation of A']]}>{"v' = \\frac{v - \\bar{A}}{\\sigma_A}"}</MB>
           <p>Standard deviations from the mean. Use it when min and max are unknown or there are outliers.</p>
         </Formula>
         <Formula title="Decimal scaling">
-          <MB>{"v' = \\frac{v}{10^j}, \\quad j \\text{ the smallest integer with } \\max |v'| < 1"}</MB>
+          <MB note="Decimal scaling: move the decimal point of every value by the same number of places so the largest absolute value drops just below 1." syms={[['v', 'original value'], ["v'", 'scaled value'], ['j', 'number of places to shift the decimal point'], ["\\max |v'|", 'largest absolute scaled value']]}>{"v' = \\frac{v}{10^j}, \\quad j \\text{ the smallest integer with } \\max |v'| < 1"}</MB>
         </Formula>
       </Section>
       <NormLab />

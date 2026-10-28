@@ -292,9 +292,9 @@ export default function Page() {
         </ul>
         <p>Neither needs k. Both need a linkage: the distance between two clusters.</p>
         <Formula title="Linkage: distance between clusters A and B">
-          <MB>{'d_{single} = \\min_{a \\in A, b \\in B} d(a, b) \\qquad d_{complete} = \\max_{a \\in A, b \\in B} d(a, b)'}</MB>
-          <MB>{'d_{average} = \\frac{1}{|A||B|}\\sum_{a \\in A}\\sum_{b \\in B} d(a, b) \\qquad d_{centroid} = d(m_A, m_B)'}</MB>
-          <MB>{'d_{Ward} = \\frac{|A||B|}{|A| + |B|}\\lVert m_A - m_B \\rVert^2 \\;\\text{(increase in SSE caused by the merge)}'}</MB>
+          <MB note="Single linkage uses the closest pair across the two clusters; complete linkage uses the farthest pair." syms={[['A, B', 'the two clusters'], ['a \\in A, b \\in B', 'one object from each cluster'], ['d(a, b)', 'distance between the two objects']]}>{'d_{single} = \\min_{a \\in A, b \\in B} d(a, b) \\qquad d_{complete} = \\max_{a \\in A, b \\in B} d(a, b)'}</MB>
+          <MB note="Average linkage takes the mean of all cross-cluster pair distances. Centroid linkage takes the distance between the two cluster means." syms={[['|A|, |B|', 'number of objects in each cluster'], ['m_A, m_B', 'centroids (means) of A and B'], ['\\sum_{a \\in A}\\sum_{b \\in B}', 'add up over every pair with one object from each cluster']]}>{'d_{average} = \\frac{1}{|A||B|}\\sum_{a \\in A}\\sum_{b \\in B} d(a, b) \\qquad d_{centroid} = d(m_A, m_B)'}</MB>
+          <MB note="Ward merges the pair of clusters whose merge raises the total SSE the least. It favours compact clusters of similar size." syms={[['|A|, |B|', 'number of objects in each cluster'], ['m_A, m_B', 'centroids (means) of A and B'], ['\\lVert m_A - m_B \\rVert^2', 'squared Euclidean distance between the centroids']]}>{'d_{Ward} = \\frac{|A||B|}{|A| + |B|}\\lVert m_A - m_B \\rVert^2 \\;\\text{(increase in SSE caused by the merge)}'}</MB>
         </Formula>
       </Section>
       <StepperLab />

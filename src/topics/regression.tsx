@@ -302,11 +302,27 @@ export default function Page() {
           Model <M>{'\\hat{y} = w_0 + w_1 x'}</M>. The residual <M>{'y_i - \\hat{y}_i'}</M> is the vertical gap between a point and the line.
         </p>
         <Formula title="Least-squares coefficients">
-          <MB>{'w_1 = \\frac{\\sum_{i=1}^{N}(x_i - \\bar{x})(y_i - \\bar{y})}{\\sum_{i=1}^{N}(x_i - \\bar{x})^2}, \\qquad w_0 = \\bar{y} - w_1 \\bar{x}'}</MB>
+          <MB
+            note="Slope and intercept of the least-squares line. Use them to fit the line by hand: center x and y, then divide the sum of products by the sum of squares of x."
+            syms={[
+              ['w_1', 'slope of the line'],
+              ['w_0', 'intercept (value of y at x = 0)'],
+              ['x_i, y_i', 'the i-th data point'],
+              ['\\bar{x}, \\bar{y}', 'mean of x and mean of y'],
+              ['N', 'number of data points'],
+            ]}
+          >{'w_1 = \\frac{\\sum_{i=1}^{N}(x_i - \\bar{x})(y_i - \\bar{y})}{\\sum_{i=1}^{N}(x_i - \\bar{x})^2}, \\qquad w_0 = \\bar{y} - w_1 \\bar{x}'}</MB>
           <p>These minimize <M>{'SSE = \\sum (y_i - \\hat{y}_i)^2'}</M>. The fitted line always passes through the point <M>{'(\\bar{x}, \\bar{y})'}</M>.</p>
         </Formula>
         <Formula title="How good is the fit">
-          <MB>{'R^2 = 1 - \\frac{SSE}{SST}, \\qquad SST = \\sum (y_i - \\bar{y})^2'}</MB>
+          <MB
+            note="R squared: the share of the variation in y that the line explains. Use it to judge how well the line fits."
+            syms={[
+              ['SSE', 'sum of squared residuals around the line'],
+              ['SST', 'total sum of squares of y around its mean'],
+              ['\\bar{y}', 'mean of y'],
+            ]}
+          >{'R^2 = 1 - \\frac{SSE}{SST}, \\qquad SST = \\sum (y_i - \\bar{y})^2'}</MB>
           <p>
             Share of the variation in <M>{'y'}</M> explained by the line. 1 is a perfect fit, 0 is no better than predicting <M>{'\\bar{y}'}</M>.
           </p>

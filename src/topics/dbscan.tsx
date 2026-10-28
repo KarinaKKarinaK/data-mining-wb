@@ -264,13 +264,13 @@ export default function Page() {
 
       <Section id="defs" title="The definitions">
         <Formula title="Neighborhood and core point">
-          <MB>{'N_{eps}(p) = \\{\\, q \\in D \\mid d(p, q) \\le eps \\,\\}, \\qquad p \\text{ is core} \\iff |N_{eps}(p)| \\ge MinPts'}</MB>
+          <MB note="Collects every point within distance eps of p: its eps-neighborhood. If that set holds at least MinPts points, counting p itself, p is a core point and can grow a cluster." syms={[['N_{eps}(p)', 'the eps-neighborhood of p'], ['D', 'the data set'], ['d(p, q)', 'distance between p and q'], ['eps', 'neighborhood radius'], ['|N_{eps}(p)|', 'number of points in it, p included'], ['MinPts', 'points needed to be core']]}>{'N_{eps}(p) = \\{\\, q \\in D \\mid d(p, q) \\le eps \\,\\}, \\qquad p \\text{ is core} \\iff |N_{eps}(p)| \\ge MinPts'}</MB>
         </Formula>
         <ul>
           <li><strong>Core point</strong>: at least MinPts points (itself included) within eps.</li>
           <li><strong>Border point</strong>: not core, but inside the eps-neighborhood of some core point.</li>
           <li><strong>Noise</strong>: neither core nor border.</li>
-          <li><strong>Directly density-reachable</strong>: p is core and q is in <M>{'N_{eps}(p)'}</M>. Not symmetric.</li>
+          <li><strong>Directly density-reachable</strong>: q is directly density-reachable from p if p is core and q is in <M>{'N_{eps}(p)'}</M>. Not symmetric.</li>
           <li><strong>Density-reachable</strong>: a chain <M>{'p = p_1, \\dots, p_n = q'}</M> of direct reaches.</li>
           <li><strong>Density-connected</strong>: both density-reachable from some o. Symmetric.</li>
           <li>A <strong>cluster</strong> is a maximal set of density-connected points.</li>

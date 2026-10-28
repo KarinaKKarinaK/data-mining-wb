@@ -20,8 +20,8 @@ const FORMULAS: { group: string; items: Fx[] }[] = [
     items: [
       { name: 'Min-max', tex: "v' = \\frac{v - \\min_A}{\\max_A - \\min_A}(new\\_max - new\\_min) + new\\_min", note: 'Rescales an attribute in a straight line so its smallest value lands on new_min and its largest on new_max, often 0 and 1.', syms: [['v', 'original value'], ["v'", 'rescaled value'], ['\\min_A, \\max_A', 'smallest and largest value of attribute A'], ['new\\_min, new\\_max', 'the target range']] },
       { name: 'z-score', tex: "v' = \\frac{v - \\bar{A}}{\\sigma_A}", note: 'How many standard deviations a value sits above (+) or below (−) the mean.', syms: [['v', 'original value'], ['\\bar{A}', 'mean of attribute A'], ['\\sigma_A', 'standard deviation of A']] },
-      { name: 'Pearson correlation', tex: 'r_{A,B} = \\frac{\\sum a_i b_i - N\\bar{A}\\bar{B}}{N\\sigma_A\\sigma_B}', note: 'How strongly two numeric attributes move together along a straight line, from −1 to +1. Close to ±1 means one of them is redundant.', syms: [['r_{A,B}', 'correlation of A and B'], ['a_i, b_i', 'the paired values in record i'], ['N', 'number of records'], ['\\bar{A}, \\bar{B}', 'the two means'], ['\\sigma_A, \\sigma_B', 'the two standard deviations']] },
-      { name: 'Chi-square', tex: '\\chi^2 = \\sum_{i,j}\\frac{(o_{ij}-e_{ij})^2}{e_{ij}}, \\quad e_{ij} = \\frac{\\text{row}_i \\times \\text{col}_j}{N}, \\quad df = (r-1)(c-1)', note: 'Compares the observed counts in a contingency table with the counts you would expect if two nominal attributes were independent. A large value means they are related.', syms: [['o_{ij}', 'observed count in cell (i, j)'], ['e_{ij}', 'expected count if independent'], ['\\text{row}_i, \\text{col}_j', 'row and column totals'], ['N', 'total number of records'], ['df', 'degrees of freedom'], ['r, c', 'number of rows and columns']] },
+      { name: 'Pearson correlation', tex: 'r_{A,B} = \\frac{\\sum a_i b_i - N\\bar{A}\\bar{B}}{N\\sigma_A\\sigma_B}', note: 'How strongly two numeric attributes move together along a straight line, from −1 to +1. Close to ±1 means one of them may be redundant.', syms: [['r_{A,B}', 'correlation of A and B'], ['a_i, b_i', 'the paired values in record i'], ['N', 'number of records'], ['\\bar{A}, \\bar{B}', 'the two means'], ['\\sigma_A, \\sigma_B', 'the two standard deviations']] },
+      { name: 'Chi-square', tex: '\\chi^2 = \\sum_{i,j}\\frac{(o_{ij}-e_{ij})^2}{e_{ij}}, \\quad e_{ij} = \\frac{\\text{row}_i \\times \\text{col}_j}{N}, \\quad df = (r-1)(c-1)', note: 'Compares the observed counts in a contingency table with the counts you would expect if two nominal attributes were independent. A value above the critical value for df means they are related.', syms: [['o_{ij}', 'observed count in cell (i, j)'], ['e_{ij}', 'expected count if independent'], ['\\text{row}_i, \\text{col}_j', 'row and column totals'], ['N', 'total number of records'], ['df', 'degrees of freedom'], ['r, c', 'number of rows and columns']] },
       { name: 'Curse of dimensionality', tex: '\\ell = r^{1/d}', note: 'Edge length of a sub-cube holding a fraction r of evenly spread data. As d grows, ℓ heads to 1, so a "local" neighborhood covers almost the whole range.', syms: [['\\ell', 'edge length of the sub-cube'], ['r', 'fraction of the data inside it'], ['d', 'number of dimensions']] },
       { name: 'PCA variance kept', tex: '\\frac{\\lambda_1 + \\dots + \\lambda_k}{\\lambda_1 + \\dots + \\lambda_d}', note: 'The share of the total variance you keep by keeping only the first k principal components.', syms: [['\\lambda_i', 'variance along component i (its eigenvalue), largest first'], ['k', 'components kept'], ['d', 'all components']] },
     ],
@@ -54,25 +54,9 @@ const FORMULAS: { group: string; items: Fx[] }[] = [
 
 function FormulaItem({ it }: { it: Fx }) {
   return (
-    <div className="fx" tabIndex={0}>
-      <div className="fx-name">{it.name}</div>
-      <MB>{it.tex}</MB>
-      <div className="fx-more">
-        <div>
-          <p className="fx-note">{it.note}</p>
-          <dl className="fx-syms">
-            {it.syms.map(([s, m]) => (
-              <div key={s}>
-                <dt>
-                  <M>{s}</M>
-                </dt>
-                <dd>{m}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </div>
-    </div>
+    <MB name={it.name} note={it.note} syms={it.syms}>
+      {it.tex}
+    </MB>
   )
 }
 

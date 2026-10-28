@@ -201,7 +201,7 @@ function UnderflowLab() {
           <Slider label="P(word | class)" value={p} min={0.001} max={0.2} step={0.001} onChange={setP} fmt={(v) => v.toFixed(3)} />
         </>
       }
-      notes={['With p = 0.01, push past 162 words: the product becomes 0 and both classes tie. The log sum (n times log p) keeps working.']}
+      notes={['With p = 0.01, push to 162 words: the product becomes 0 and both classes tie. The log sum (n times log p) keeps working.']}
     >
       <Plot w={560} h={240} x={[0, 400]} y={[ymin, 0]} xLabel="number of words" yLabel="log10 of the product" yTicks={4} label="Log of the product falls linearly with the number of words">
         <HLine y={-323.3} color="var(--bad)" label="smallest positive double, about 1e-323" />
@@ -230,11 +230,11 @@ export default function Page() {
 
       <Section id="bayes-rule" title="Bayes rule">
         <Formula title="Conditional probability and Bayes rule">
-          <MB>{'P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)} \\qquad P(C \\mid X) = \\frac{P(X \\mid C)\\,P(C)}{P(X)}'}</MB>
+          <MB note="Left: the chance of A once you know B happened. Right: Bayes rule, which turns how likely the record is under a class into how likely the class is given the record." syms={[['P(A \\mid B)', 'probability of A given that B happened'], ['A \\cap B', 'A and B both happen'], ['C', 'a class'], ['X', 'the record (its attribute values)'], ['P(C)', 'prior: share of records in class C'], ['P(X \\mid C)', 'likelihood: how typical X is for class C'], ['P(C \\mid X)', 'posterior: probability of class C given X'], ['P(X)', 'evidence: overall probability of X']]}>{'P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)} \\qquad P(C \\mid X) = \\frac{P(X \\mid C)\\,P(C)}{P(X)}'}</MB>
           <p>
             <M>{'P(C)'}</M> is the prior, <M>{'P(X \\mid C)'}</M> the likelihood, <M>{'P(C \\mid X)'}</M> the posterior. <M>{'P(X)'}</M> is the same for every class, so to predict you only compare <M>{'P(X \\mid C)P(C)'}</M>.
           </p>
-          <MB>{'P(X) = \\sum_i P(X \\mid C_i) P(C_i) \\quad \\text{(the classes are mutually exclusive and cover everything)}'}</MB>
+          <MB note="The total probability of the record: add its likelihood under each class, weighted by how common that class is. This is the denominator of Bayes rule." syms={[['P(X)', 'overall probability of record X'], ['C_i', 'the i-th class'], ['P(X \\mid C_i)', 'probability of X within class C_i'], ['P(C_i)', 'prior of class C_i']]}>{'P(X) = \\sum_i P(X \\mid C_i) P(C_i) \\quad \\text{(the classes are mutually exclusive and cover everything)}'}</MB>
         </Formula>
       </Section>
       <DiagnosisLab />
@@ -244,7 +244,7 @@ export default function Page() {
           Estimating <M>{'P(x_1, \\dots, x_n \\mid C)'}</M> directly needs a count for every combination of values, and most never appear. Naive Bayes assumes the attributes are <strong>conditionally independent given the class</strong>:
         </p>
         <Formula title="Naive Bayes">
-          <MB>{'P(X \\mid C_i) = \\prod_{k=1}^{n} P(x_k \\mid C_i) \\qquad \\text{predict } \\arg\\max_i \\; P(C_i)\\prod_{k} P(x_k \\mid C_i)'}</MB>
+          <MB note="Naive Bayes treats the attributes as independent within a class, so the likelihood is a product of one probability per attribute. Predict the class with the largest prior times that product." syms={[['x_k', 'value of the k-th attribute in the record'], ['n', 'number of attributes'], ['C_i', 'the i-th class'], ['\\prod', 'multiply over k = 1 to n'], ['P(C_i)', 'prior: share of records in class C_i'], ['\\arg\\max_i', 'the class i that gives the largest value']]}>{'P(X \\mid C_i) = \\prod_{k=1}^{n} P(x_k \\mid C_i) \\qquad \\text{predict } \\arg\\max_i \\; P(C_i)\\prod_{k} P(x_k \\mid C_i)'}</MB>
           <p>
             For a categorical attribute, <M>{'P(x_k \\mid C_i)'}</M> is the number of class-<M>{'C_i'}</M> records with value <M>{'x_k'}</M> divided by the number of class-<M>{'C_i'}</M> records.
           </p>
@@ -258,7 +258,7 @@ export default function Page() {
       <Section id="laplace" title="Zero counts and Laplace correction">
         <p>A value that never appears with a class gets probability 0 and wipes out that class's whole product.</p>
         <Formula title="Laplace correction">
-          <MB>{'P(x_k \\mid C_i) = \\frac{n_{x_k, C_i} + 1}{n_{C_i} + |\\text{values of } A_k|}'}</MB>
+          <MB note="Smoothed estimate of one conditional probability. Use it when some value never appears with a class, so no factor is 0." syms={[['n_{x_k, C_i}', 'number of class C_i records with value x_k'], ['n_{C_i}', 'number of class C_i records'], ['|\\text{values of } A_k|', 'number of distinct values of attribute A_k']]}>{'P(x_k \\mid C_i) = \\frac{n_{x_k, C_i} + 1}{n_{C_i} + |\\text{values of } A_k|}'}</MB>
           <p>Add 1 to every count and the number of distinct values to the denominator, so the probabilities still sum to 1. Priors are usually left unchanged.</p>
         </Formula>
       </Section>

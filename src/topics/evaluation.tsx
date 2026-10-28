@@ -288,7 +288,7 @@ function FoldsLab() {
       }
       notes={[
         'Step through k-fold rounds: every record validates exactly once.',
-        'k-fold with k = 5 can leave a fold with no triangles. Switch to Stratified: every fold keeps the 30% minority share.',
+        'k-fold with k = 5 can leave a fold with no triangles. Switch to Stratified: every fold stays as close to the 30% minority share as the counts allow.',
       ]}
     >
       <svg viewBox="0 0 560 120" className="plot" style={{ width: '100%', maxWidth: 640 }} role="img" aria-label="Records colored by train or validation role">
@@ -360,8 +360,8 @@ export default function Page() {
           Rows are the actual class, columns the predicted class. Cell <M>{'c_{ij}'}</M> counts records of class i predicted as class j, so the diagonal holds the correct predictions. For two classes, call the class you care about positive.
         </p>
         <Formula title="Definitions">
-          <MB>{'Accuracy = \\frac{TP + TN}{N} \\qquad Precision = \\frac{TP}{TP + FP} \\qquad Recall = \\frac{TP}{TP + FN}'}</MB>
-          <MB>{'F = \\frac{2 \\cdot Precision \\cdot Recall}{Precision + Recall}'}</MB>
+          <MB note="Three basic scores from the confusion matrix. Accuracy is the share of all records predicted correctly; precision and recall look only at the positive class." syms={[['TP', 'true positives: positive records predicted positive'], ['TN', 'true negatives: negative records predicted negative'], ['FP', 'false positives: negative records wrongly flagged positive'], ['FN', 'false negatives: positive records the model missed'], ['N', 'total number of test records']]}>{'Accuracy = \\frac{TP + TN}{N} \\qquad Precision = \\frac{TP}{TP + FP} \\qquad Recall = \\frac{TP}{TP + FN}'}</MB>
+          <MB note="The F measure (F1) is the harmonic mean of precision and recall. Use it when you want one number that is only high if both are high." syms={[['F', 'F measure, also called F1'], ['Precision', 'TP / (TP + FP)'], ['Recall', 'TP / (TP + FN)']]}>{'F = \\frac{2 \\cdot Precision \\cdot Recall}{Precision + Recall}'}</MB>
           <p>
             Precision: of what I flagged, how much was right. Recall: of what was there, how much I found. F stays low unless both are high.
           </p>
@@ -384,7 +384,7 @@ export default function Page() {
 
       <Section id="multiclass" title="More than two classes">
         <Formula title="Two ways to average">
-          <MB>{'F1_{macro} = \\frac{1}{C}\\sum_{c=1}^{C} F1_c \\qquad P_{micro} = \\frac{\\sum_c TP_c}{\\sum_c (TP_c + FP_c)}'}</MB>
+          <MB note="Two ways to get one score for many classes. Macro F1 averages the per-class F1 scores so every class counts the same; micro precision pools the counts of all classes first so every record counts the same." syms={[['C', 'number of classes'], ['F1_c', 'F1 score of class c on its own'], ['TP_c', 'true positives for class c'], ['FP_c', 'false positives for class c (records wrongly predicted as c)']]}>{'F1_{macro} = \\frac{1}{C}\\sum_{c=1}^{C} F1_c \\qquad P_{micro} = \\frac{\\sum_c TP_c}{\\sum_c (TP_c + FP_c)}'}</MB>
           <p>Macro weights every class equally, micro every record. In the worked example: macro F1 0.58, micro F1 0.60 (equal to accuracy).</p>
         </Formula>
       </Section>

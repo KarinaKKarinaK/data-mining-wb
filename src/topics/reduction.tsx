@@ -300,7 +300,7 @@ export default function Page() {
           As the number of attributes d grows, data becomes sparse and distances lose meaning. Fewer dimensions also remove noise, save time and space, and allow plots.
         </p>
         <Formula>
-          <MB>{'\\ell = r^{1/d}'}</MB>
+          <MB note="Edge length of a sub-cube that holds a fraction r of evenly spread data. As the number of dimensions grows it heads to 1, so a small neighborhood covers almost the whole range." syms={[['\\ell', 'edge length, as a share of each attribute range'], ['r', 'fraction of the data inside the sub-cube'], ['d', 'number of dimensions']]}>{'\\ell = r^{1/d}'}</MB>
           <p>
             Edge length of a sub-cube that holds a fraction <M>{'r'}</M> of uniformly spread data in <M>{'d'}</M> dimensions. With <M>{'d = 10'}</M> and <M>{'r = 0.01'}</M>: <M>{'\\ell = 0.01^{0.1} = 0.63'}</M>.
           </p>
@@ -316,11 +316,11 @@ export default function Page() {
           </p>
         </Plain>
         <Formula>
-          <MB>{'\\mathbf{C} = \\frac{1}{N}\\sum_{k}(\\mathbf{x}_k - \\bar{\\mathbf{x}})(\\mathbf{x}_k - \\bar{\\mathbf{x}})^T, \\qquad \\mathbf{C}\\mathbf{v} = \\lambda \\mathbf{v}'}</MB>
+          <MB note="PCA: build the covariance matrix of the centered data, then find its eigenvectors. Each eigenvector is a principal direction and its eigenvalue is the variance along it." syms={[['\\mathbf{C}', 'covariance matrix'], ['\\mathbf{x}_k', 'record k as a vector'], ['\\bar{\\mathbf{x}}', 'mean vector'], ['N', 'number of records'], ['^T', 'transpose'], ['\\mathbf{v}', 'eigenvector: a principal direction'], ['\\lambda', 'eigenvalue: variance along that direction']]}>{'\\mathbf{C} = \\frac{1}{N}\\sum_{k}(\\mathbf{x}_k - \\bar{\\mathbf{x}})(\\mathbf{x}_k - \\bar{\\mathbf{x}})^T, \\qquad \\mathbf{C}\\mathbf{v} = \\lambda \\mathbf{v}'}</MB>
           <p>
             Each eigenvector <M>{'\\mathbf{v}'}</M> is a principal direction and its eigenvalue <M>{'\\lambda'}</M> is the variance along it. Sort by decreasing <M>{'\\lambda'}</M> and keep the first <M>{'k'}</M>.
           </p>
-          <MB>{'\\text{proportion of variance explained} = \\frac{\\lambda_1 + \\dots + \\lambda_k}{\\lambda_1 + \\dots + \\lambda_d}'}</MB>
+          <MB note="The share of the total variance kept when you keep only the first k principal components. Use it to choose k." syms={[['\\lambda_i', 'eigenvalue of component i, largest first'], ['k', 'components kept'], ['d', 'all components (number of attributes)']]}>{'\\text{proportion of variance explained} = \\frac{\\lambda_1 + \\dots + \\lambda_k}{\\lambda_1 + \\dots + \\lambda_d}'}</MB>
           <p>A common rule: keep the smallest k that explains at least 80% or 90%.</p>
         </Formula>
       </Section>

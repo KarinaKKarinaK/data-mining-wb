@@ -249,7 +249,7 @@ export default function Page() {
         />
         <Trap>
           <ul>
-            <li>Order items by <strong>descending</strong> count before inserting. Using a different order gives a valid but bigger tree, and the exam answer will not match.</li>
+            <li>Order items by <strong>descending</strong> count before inserting. Using a different order gives a valid but usually bigger tree, and the exam answer will not match.</li>
             <li>Remove infrequent items from every transaction before inserting it.</li>
             <li>In a conditional pattern base, each prefix path gets the count of the suffix node at its end.</li>
             <li>Drop items below min_sup inside the conditional pattern base before building the conditional tree.</li>

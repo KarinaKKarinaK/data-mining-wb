@@ -350,7 +350,7 @@ function DtwLab() {
         </div>
         <div>
           <Formula title="DTW recurrence">
-            <MB>{'\\begin{aligned} D(i,j) = {} & |a_i - b_j| \\\\ & + \\min\\{D(i-1,j),\\, D(i,j-1), \\\\ & \\qquad D(i-1,j-1)\\} \\end{aligned}'}</MB>
+            <MB note="Cumulative cost of the cheapest alignment of the first i points of A with the first j points of B. Fill the table cell by cell; the last cell is the DTW distance." syms={[['D(i,j)', 'cheapest total cost to align A up to i with B up to j'], ['a_i', 'i-th value of series A'], ['b_j', 'j-th value of series B'], ['|a_i - b_j|', 'cost of matching these two points']]}>{'\\begin{aligned} D(i,j) = {} & |a_i - b_j| \\\\ & + \\min\\{D(i-1,j),\\, D(i,j-1), \\\\ & \\qquad D(i-1,j-1)\\} \\end{aligned}'}</MB>
             <p>The answer is the cost in the last cell. Steps go down, right or diagonal, so time never runs backward.</p>
           </Formula>
           <Readout>
@@ -413,7 +413,7 @@ export default function Page() {
           <li>Classification: majority class among them. Regression: average of their values.</li>
         </ol>
         <Formula title="Distances">
-          <MB>{'d_p(x, y) = \\Big(\\sum_{i=1}^{n} |x_i - y_i|^p\\Big)^{1/p}'}</MB>
+          <MB note="Minkowski distance between two records with n numeric attributes. p = 1 gives Manhattan, p = 2 gives Euclidean." syms={[['d_p(x, y)', 'distance between records x and y'], ['x_i, y_i', 'value of attribute i in each record'], ['n', 'number of attributes'], ['p', 'order of the distance, p \u2265 1']]}>{'d_p(x, y) = \\Big(\\sum_{i=1}^{n} |x_i - y_i|^p\\Big)^{1/p}'}</MB>
           <p>
             <M>{'p = 1'}</M> Manhattan, <M>{'p = 2'}</M> Euclidean (most common), <M>{'p \\to \\infty'}</M> the largest single difference <M>{'\\max_i |x_i - y_i|'}</M>.
           </p>
@@ -431,7 +431,7 @@ export default function Page() {
         <p>
           A plain vote gives the 5th neighbor as much say as the 1st. Weighting by inverse squared distance lets close neighbors count more. You can also weight <strong>attributes</strong> inside the distance.
         </p>
-        <MB>{'w_i = \\frac{1}{d(q, x_i)^2}, \\qquad \\hat{y} = \\arg\\max_c \\sum_{i \\in N_k(q),\\, y_i = c} w_i'}</MB>
+        <MB note="Distance-weighted vote: each of the k neighbors votes with weight 1 over its squared distance, and the class with the largest total weight wins." syms={[['w_i', 'weight of neighbor i'], ['d(q, x_i)', 'distance from the query to neighbor i'], ['q', 'the query record'], ['N_k(q)', 'the k nearest neighbors of q'], ['y_i', 'class of neighbor i'], ['\\hat{y}', 'predicted class'], ['\\arg\\max_c', 'the class c with the largest sum']]}>{'w_i = \\frac{1}{d(q, x_i)^2}, \\qquad \\hat{y} = \\arg\\max_c \\sum_{i \\in N_k(q),\\, y_i = c} w_i'}</MB>
       </Section>
 
       <Section id="preprocessing" title="Preprocessing matters">

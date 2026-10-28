@@ -42,23 +42,7 @@ export default function HeroGraph() {
   const open = (c: Card) => nav(c.to)
 
   return (
-    <svg className="hero-graph" viewBox="0 0 560 460" role="img" aria-label="Data mining pipeline: raw records, cleaning, clusters and rules">
-      <defs>
-        <pattern id="hg-dots" width="16" height="16" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="0.8" fill="oklch(100% 0 0 / 0.08)" />
-        </pattern>
-        <radialGradient id="hg-glow-a" cx="0.15" cy="0.05" r="0.7">
-          <stop offset="0" stopColor="oklch(55% 0.18 275)" stopOpacity="0.55" />
-          <stop offset="1" stopColor="oklch(55% 0.18 275)" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="hg-glow-b" cx="0.95" cy="1" r="0.6">
-          <stop offset="0" stopColor="oklch(70% 0.11 195)" stopOpacity="0.35" />
-          <stop offset="1" stopColor="oklch(70% 0.11 195)" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <rect width="560" height="460" fill="url(#hg-glow-a)" />
-      <rect width="560" height="460" fill="url(#hg-glow-b)" />
-      <rect width="560" height="460" fill="url(#hg-dots)" />
+    <svg className="hero-graph" viewBox="0 0 560 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Data mining pipeline: raw records, cleaning, clusters and rules">
 
       {LINKS.map((l, i) => (
         <g key={i}>

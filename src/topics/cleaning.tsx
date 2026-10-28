@@ -303,8 +303,16 @@ export default function Page() {
           Noise is random error in a measured value. <strong>Binning</strong> smooths it: sort, split into bins, and replace each value by its bin mean, median or nearest boundary. Regression and clustering can also smooth noise.
         </p>
         <Formula title="Bin sizes">
-          <MB>{'\\text{equal width: } w = \\frac{\\max - \\min}{k} \\qquad \\text{equal depth: about } \\frac{N}{k} \\text{ values per bin}'}</MB>
-          <p>One outlier can leave most equal-width bins nearly empty. Equal-depth bins always hold the same number of values.</p>
+          <MB
+            note="How wide or how full each bin is. Equal width splits the value range into k same-size intervals; equal depth puts about the same number of values in each bin."
+            syms={[
+              ['w', 'width of each bin'],
+              ['k', 'number of bins'],
+              ['N', 'number of values'],
+              ['\\max, \\min', 'largest and smallest value'],
+            ]}
+          >{'\\text{equal width: } w = \\frac{\\max - \\min}{k} \\qquad \\text{equal depth: about } \\frac{N}{k} \\text{ values per bin}'}</MB>
+          <p>One outlier can leave most equal-width bins nearly empty. Equal-depth bins always hold about the same number of values.</p>
         </Formula>
       </Section>
       <BinningLab />

@@ -96,7 +96,7 @@ function ManualLab() {
           </Readout>
         </div>
       </div>
-      <Legend items={[{ label: 'target 0', color: seriesColor(0), shape: 0 }, { label: 'target 1', color: seriesColor(1), shape: 1 }, { label: 'light ring = wrong output', color: 'var(--ink)' }]} />
+      <Legend items={[{ label: 'target 0', color: seriesColor(0), shape: 0 }, { label: 'target 1', color: seriesColor(1), shape: 1 }, { label: 'ring = wrong output', color: 'var(--ink)' }]} />
     </Lab>
   )
 }
@@ -325,7 +325,7 @@ export default function Page() {
           Inputs <M>{'I_1, \\dots, I_n'}</M>, weights <M>{'w_1, \\dots, w_n'}</M>. Fold the threshold in with a constant input <M>{'I_0 = 1'}</M> and weight <M>{'w_0 = -t'}</M>.
         </p>
         <Formula title="Output">
-          <MB>{'O = \\begin{cases} 1 & \\text{if } \\sum_{i=0}^{n} w_i I_i \\ge 0 \\\\ 0 & \\text{otherwise} \\end{cases}'}</MB>
+          <MB note="The perceptron output: weigh each input, add them up, and output 1 if the total is at least 0. The bias input I_0 = 1 carries the threshold." syms={[['O', 'output, 0 or 1'], ['I_i', 'the i-th input'], ['I_0', 'bias input, always 1'], ['w_i', 'weight of input i'], ['w_0', 'bias weight, equal to minus the threshold'], ['n', 'number of real inputs']]}>{'O = \\begin{cases} 1 & \\text{if } \\sum_{i=0}^{n} w_i I_i \\ge 0 \\\\ 0 & \\text{otherwise} \\end{cases}'}</MB>
           <p>Where the sum is exactly 0 is a line in 2D (a hyperplane in general): 1 on one side, 0 on the other.</p>
         </Formula>
       </Section>
@@ -346,7 +346,7 @@ export default function Page() {
           <li>Loop over the examples until a whole pass (epoch) has no errors, or a stopping rule is hit.</li>
         </ol>
         <Formula title="Perceptron weight update">
-          <MB>{'w_i \\leftarrow w_i + \\alpha\\,(T - O)\\,I_i'}</MB>
+          <MB note="The perceptron learning rule, applied after each training example. Weights change only when the output is wrong." syms={[['w_i', 'weight of input i'], ['\\leftarrow', 'replace with'], ['\\alpha', 'learning rate, a small positive number'], ['T', 'target output'], ['O', 'actual output'], ['I_i', 'value of input i']]}>{'w_i \\leftarrow w_i + \\alpha\\,(T - O)\\,I_i'}</MB>
           <p>
             <M>{'\\alpha'}</M> is the learning rate. Output 0 but target 1: <M>{'T - O = 1'}</M>, each weight moves toward its input and the sum rises next time. Output 1 but target 0: the reverse. Weights of inputs that were 0 do not change.
           </p>

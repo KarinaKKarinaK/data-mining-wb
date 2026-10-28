@@ -19,6 +19,22 @@ export default function Home() {
         <div>
           <h1>Data mining</h1>
           <p className="lede">{TOPICS.length} topics, from cleaning raw records to mining association rules. Learn each method's formula, work it by hand, then test it in a live lab.</p>
+          <ol className="hero-steps">
+            {[
+              ['Clean and scale', 'fix missing and noisy values', '/learn/cleaning'],
+              ['Classify', 'learn from labeled records', '/learn/decision-trees'],
+              ['Cluster', 'group records with no labels', '/learn/kmeans'],
+              ['Mine rules', 'find items bought together', '/learn/apriori'],
+            ].map(([t, d, to], i) => (
+              <li key={to}>
+                <Link to={to}>
+                  <span className="hs-n">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="hs-t">{t}</span>
+                  <span className="hs-d">{d}</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
           <div className="row" style={{ marginTop: 24 }}>
             <Link className="btn primary" to="/learn/intro">
               Start with topic 1

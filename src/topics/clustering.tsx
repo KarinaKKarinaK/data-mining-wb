@@ -160,8 +160,8 @@ function BinaryLab() {
           ]}
         />
         <div>
-          <MB>{`\\text{SMC} = \\frac{q + t}{q + r + s + t} = \\frac{${q + t}}{${n}}`}</MB>
-          <MB>{`\\text{Jaccard} = \\frac{q}{q + r + s} = \\frac{${q}}{${q + r + s}}`}</MB>
+          <MB note="Simple matching: the share of all attributes on which the two objects agree, counting 1-1 and 0-0 matches. Use it for symmetric binary data." syms={[['q', 'attributes where both are 1'], ['t', 'attributes where both are 0'], ['r, s', 'attributes where only one of them is 1'], ['\\text{SMC}', 'simple matching coefficient']]}>{`\\text{SMC} = \\frac{q + t}{q + r + s + t} = \\frac{${q + t}}{${n}}`}</MB>
+          <MB note="Jaccard: the share of agreeing 1s among attributes where at least one object is 1. 0-0 matches are ignored, so use it for asymmetric binary data." syms={[['q', 'attributes where both are 1'], ['r', 'only object i is 1'], ['s', 'only object j is 1']]}>{`\\text{Jaccard} = \\frac{q}{q + r + s} = \\frac{${q}}{${q + r + s}}`}</MB>
         </div>
       </div>
       <Readout>
@@ -220,7 +220,7 @@ function MixedLab() {
       notes={['Turn has_pet off for both objects. The attribute drops out of the average (its indicator becomes 0), so a shared absence does not make the objects look closer.', 'Numeric values are divided by the range so a big-unit attribute cannot swamp the others.']}
     >
       <Table head={['Attribute', 'Type', 'Dissimilarity', 'Counts', 'd']} num={[3, 4]} rows={rows.map((r) => [r[0], r[1], r[2], r[3], fmt(r[4], 3)])} />
-      <MB>{`d(1, 2) = \\frac{\\sum_f \\delta^{(f)} d^{(f)}}{\\sum_f \\delta^{(f)}} = \\frac{${fmt(num, 3)}}{${den}} = ${fmt(num / den, 3)}`}</MB>
+      <MB note="The overall distance is the average of the per-attribute dissimilarities, counting only the attributes that apply. Use it when one object mixes nominal, ordinal, numeric and binary attributes." syms={[['d^{(f)}', 'dissimilarity on attribute f, between 0 and 1'], ['\\delta^{(f)}', '1 if attribute f counts, 0 if it is missing or an asymmetric binary 0-0 match'], ['\\sum_f', 'add up over all attributes']]}>{`d(1, 2) = \\frac{\\sum_f \\delta^{(f)} d^{(f)}}{\\sum_f \\delta^{(f)}} = \\frac{${fmt(num, 3)}}{${den}} = ${fmt(num / den, 3)}`}</MB>
       <Readout>
         <Stat k="Overall distance" v={fmt(num / den, 3)} />
         <Stat k="Attributes used" v={`${den} of 4`} />
@@ -336,7 +336,7 @@ export default function Page() {
 
       <Section id="numeric" title="Distance for numeric attributes">
         <Formula title="Minkowski distance">
-          <MB>{'d(i, j) = \\Big(\\sum_{f=1}^{p} |x_{if} - x_{jf}|^h\\Big)^{1/h}'}</MB>
+          <MB note="The distance between two objects with numeric attributes: raise each coordinate difference to the power h, add them up, take the h-th root. h = 1 is Manhattan, h = 2 is Euclidean." syms={[['x_{if}', 'value of attribute f for object i'], ['p', 'number of attributes'], ['h', 'the order of the distance, h at least 1'], ['|x_{if} - x_{jf}|', 'gap between the two objects on attribute f']]}>{'d(i, j) = \\Big(\\sum_{f=1}^{p} |x_{if} - x_{jf}|^h\\Big)^{1/h}'}</MB>
           <p>
             <M>{'h = 1'}</M> is Manhattan, <M>{'h = 2'}</M> is Euclidean, <M>{'h \\to \\infty'}</M> is the supremum distance <M>{'\\max_f |x_{if} - x_{jf}|'}</M>. A metric is non-negative, zero only for identical objects, symmetric, and obeys the triangle inequality.
           </p>
@@ -349,14 +349,14 @@ export default function Page() {
           Count a 2 by 2 table: <M>{'q'}</M> both 1, <M>{'r'}</M> only i is 1, <M>{'s'}</M> only j is 1, <M>{'t'}</M> both 0.
         </p>
         <Formula title="Binary dissimilarity">
-          <MB>{'d_{sym}(i, j) = \\frac{r + s}{q + r + s + t}, \\qquad d_{asym}(i, j) = \\frac{r + s}{q + r + s}, \\qquad sim_{Jaccard} = \\frac{q}{q + r + s}'}</MB>
+          <MB note="Distances for binary attributes from the 2 by 2 count table. Use the symmetric one when 0 and 1 matter equally, the asymmetric one (and Jaccard) when 1 is rare and 0-0 matches say nothing." syms={[['q', 'attributes where both are 1'], ['r', 'only i is 1'], ['s', 'only j is 1'], ['t', 'attributes where both are 0'], ['sim_{Jaccard}', 'Jaccard similarity, equal to 1 minus the asymmetric distance']]}>{'d_{sym}(i, j) = \\frac{r + s}{q + r + s + t}, \\qquad d_{asym}(i, j) = \\frac{r + s}{q + r + s}, \\qquad sim_{Jaccard} = \\frac{q}{q + r + s}'}</MB>
           <p>Symmetric: both states matter equally. Asymmetric: the 1 is rare and meaningful (positive test), so 0-0 matches are ignored.</p>
         </Formula>
       </Section>
       <BinaryLab />
 
       <Formula title="Nominal and ordinal">
-        <MB>{'d_{nominal}(i, j) = \\frac{p - m}{p}, \\qquad z_{if} = \\frac{r_{if} - 1}{M_f - 1}'}</MB>
+        <MB note="Left: the share of nominal attributes on which two objects differ. Right: turn an ordinal value into a number between 0 and 1 from its rank, then treat it as numeric." syms={[['p', 'number of attributes'], ['m', 'number of attributes that match'], ['r_{if}', 'rank of object i on attribute f, starting at 1'], ['M_f', 'number of ordered states of attribute f'], ['z_{if}', 'the rank scaled to [0, 1]']]}>{'d_{nominal}(i, j) = \\frac{p - m}{p}, \\qquad z_{if} = \\frac{r_{if} - 1}{M_f - 1}'}</MB>
         <p>
           Nominal: <M>{'m'}</M> matches out of <M>{'p'}</M> attributes. Ordinal: replace a value by its rank <M>{'r_{if}'}</M> of <M>{'M_f'}</M> states, scale to [0, 1], treat as numeric.
         </p>
@@ -380,7 +380,7 @@ export default function Page() {
           Without labels, use an internal measure such as the silhouette. With known labels (only for testing a method), use external ones like purity.
         </p>
         <Formula title="Silhouette">
-          <MB>{'s(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}} \\in [-1, 1]'}</MB>
+          <MB note="How well one object fits its cluster compared with the nearest other cluster. Near 1 is a good fit, near 0 is on a border, negative means it is probably in the wrong cluster." syms={[['a(i)', 'mean distance from i to the other members of its own cluster'], ['b(i)', 'smallest mean distance from i to the members of another cluster'], ['s(i)', 'silhouette of object i']]}>{'s(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}} \\in [-1, 1]'}</MB>
           <p><M>{'a(i)'}</M>: mean distance to its own cluster. <M>{'b(i)'}</M>: smallest mean distance to another cluster.</p>
         </Formula>
       </Section>

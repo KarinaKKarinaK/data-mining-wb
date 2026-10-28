@@ -176,7 +176,7 @@ function covering(target: string) {
     const rule = { conds, cls: target }
     rules.push(rule)
     remaining = remaining.filter((r) => !matches(r, conds))
-    snaps.push({ rules: [...rules], current: [], cands: [], remaining: remaining.length, remainingPos: posIn(remaining), msg: `The rule covers no negatives, so it is finished. Remove the ${covered.length} tuples it covers. ${posIn(remaining)} positive tuples remain.` })
+    snaps.push({ rules: [...rules], current: [], cands: [], remaining: remaining.length, remainingPos: posIn(remaining), msg: `${covered.some((r) => r[TARGET] !== target) ? 'No condition has positive FOIL gain, so the rule stops here.' : 'The rule covers no negatives, so it is finished.'} Remove the ${covered.length} tuples it covers. ${posIn(remaining)} positive tuples remain.` })
   }
   snaps[snaps.length - 1].msg += ' No positives left: done.'
   return snaps
@@ -260,7 +260,14 @@ export default function Page() {
           <strong>Antecedent</strong>: the IF part, a conjunction of tests. <strong>Consequent</strong>: the THEN part, a class. A rule <strong>covers</strong> a tuple when every test is true for it.
         </p>
         <Formula title="Quality of a rule R on data D">
-          <MB>{'coverage(R) = \\frac{n_{covers}}{|D|}, \\qquad accuracy(R) = \\frac{n_{correct}}{n_{covers}}'}</MB>
+          <MB
+            note="Coverage is the share of all tuples the rule applies to. Accuracy is the share of those covered tuples it gets right."
+            syms={[
+              ['n_{covers}', 'number of tuples the rule covers'],
+              ['n_{correct}', 'covered tuples the rule classifies correctly'],
+              ['|D|', 'number of tuples in the data set'],
+            ]}
+          >{'coverage(R) = \\frac{n_{covers}}{|D|}, \\qquad accuracy(R) = \\frac{n_{correct}}{n_{covers}}'}</MB>
           <p>
             <M>{'n_{covers}'}</M>: tuples covered by R. <M>{'n_{correct}'}</M>: covered tuples that R classifies correctly.
           </p>
@@ -297,7 +304,13 @@ export default function Page() {
       <Section id="covering" title="Sequential covering">
         <p>Learn rules for one class at a time, each covering many tuples of that class and few others.</p>
         <Formula title="FOIL gain for adding a condition">
-          <MB>{"FOIL\\_Gain = pos' \\times \\Big(\\log_2 \\frac{pos'}{pos' + neg'} - \\log_2 \\frac{pos}{pos + neg}\\Big)"}</MB>
+          <MB
+            note="FOIL gain scores a candidate condition while a rule is grown in sequential covering. Pick the condition with the highest gain: it raises accuracy while still covering many positives."
+            syms={[
+              ['pos, neg', 'positive and negative tuples covered by the current rule'],
+              ["pos', neg'", 'positive and negative tuples covered after adding the condition'],
+            ]}
+          >{"FOIL\\_Gain = pos' \\times \\Big(\\log_2 \\frac{pos'}{pos' + neg'} - \\log_2 \\frac{pos}{pos + neg}\\Big)"}</MB>
           <p>
             <M>{'pos, neg'}</M>: covered by the current rule. <M>{"pos', neg'"}</M>: covered after adding the condition. Rewards higher accuracy that still covers many positives.
           </p>

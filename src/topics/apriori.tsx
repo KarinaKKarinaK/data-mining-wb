@@ -396,9 +396,9 @@ export default function Page() {
           An <strong>itemset</strong> is a set of items, such as {'{'}coffee, croissant{'}'}. A <strong>rule</strong> <M>{'A \\Rightarrow B'}</M> says that baskets containing A tend to contain B, where A and B share no items.
         </p>
         <Formula title="Definitions (N transactions)">
-          <MB>{'support(A \\Rightarrow B) = P(A \\cup B) = \\frac{\\text{count}(A \\cup B)}{N}'}</MB>
-          <MB>{'confidence(A \\Rightarrow B) = P(B \\mid A) = \\frac{support(A \\cup B)}{support(A)}'}</MB>
-          <MB>{'lift(A, B) = \\frac{P(A \\cup B)}{P(A)\\,P(B)} = \\frac{confidence(A \\Rightarrow B)}{support(B)}'}</MB>
+          <MB note="The share of all transactions that contain every item of A and of B. Compared with min_sup to decide what is frequent." syms={[['A, B', 'left and right side of the rule, itemsets with no shared items'], ['A \\cup B', 'all items of A and B in the same basket'], ['\\text{count}(A \\cup B)', 'number of transactions containing them'], ['N', 'number of transactions']]}>{'support(A \\Rightarrow B) = P(A \\cup B) = \\frac{\\text{count}(A \\cup B)}{N}'}</MB>
+          <MB note="Of the transactions that contain A, the share that also contain B. Compared with min_conf to keep strong rules." syms={[['P(B \\mid A)', 'probability of B given A'], ['support(A \\cup B)', 'share of transactions with A and B'], ['support(A)', 'share of transactions with A']]}>{'confidence(A \\Rightarrow B) = P(B \\mid A) = \\frac{support(A \\cup B)}{support(A)}'}</MB>
+          <MB note="How much more often A and B occur together than they would if independent. Above 1: positive correlation. Exactly 1: independent. Below 1: negative." syms={[['P(A \\cup B)', 'support of A and B together'], ['P(A), P(B)', 'support of A and of B alone'], ['support(B)', 'share of transactions with B, the same as P(B)']]}>{'lift(A, B) = \\frac{P(A \\cup B)}{P(A)\\,P(B)} = \\frac{confidence(A \\Rightarrow B)}{support(B)}'}</MB>
           <p>
             Here <M>{'A \\cup B'}</M> means the basket contains <em>all</em> items of A and of B. A rule is <strong>strong</strong> when support reaches min_sup and confidence reaches min_conf.
           </p>

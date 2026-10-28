@@ -254,7 +254,7 @@ export default function Page() {
       <Section id="statistical" title="Statistical methods">
         <p>Assume the normal data follows a distribution and flag objects in its low-probability tails.</p>
         <Formula title="Two simple rules">
-          <MB>{'z_i = \\frac{x_i - \\bar{x}}{\\sigma}, \\quad \\text{flag if } |z_i| > 3 \\qquad\\text{or}\\qquad x_i < Q_1 - 1.5\\,IQR \\;\\text{ or }\\; x_i > Q_3 + 1.5\\,IQR'}</MB>
+          <MB note="Two quick tests on one numeric attribute. Flag a value whose z-score is beyond 3, or one that falls outside the boxplot fences built from the quartiles." syms={[['z_i', 'z-score: how many standard deviations x_i is from the mean'], ['x_i', 'the i-th value'], ['\\bar{x}', 'the mean'], ['\\sigma', 'standard deviation (divide by N)'], ['Q_1, Q_3', 'first and third quartile'], ['IQR', 'Q_3 - Q_1, the spread of the middle half']]}>{'z_i = \\frac{x_i - \\bar{x}}{\\sigma}, \\quad \\text{flag if } |z_i| > 3 \\qquad\\text{or}\\qquad x_i < Q_1 - 1.5\\,IQR \\;\\text{ or }\\; x_i > Q_3 + 1.5\\,IQR'}</MB>
           <p>For a normal distribution about 99.7% of values fall within <M>{'\\bar{x} \\pm 3\\sigma'}</M>. The IQR rule is the boxplot rule.</p>
         </Formula>
       </Section>
@@ -263,7 +263,7 @@ export default function Page() {
       <Section id="proximity" title="Proximity-based methods">
         <p>No distribution needed: an object is an outlier if its neighbors are far away.</p>
         <Formula title="Distance-based outlier">
-          <MB>{'o \\text{ is a } DB(r, \\pi) \\text{ outlier if } \\frac{|\\{o\' : d(o, o\') \\le r\\}|}{|D|} \\le \\pi'}</MB>
+          <MB note="Counts the share of all objects that lie within distance r of o. If that share is at most π, o has too few neighbors and is flagged as an outlier." syms={[['o', 'the object being tested'], ["o'", 'any object in the data'], ["d(o, o')", 'distance between o and o\''], ['r', 'distance threshold (radius)'], ['\\pi', 'fraction threshold'], ['|D|', 'number of objects in the data set']]}>{'o \\text{ is a } DB(r, \\pi) \\text{ outlier if } \\frac{|\\{o\' : d(o, o\') \\le r\\}|}{|D|} \\le \\pi'}</MB>
           <p>A related score is the kNN distance: the distance from o to its kth nearest neighbor. Larger means more isolated.</p>
         </Formula>
       </Section>
@@ -274,8 +274,8 @@ export default function Page() {
           Distance rules use one global yardstick. LOF compares an object's density with its neighbors' density, so it adapts to clusters of different spread.
         </p>
         <Formula title="LOF">
-          <MB>{'reachdist_k(o \\leftarrow o\') = \\max\\{dist_k(o), d(o, o\')\\}'}</MB>
-          <MB>{'lrd_k(o) = \\frac{|N_k(o)|}{\\sum_{o\' \\in N_k(o)} reachdist_k(o\' \\leftarrow o)}, \\qquad LOF_k(o) = \\frac{1}{|N_k(o)|}\\sum_{o\' \\in N_k(o)} \\frac{lrd_k(o\')}{lrd_k(o)}'}</MB>
+          <MB note="The distance LOF uses between o and a neighbor o'. It is the true distance, but never smaller than the k-distance of o, so points very close to o all count the same." syms={[['dist_k(o)', 'distance from o to its kth nearest neighbor'], ["d(o, o')", 'distance between o and o\''], ['k', 'number of neighbors']]}>{'reachdist_k(o \\leftarrow o\') = \\max\\{dist_k(o), d(o, o\')\\}'}</MB>
+          <MB note="lrd is one over the average reachability distance from o to its k nearest neighbors, so high means dense. LOF averages the neighbors' lrd divided by o's own: near 1 is normal, well above 1 means o is sparser than its neighbors." syms={[['N_k(o)', 'the k nearest neighbors of o'], ['|N_k(o)|', 'how many there are (k, more with ties)'], ["reachdist_k(o' \\leftarrow o)", 'reachability distance (formula above)'], ['lrd_k(o)', 'local reachability density of o'], ['LOF_k(o)', 'local outlier factor of o']]}>{'lrd_k(o) = \\frac{|N_k(o)|}{\\sum_{o\' \\in N_k(o)} reachdist_k(o\' \\leftarrow o)}, \\qquad LOF_k(o) = \\frac{1}{|N_k(o)|}\\sum_{o\' \\in N_k(o)} \\frac{lrd_k(o\')}{lrd_k(o)}'}</MB>
           <p>
             <M>{'dist_k(o)'}</M>: distance to the kth nearest neighbor. <M>{'lrd'}</M>: local reachability density. LOF near 1 is normal; well above 1 is an outlier.
           </p>

@@ -360,9 +360,9 @@ export default function Page() {
           <li>Repeat 2 and 3 until no assignment changes (or the centroids stop moving).</li>
         </ol>
         <Formula title="What k-means minimizes">
-          <MB>{'SSE = \\sum_{j=1}^{k} \\sum_{x \\in C_j} \\lVert x - m_j \\rVert^2'}</MB>
+          <MB note="The total squared distance from every object to the center of its cluster. k-means tries to make this as small as possible; lower means tighter clusters." syms={[['k', 'number of clusters'], ['C_j', 'the set of objects in cluster j'], ['m_j', 'centroid (mean) of cluster j'], ['\\lVert x - m_j \\rVert^2', 'squared Euclidean distance from x to its centroid']]}>{'SSE = \\sum_{j=1}^{k} \\sum_{x \\in C_j} \\lVert x - m_j \\rVert^2'}</MB>
           <p>
-            <M>{'m_j'}</M> is the mean of cluster <M>{'C_j'}</M>. Both steps can only lower SSE, so the loop always stops, but at a <strong>local</strong> minimum that depends on the start.
+            <M>{'m_j'}</M> is the mean of cluster <M>{'C_j'}</M>. Neither step can raise SSE, so the loop always stops, but at a <strong>local</strong> minimum that depends on the start.
           </p>
         </Formula>
       </Section>
@@ -379,7 +379,7 @@ export default function Page() {
           SSE reaches zero when every point is its own cluster, so it cannot choose k. Use the <strong>elbow method</strong> or the <strong>silhouette coefficient</strong>.
         </p>
         <Formula title="Silhouette of one object">
-          <MB>{'s(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}}'}</MB>
+          <MB note="How well one object fits its cluster compared with the nearest other cluster. Average it over all objects to compare different values of k." syms={[['a(i)', 'mean distance from i to the other members of its own cluster'], ['b(i)', 'smallest mean distance from i to the members of another cluster'], ['s(i)', 'silhouette of object i, between -1 and 1']]}>{'s(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}}'}</MB>
           <p>
             <M>{'a(i)'}</M>: mean distance to its own cluster. <M>{'b(i)'}</M>: smallest mean distance to another cluster. Near 1 is good, near 0 is on a border, negative is likely misassigned.
           </p>

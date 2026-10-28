@@ -108,7 +108,7 @@ function Explorer() {
       notes={[
         'On "One outlier", drag 48 further right. Mean and std dev follow it; median and IQR stay put.',
         'On the trimmed mean example, a 10% trim drops 0 and 18 and gives 7.25.',
-        'Drag values until mean, median and mode are equal: the data is now symmetric.',
+        'Drag values until mean, median and mode are equal, as they are for symmetric data.',
       ]}
     >
       <Plot
@@ -329,7 +329,17 @@ export default function Page() {
 
       <Section id="center" title="Measures of center">
         <Formula>
-          <MB>{'\\bar{x} = \\frac{1}{N}\\sum_{i=1}^{N} x_i \\qquad \\bar{x}_w = \\frac{\\sum_i w_i x_i}{\\sum_i w_i} \\qquad \\text{midrange} = \\frac{\\max + \\min}{2}'}</MB>
+          <MB
+            note="Three ways to find the center of numeric data. The mean averages all values, the weighted mean lets some values count more, and the midrange is halfway between the smallest and largest value."
+            syms={[
+              ['\\bar{x}', 'the mean'],
+              ['N', 'number of values'],
+              ['x_i', 'the i-th value'],
+              ['w_i', 'weight of the i-th value (how much it counts)'],
+              ['\\bar{x}_w', 'the weighted mean'],
+              ['\\sum', 'add up over all values'],
+            ]}
+          >{'\\bar{x} = \\frac{1}{N}\\sum_{i=1}^{N} x_i \\qquad \\bar{x}_w = \\frac{\\sum_i w_i x_i}{\\sum_i w_i} \\qquad \\text{midrange} = \\frac{\\max + \\min}{2}'}</MB>
           <p>
             The <strong>median</strong> is the middle value of the sorted data. With an even count, average the two middle values. The <strong>mode</strong> is the most frequent value. A <strong>trimmed mean</strong> drops a percentage of the lowest and highest values first, like diving judges ignoring the extreme scores.
           </p>
@@ -339,8 +349,25 @@ export default function Page() {
 
       <Section id="spread" title="Measures of spread">
         <Formula>
-          <MB>{'\\sigma^2 = \\frac{1}{N}\\sum_{i=1}^{N}(x_i - \\bar{x})^2 = \\frac{1}{N}\\sum x_i^2 - \\bar{x}^2 \\qquad \\sigma = \\sqrt{\\sigma^2}'}</MB>
-          <MB>{'IQR = Q_3 - Q_1 \\qquad \\text{outlier if } x < Q_1 - 1.5\\,IQR \\text{ or } x > Q_3 + 1.5\\,IQR'}</MB>
+          <MB
+            note="Variance is the average squared distance from the mean, and the standard deviation is its square root. Both grow when values are spread out. The second form is faster by hand."
+            syms={[
+              ['\\sigma^2', 'variance'],
+              ['\\sigma', 'standard deviation'],
+              ['x_i', 'the i-th value'],
+              ['\\bar{x}', 'the mean'],
+              ['N', 'number of values'],
+            ]}
+          >{'\\sigma^2 = \\frac{1}{N}\\sum_{i=1}^{N}(x_i - \\bar{x})^2 = \\frac{1}{N}\\sum x_i^2 - \\bar{x}^2 \\qquad \\sigma = \\sqrt{\\sigma^2}'}</MB>
+          <MB
+            note="The IQR is the spread of the middle half of the data. Values beyond 1.5 IQR below Q1 or above Q3 are flagged as possible outliers."
+            syms={[
+              ['Q_1', 'first quartile: 25% of values are below it'],
+              ['Q_3', 'third quartile: 75% of values are below it'],
+              ['IQR', 'interquartile range'],
+              ['1.5', 'the usual fence multiplier'],
+            ]}
+          >{'IQR = Q_3 - Q_1 \\qquad \\text{outlier if } x < Q_1 - 1.5\\,IQR \\text{ or } x > Q_3 + 1.5\\,IQR'}</MB>
           <p>
             <M>{'Q_1'}</M>, the median and <M>{'Q_3'}</M> are the 25th, 50th and 75th percentiles. Together with min and max they form the <strong>five-number summary</strong>. <M>{'\\sigma = 0'}</M> only when every value is equal.
           </p>
