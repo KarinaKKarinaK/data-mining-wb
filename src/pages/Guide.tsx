@@ -4,50 +4,77 @@ import { M, MB } from '../components/Math'
 import { Stat } from '../components/ui'
 import { GROUPS, TOPICS } from '../topics'
 
-const FORMULAS: { group: string; items: { name: string; tex: string; note?: string }[] }[] = [
+type Fx = { name: string; tex: string; note: string; syms: [string, string][] }
+
+const FORMULAS: { group: string; items: Fx[] }[] = [
   {
     group: 'Summaries',
     items: [
-      { name: 'Mean', tex: '\\bar{x} = \\frac{1}{N}\\sum_{i=1}^{N} x_i' },
-      { name: 'Variance (divide by N)', tex: '\\sigma^2 = \\frac{1}{N}\\sum (x_i - \\bar{x})^2 = \\frac{1}{N}\\sum x_i^2 - \\bar{x}^2' },
-      { name: 'IQR and outlier fences', tex: 'IQR = Q_3 - Q_1, \\quad [\\,Q_1 - 1.5\\,IQR,\\; Q_3 + 1.5\\,IQR\\,]' },
+      { name: 'Mean', tex: '\\bar{x} = \\frac{1}{N}\\sum_{i=1}^{N} x_i', note: 'The balance point of the values: add them up, divide by how many there are.', syms: [['\\bar{x}', 'the mean'], ['N', 'number of values'], ['x_i', 'the i-th value'], ['\\sum', 'add up over i = 1 to N']] },
+      { name: 'Variance (divide by N)', tex: '\\sigma^2 = \\frac{1}{N}\\sum (x_i - \\bar{x})^2 = \\frac{1}{N}\\sum x_i^2 - \\bar{x}^2', note: 'The average squared distance from the mean. Large when values are spread out. The second form is faster by hand.', syms: [['\\sigma^2', 'variance (σ is the standard deviation)'], ['x_i', 'the i-th value'], ['\\bar{x}', 'the mean'], ['N', 'number of values']] },
+      { name: 'IQR and outlier fences', tex: 'IQR = Q_3 - Q_1, \\quad [\\,Q_1 - 1.5\\,IQR,\; Q_3 + 1.5\\,IQR\\,]', note: 'The spread of the middle half of the data. Values outside the fences are flagged as outliers.', syms: [['Q_1', 'first quartile: 25% of values are below it'], ['Q_3', 'third quartile: 75% are below it'], ['IQR', 'interquartile range'], ['1.5', 'the usual fence multiplier']] },
     ],
   },
   {
     group: 'Preprocessing',
     items: [
-      { name: 'Min-max', tex: "v' = \\frac{v - \\min_A}{\\max_A - \\min_A}(new\\_max - new\\_min) + new\\_min" },
-      { name: 'z-score', tex: "v' = \\frac{v - \\bar{A}}{\\sigma_A}" },
-      { name: 'Pearson correlation', tex: 'r_{A,B} = \\frac{\\sum a_i b_i - N\\bar{A}\\bar{B}}{N\\sigma_A\\sigma_B}' },
-      { name: 'Chi-square', tex: '\\chi^2 = \\sum_{i,j}\\frac{(o_{ij}-e_{ij})^2}{e_{ij}}, \\quad e_{ij} = \\frac{\\text{row}_i \\times \\text{col}_j}{N}, \\quad df = (r-1)(c-1)' },
-      { name: 'Curse of dimensionality', tex: '\\ell = r^{1/d}' },
-      { name: 'PCA variance kept', tex: '\\frac{\\lambda_1 + \\dots + \\lambda_k}{\\lambda_1 + \\dots + \\lambda_d}' },
+      { name: 'Min-max', tex: "v' = \\frac{v - \\min_A}{\\max_A - \\min_A}(new\\_max - new\\_min) + new\\_min", note: 'Rescales an attribute in a straight line so its smallest value lands on new_min and its largest on new_max, often 0 and 1.', syms: [['v', 'original value'], ["v'", 'rescaled value'], ['\\min_A, \\max_A', 'smallest and largest value of attribute A'], ['new\\_min, new\\_max', 'the target range']] },
+      { name: 'z-score', tex: "v' = \\frac{v - \\bar{A}}{\\sigma_A}", note: 'How many standard deviations a value sits above (+) or below (−) the mean.', syms: [['v', 'original value'], ['\\bar{A}', 'mean of attribute A'], ['\\sigma_A', 'standard deviation of A']] },
+      { name: 'Pearson correlation', tex: 'r_{A,B} = \\frac{\\sum a_i b_i - N\\bar{A}\\bar{B}}{N\\sigma_A\\sigma_B}', note: 'How strongly two numeric attributes move together along a straight line, from −1 to +1. Close to ±1 means one of them is redundant.', syms: [['r_{A,B}', 'correlation of A and B'], ['a_i, b_i', 'the paired values in record i'], ['N', 'number of records'], ['\\bar{A}, \\bar{B}', 'the two means'], ['\\sigma_A, \\sigma_B', 'the two standard deviations']] },
+      { name: 'Chi-square', tex: '\\chi^2 = \\sum_{i,j}\\frac{(o_{ij}-e_{ij})^2}{e_{ij}}, \\quad e_{ij} = \\frac{\\text{row}_i \\times \\text{col}_j}{N}, \\quad df = (r-1)(c-1)', note: 'Compares the observed counts in a contingency table with the counts you would expect if two nominal attributes were independent. A large value means they are related.', syms: [['o_{ij}', 'observed count in cell (i, j)'], ['e_{ij}', 'expected count if independent'], ['\\text{row}_i, \\text{col}_j', 'row and column totals'], ['N', 'total number of records'], ['df', 'degrees of freedom'], ['r, c', 'number of rows and columns']] },
+      { name: 'Curse of dimensionality', tex: '\\ell = r^{1/d}', note: 'Edge length of a sub-cube holding a fraction r of evenly spread data. As d grows, ℓ heads to 1, so a "local" neighborhood covers almost the whole range.', syms: [['\\ell', 'edge length of the sub-cube'], ['r', 'fraction of the data inside it'], ['d', 'number of dimensions']] },
+      { name: 'PCA variance kept', tex: '\\frac{\\lambda_1 + \\dots + \\lambda_k}{\\lambda_1 + \\dots + \\lambda_d}', note: 'The share of the total variance you keep by keeping only the first k principal components.', syms: [['\\lambda_i', 'variance along component i (its eigenvalue), largest first'], ['k', 'components kept'], ['d', 'all components']] },
     ],
   },
   {
     group: 'Classification',
     items: [
-      { name: 'Precision, recall, F1', tex: 'P = \\frac{TP}{TP+FP}, \\quad R = \\frac{TP}{TP+FN}, \\quad F_1 = \\frac{2PR}{P+R}' },
-      { name: 'Entropy', tex: 'Info(D) = -\\sum_{i=1}^{m} p_i \\log_2 p_i' },
-      { name: 'Information gain', tex: 'Gain(A) = Info(D) - \\sum_{v} \\frac{|D_v|}{|D|} Info(D_v)' },
-      { name: 'Gain ratio', tex: 'GainRatio(A) = \\frac{Gain(A)}{SplitInfo_A(D)}, \\; SplitInfo_A(D) = -\\sum_v \\frac{|D_v|}{|D|}\\log_2\\frac{|D_v|}{|D|}' },
-      { name: 'Bayes rule', tex: 'P(C \\mid X) = \\frac{P(X \\mid C)P(C)}{P(X)}' },
-      { name: 'Naive Bayes', tex: 'P(X \\mid C) = \\prod_{k} P(x_k \\mid C)' },
-      { name: 'Laplace correction', tex: 'P(x_k \\mid C) = \\frac{n_{x_k,C} + 1}{n_C + |\\text{values of } A_k|}' },
-      { name: 'Minkowski distance', tex: 'd(x, y) = \\Big(\\sum_i |x_i - y_i|^p\\Big)^{1/p}' },
-      { name: 'Perceptron update', tex: 'w_i \\leftarrow w_i + \\alpha (T - O) I_i' },
+      { name: 'Precision, recall, F1', tex: 'P = \\frac{TP}{TP+FP}, \\quad R = \\frac{TP}{TP+FN}, \\quad F_1 = \\frac{2PR}{P+R}', note: 'Precision: of the records predicted positive, the share that really are. Recall: of the real positives, the share found. F1 is their harmonic mean.', syms: [['TP', 'true positives'], ['FP', 'false positives (false alarms)'], ['FN', 'false negatives (missed)'], ['P, R', 'precision and recall']] },
+      { name: 'Entropy', tex: 'Info(D) = -\\sum_{i=1}^{m} p_i \\log_2 p_i', note: 'How mixed the class labels in D are, in bits. 0 when every record has the same class, highest when all classes are equally common.', syms: [['D', 'the set of records'], ['m', 'number of classes'], ['p_i', 'share of records in class i'], ['\\log_2', 'log base 2, so the answer is in bits']] },
+      { name: 'Information gain', tex: 'Gain(A) = Info(D) - \\sum_{v} \\frac{|D_v|}{|D|} Info(D_v)', note: 'How much splitting on attribute A lowers the entropy. ID3 splits on the attribute with the highest gain.', syms: [['Info(D)', 'entropy before the split'], ['D_v', 'records where A has value v'], ['|D_v| / |D|', 'weight of that branch'], ['Info(D_v)', 'entropy inside the branch']] },
+      { name: 'Gain ratio', tex: 'GainRatio(A) = \\frac{Gain(A)}{SplitInfo_A(D)}', note: 'Gain divided by split information, so attributes with many values (like an ID) do not win just by splitting finely. Used by C4.5.', syms: [['Gain(A)', 'information gain of A'], ['SplitInfo_A(D)', 'entropy of the split itself (next formula)']] },
+      { name: 'Split information', tex: 'SplitInfo_A(D) = -\\sum_v \\frac{|D_v|}{|D|}\\log_2\\frac{|D_v|}{|D|}', note: 'The entropy of the branch sizes. Large when A breaks D into many small branches.', syms: [['|D_v| / |D|', 'share of records going down branch v']] },
+      { name: 'Bayes rule', tex: 'P(C \\mid X) = \\frac{P(X \\mid C)P(C)}{P(X)}', note: 'Turns "how likely is this record, given the class" into "how likely is the class, given this record".', syms: [['P(C \\mid X)', 'posterior: class probability after seeing X'], ['P(X \\mid C)', 'likelihood of the record within the class'], ['P(C)', 'prior: how common the class is'], ['P(X)', 'evidence: the same for every class, so it can be dropped when comparing']] },
+      { name: 'Naive Bayes', tex: 'P(X \\mid C) = \\prod_{k} P(x_k \\mid C)', note: 'Assumes the attributes are independent within each class, so the likelihood becomes a product of one-attribute probabilities.', syms: [['x_k', 'value of attribute k in the record'], ['\\prod_k', 'multiply over all attributes']] },
+      { name: 'Laplace correction', tex: 'P(x_k \\mid C) = \\frac{n_{x_k,C} + 1}{n_C + |\\text{values of } A_k|}', note: 'Adds 1 to every count so one unseen value does not make the whole product zero.', syms: [['n_{x_k,C}', 'records in class C with value x_k'], ['n_C', 'records in class C'], ['|\\text{values of } A_k|', 'number of distinct values of attribute k']] },
+      { name: 'Minkowski distance', tex: 'd(x, y) = \\Big(\\sum_i |x_i - y_i|^p\\Big)^{1/p}', note: 'Distance between two records. p = 1 is Manhattan, p = 2 is Euclidean, and p → ∞ gives the largest single difference.', syms: [['x_i, y_i', 'attribute i of the two records'], ['p', 'the order of the distance']] },
+      { name: 'Perceptron update', tex: 'w_i \\leftarrow w_i + \\alpha (T - O) I_i', note: 'After each training record, nudge every weight in the direction that shrinks the error. Nothing changes when the output is already right.', syms: [['w_i', 'weight of input i'], ['\\alpha', 'learning rate (step size)'], ['T', 'target output'], ['O', 'actual output'], ['I_i', 'input i']] },
     ],
   },
   {
     group: 'Clustering and association',
     items: [
-      { name: 'k-means objective', tex: 'SSE = \\sum_{j}\\sum_{x \\in C_j} \\lVert x - m_j \\rVert^2' },
-      { name: 'Silhouette', tex: 's(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}}' },
-      { name: 'Support and confidence', tex: 'sup(A \\Rightarrow B) = P(A \\cup B), \\quad conf(A \\Rightarrow B) = \\frac{sup(A \\cup B)}{sup(A)}' },
-      { name: 'Lift', tex: 'lift(A, B) = \\frac{P(A \\cup B)}{P(A)P(B)}' },
+      { name: 'k-means objective', tex: 'SSE = \\sum_{j}\\sum_{x \\in C_j} \\lVert x - m_j \\rVert^2', note: 'Total squared distance from each point to its cluster center. k-means keeps reassigning and recentering to make this smaller.', syms: [['C_j', 'cluster j'], ['m_j', 'its center (the mean)'], ['\\lVert x - m_j \\rVert', 'distance from point x to the center']] },
+      { name: 'Silhouette', tex: 's(i) = \\frac{b(i) - a(i)}{\\max\\{a(i), b(i)\\}}', note: 'How well a point fits its own cluster compared with the nearest other one, from −1 to 1. Close to 1 means well placed.', syms: [['a(i)', 'average distance to the other points in its own cluster'], ['b(i)', 'smallest average distance to the points of another cluster']] },
+      { name: 'Support and confidence', tex: 'sup(A \\Rightarrow B) = P(A \\cup B), \\quad conf(A \\Rightarrow B) = \\frac{sup(A \\cup B)}{sup(A)}', note: 'Support: how often A and B appear together across all transactions. Confidence: of the transactions with A, the share that also have B.', syms: [['A \\Rightarrow B', 'the rule "if A then B"'], ['A \\cup B', 'transactions containing every item of A and of B'], ['sup(A)', 'share of transactions containing A']] },
+      { name: 'Lift', tex: 'lift(A, B) = \\frac{P(A \\cup B)}{P(A)P(B)}', note: 'Confidence compared with how common B is anyway. Above 1: A and B occur together more than chance. 1: independent. Below 1: they tend to exclude each other.', syms: [['P(A \\cup B)', 'share of transactions with both'], ['P(A), P(B)', 'share with each one']] },
     ],
   },
 ]
+
+function FormulaItem({ it }: { it: Fx }) {
+  return (
+    <div className="fx" tabIndex={0}>
+      <div className="fx-name">{it.name}</div>
+      <MB>{it.tex}</MB>
+      <div className="fx-more">
+        <div>
+          <p className="fx-note">{it.note}</p>
+          <dl className="fx-syms">
+            {it.syms.map(([s, m]) => (
+              <div key={s}>
+                <dt>
+                  <M>{s}</M>
+                </dt>
+                <dd>{m}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Guide() {
   return (
@@ -142,14 +169,12 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
       </Section>
 
       <Section id="formulas" title="Formula sheet">
+        <p className="muted">Hover or tap a formula to see what it does and what each symbol means.</p>
         <div className="grid c2">
           {FORMULAS.map((g) => (
             <Formula key={g.group} title={g.group}>
               {g.items.map((it) => (
-                <div key={it.name} style={{ marginBottom: 8 }}>
-                  <div style={{ fontSize: 13, color: 'var(--ink-3)' }}>{it.name}</div>
-                  <MB>{it.tex}</MB>
-                </div>
+                <FormulaItem key={it.name} it={it} />
               ))}
             </Formula>
           ))}

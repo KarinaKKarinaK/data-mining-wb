@@ -96,7 +96,7 @@ function ManualLab() {
           </Readout>
         </div>
       </div>
-      <Legend items={[{ label: 'target 0', color: seriesColor(0), shape: 0 }, { label: 'target 1', color: seriesColor(1), shape: 1 }, { label: 'dark ring = wrong output', color: 'var(--ink)' }]} />
+      <Legend items={[{ label: 'target 0', color: seriesColor(0), shape: 0 }, { label: 'target 1', color: seriesColor(1), shape: 1 }, { label: 'light ring = wrong output', color: 'var(--ink)' }]} />
     </Lab>
   )
 }

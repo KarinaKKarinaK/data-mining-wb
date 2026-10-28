@@ -17,7 +17,7 @@ function metrics(tp: number, fp: number, fn: number, tn: number) {
   return { accuracy: (tp + tn) / n, precision, recall, f1, fpr: fp + tn ? fp / (fp + tn) : NaN }
 }
 
-const pct = (v: number) => (isFinite(v) ? `${(v * 100).toFixed(1)}%` : 'undefined')
+const pct = (v: number) => (isFinite(v) ? `${(v * 100).toFixed(1)}%` : '0/0')
 
 function ThresholdLab() {
   const [t, setT] = useState(0.5)
@@ -83,7 +83,7 @@ function ThresholdLab() {
         <Stat k="Accuracy" v={pct(m.accuracy)} />
         <Stat k="Precision" v={pct(m.precision)} sub="TP / (TP + FP)" />
         <Stat k="Recall" v={pct(m.recall)} sub="TP / (TP + FN)" />
-        <Stat k="F1" v={isFinite(m.f1) ? fmt(m.f1, 3) : 'undefined'} />
+        <Stat k="F1" v={isFinite(m.f1) ? fmt(m.f1, 3) : '0/0'} />
       </Readout>
       <div className="grid c2" style={{ marginTop: 14 }}>
         <div>
@@ -141,8 +141,8 @@ function ImbalanceLab() {
       <Readout>
         <Stat k="Accuracy" v={pct(m.accuracy)} />
         <Stat k="Recall (cancer)" v={pct(m.recall)} />
-        <Stat k="Precision (cancer)" v={pct(m.precision)} />
-        <Stat k="F1 (cancer)" v={isFinite(m.f1) ? fmt(m.f1, 3) : 'undefined'} />
+        <Stat k="Precision (cancer)" v={pct(m.precision)} sub={isFinite(m.precision) ? undefined : 'no positive predictions'} />
+        <Stat k="F1 (cancer)" v={isFinite(m.f1) ? fmt(m.f1, 3) : '0/0'} />
       </Readout>
     </Lab>
   )

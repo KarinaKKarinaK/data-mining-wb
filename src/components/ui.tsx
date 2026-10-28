@@ -185,5 +185,5 @@ export function shapePath(shape: number, r: number) {
 }
 
 export const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)', 'var(--s7)', 'var(--s8)']
-export const SERIES_HEX = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767']
+export const SERIES_HEX = ['#8b97ff', '#5fd4c8', '#e6cfa6', '#f0936f', '#c99bf0', '#9fd36c', '#6cc3f2', '#ef86a3']
 export const seriesColor = (i: number) => (i < 0 ? 'var(--ink-4)' : SERIES[i % SERIES.length])

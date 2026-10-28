@@ -12,7 +12,7 @@ Learn data mining by changing the numbers. Every topic has a plain-words explana
 - **Flashcards** by topic, with progress saved in your browser
 - **Practice quiz** with calculation and concept questions and worked answers
 - **Dataset playground**: paste any CSV and run k-means, DBSCAN, hierarchical clustering or kNN on it
-- **Study guide** with a topic map, a "which method for which question" table, common mistakes and a one-page formula sheet
+- **Study guide** with a topic map, a "which method for which question" table, common mistakes and a formula sheet: hover any formula for what it does and what each symbol means
 - **Where to find data**: Kaggle, Hugging Face, UCI, OpenML, GitHub and government portals, plus starter datasets matched to each topic
 - **Books, videos and tools**: free textbooks, library docs, visual explainers and the Python tools worth knowing
 - Search everything with `⌘K`
@@ -44,6 +44,7 @@ Other scripts:
 npm run build     # type-check and build to dist/
 npm run preview   # serve the built site
 npm run lint      # oxlint
+npm run check     # check the algorithms against known textbook answers
 ```
 
 ## How it's built
