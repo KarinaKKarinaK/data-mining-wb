@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Check, Formula, Note, Plain, Section, Table, TopicHeader, Trap } from '../components/Content'
+import { Check, Formula, Note, Plain, Section, Table, TopicHeader } from '../components/Content'
 import { M, MB } from '../components/Math'
 import { Stat } from '../components/ui'
 import { GROUPS, TOPICS } from '../topics'
@@ -49,56 +49,52 @@ const FORMULAS: { group: string; items: { name: string; tex: string; note?: stri
   },
 ]
 
-export default function Course() {
+export default function Guide() {
   return (
     <div className="page">
       <TopicHeader
-        group="Course guide"
-        title="COMP 4331 Introduction to Data Mining"
-        lede="What the course covers, how it is graded, the tools, the conventions that cost marks, and every formula on one sheet."
+        group="Study guide"
+        title="How data mining fits together"
+        lede="The map of topics, the tools, the mistakes that cost points, and every formula on one sheet."
       />
 
       <div className="grid c4">
-        <Stat k="Assignments" v="20%" sub="2 coding assignments" />
-        <Stat k="Quizzes" v="20%" sub="2 in-class quizzes" />
-        <Stat k="Final exam" v="60%" sub="must attend to pass" />
+        <Stat k="Topics" v={TOPICS.length} sub={`in ${GROUPS.length} modules`} />
+        <Stat k="Preprocessing" v="5 topics" sub="clean, integrate, transform, reduce" />
+        <Stat k="Learning" v="2 kinds" sub="supervised and unsupervised" />
         <Stat k="Textbook" v="Han et al." sub="Data Mining: Concepts and Techniques, 3rd ed." />
       </div>
 
-      <Plain title="The course in one paragraph">
+      <Plain title="Data mining in one paragraph">
         <p>
-          The course follows the order of a real project: clean and understand the data, learn from labeled examples (classification), find groups without labels (clustering and outliers), then find items that occur together (association rules).
+          The topics follow the order of a real project: clean and understand the data, learn from labeled examples (classification), find groups without labels (clustering and outliers), then find items that occur together (association rules).
         </p>
       </Plain>
 
-      <Section id="map" title="Course map">
+      <Section id="map" title="Topic map">
         {GROUPS.map((g) => (
           <div key={g} style={{ marginTop: 18 }}>
             <h3 style={{ marginBottom: 10 }}>{g}</h3>
             <Table
-              head={['Topic', 'What you learn', 'Lecture']}
-              rows={TOPICS.filter((t) => t.group === g).map((t) => [<Link to={`/learn/${t.id}`}>{t.title}</Link>, t.blurb, t.lecture ?? 'Later'])}
+              head={['Topic', 'What you learn']}
+              rows={TOPICS.filter((t) => t.group === g).map((t) => [<Link key={t.id} to={`/learn/${t.id}`}>{t.title}</Link>, t.blurb])}
             />
           </div>
         ))}
       </Section>
 
-      <Section id="assessment" title="How you are assessed">
+      <Section id="pipeline" title="Which method for which question">
         <Table
-          head={['Component', 'Weight', 'What it tests', 'How to prepare']}
+          head={['You want to', 'You have', 'Reach for']}
           rows={[
-            ['2 assignments', '20%', 'Python notebooks on real data: cleaning, plots, statistics, PCA, classifiers', 'Follow the conventions line exactly. Every number in the right format, every plot labeled.'],
-            ['2 quizzes', '20%', 'Short concept and calculation questions on recent lectures', 'Flashcards plus the practice quiz for the covered topics.'],
-            ['Final exam', '60%', 'All topics. Calculations by hand and explanations.', 'Work the labs in exam mode: predict the result, then check it with the lab.'],
+            ['Predict a category', 'Labeled records', <><Link to="/learn/decision-trees">decision tree</Link>, <Link to="/learn/naive-bayes">naive Bayes</Link>, <Link to="/learn/knn">kNN</Link>, <Link to="/learn/neural-networks">neural network</Link></>],
+            ['Predict a number', 'Labeled records with a numeric target', <Link to="/learn/regression">regression</Link>],
+            ['Find natural groups', 'No labels', <><Link to="/learn/kmeans">k-means</Link>, <Link to="/learn/hierarchical">hierarchical</Link>, <Link to="/learn/dbscan">DBSCAN</Link></>],
+            ['Find unusual records', 'No labels, mostly normal data', <Link to="/learn/outliers">outlier detection</Link>],
+            ['Find items bought together', 'Transactions (sets of items)', <><Link to="/learn/apriori">Apriori</Link>, <Link to="/learn/fp-growth">FP-growth</Link></>],
+            ['Shrink or tidy the data first', 'Messy, wide or redundant columns', <><Link to="/learn/cleaning">cleaning</Link>, <Link to="/learn/transformation">normalization</Link>, <Link to="/learn/reduction">PCA</Link></>],
           ]}
         />
-        <Trap title="Rules worth knowing">
-          <ul>
-            <li>Missing the final exam means failing the course.</li>
-            <li>Plagiarism gives zero to every party involved. Discuss ideas, never share code or answers.</li>
-            <li>Late assignments lose marks for every 24 hours past the deadline.</li>
-          </ul>
-        </Trap>
       </Section>
 
       <Section id="tools" title="Tools">
@@ -133,9 +129,9 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
         </div>
       </Section>
 
-      <Section id="conventions" title="Conventions that cost marks">
+      <Section id="conventions" title="Mistakes that cost points">
         <ul>
-          <li><strong>Standard deviation.</strong> The course divides by N. pandas divides by N - 1 by default, so pass <code>ddof=0</code>. numpy already divides by N.</li>
+          <li><strong>Standard deviation.</strong> The population formula divides by N, the sample formula by N - 1. pandas uses N - 1 by default (pass <code>ddof=0</code> for N); numpy uses N. Say which one you used.</li>
           <li><strong>Rounding.</strong> If a question asks for 4 decimal places, print with <code>f'{'{'}v:.4f{'}'}'</code>. <code>round()</code> drops trailing zeros (it prints 4.0 instead of 4.0000).</li>
           <li><strong>Row indices.</strong> After dropping rows, keep the original index unless told otherwise. Do not call <code>reset_index</code>.</li>
           <li><strong>Logs.</strong> Entropy uses base 2, so the answer is in bits.</li>
@@ -163,7 +159,7 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
       <Section id="plan" title="A study loop that works">
         <div className="grid c3">
           <div className="card">
-            <span className="label">After each lecture</span>
+            <span className="label">After each topic</span>
             <h3 style={{ margin: '8px 0' }}>30 minutes</h3>
             <p>Read the topic page. Predict a lab result on paper, then check it.</p>
           </div>
@@ -173,14 +169,14 @@ DecisionTreeClassifier(criterion='entropy')`}</pre>
             <p>Flashcards for every topic so far. Repeat the ones you miss.</p>
           </div>
           <div className="card">
-            <span className="label">Two weeks before the exam</span>
+            <span className="label">Before a test</span>
             <h3 style={{ margin: '8px 0' }}>Daily</h3>
             <p>One practice quiz a day. Redo every wrong calculation by hand.</p>
           </div>
         </div>
       </Section>
 
-      <Section id="textbook" title="Textbook chapters (Han, Kamber and Pei, 3rd ed.)">
+      <Section id="textbook" title="Reading alongside: Han, Kamber and Pei (3rd ed.)">
         <Table
           head={['Chapter', 'Matches']}
           rows={[

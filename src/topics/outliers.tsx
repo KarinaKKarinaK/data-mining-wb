@@ -5,7 +5,7 @@ import { M, MB } from '../components/Math'
 import { Dot, Line, Plot, Tip, VLine } from '../components/Plot'
 import { Legend, Readout, Seg, Slider, Stat, seriesColor } from '../components/ui'
 import { bestKmeans } from '../lib/cluster'
-import { knnIdx, lof } from '../lib/d-cluster'
+import { knnIdx, lof } from '../lib/density'
 import { addOutliers, make2D } from '../lib/datasets'
 import { dist, fmt, gauss, mean, quantile, rng, std, type Pt } from '../lib/stats'
 

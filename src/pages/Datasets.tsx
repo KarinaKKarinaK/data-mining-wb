@@ -12,7 +12,7 @@ export default function Datasets() {
   const list = kind === 'All' ? SOURCES : SOURCES.filter((s) => s.kind === kind)
   return (
     <div className="page">
-      <TopicHeader group="Explore" title="Where to find data" lede="Where to search for data, plus starter datasets matched to course topics." />
+      <TopicHeader group="Explore" title="Where to find data" lede="Where to search for data, plus starter datasets matched to each topic." />
 
       <Plain title="Before you download">
         <ul>
@@ -65,13 +65,27 @@ export default function Datasets() {
       </Section>
 
       <Section id="load" title="Load one in Python">
-        <pre className="code">{`import pandas as pd
+        <div className="grid c2">
+          <pre className="code">{`# Any CSV
+import pandas as pd
 df = pd.read_csv('your_file.csv')
 df.info()
 df.describe()`}</pre>
-        <p style={{ marginTop: 12 }}>
-          UCI datasets load with the <code>ucimlrepo</code> package; Iris and other small ones ship in <code>sklearn.datasets</code>.
-        </p>
+          <pre className="code">{`# Hugging Face (pip install datasets)
+from datasets import load_dataset
+ds = load_dataset('stanfordnlp/imdb')
+df = ds['train'].to_pandas()`}</pre>
+          <pre className="code">{`# UCI (pip install ucimlrepo)
+from ucimlrepo import fetch_ucirepo
+iris = fetch_ucirepo(id=53)
+X, y = iris.data.features, iris.data.targets`}</pre>
+          <pre className="code">{`# Kaggle (pip install kaggle, add your API token)
+kaggle datasets download -d blastchar/telco-customer-churn --unzip
+
+# Built into scikit-learn
+from sklearn.datasets import load_iris
+df = load_iris(as_frame=True).frame`}</pre>
+        </div>
       </Section>
     </div>
   )

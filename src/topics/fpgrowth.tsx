@@ -4,8 +4,8 @@ import { Lab } from '../components/Lab'
 import { M } from '../components/Math'
 import { Btn, Readout, Seg, Slider, Stat, Toggle } from '../components/ui'
 import { GROCERIES } from '../lib/datasets'
-import { allFrequent, apriori, buildTree, condTree, fpgrowth, headerOrder, key, orderTx, patternBase, show } from '../lib/e-assoc'
-import { TreeView, TxEditor } from '../lib/e-ui'
+import { allFrequent, apriori, buildTree, condTree, fpgrowth, headerOrder, key, orderTx, patternBase, show } from '../lib/assoc'
+import { TreeView, TxEditor } from '../lib/assoc-ui'
 
 const pct = (v: number) => `${Math.round(v * 100)}%`
 const DEFAULT = GROCERIES.map((t) => [...t].sort())

@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Btn, Stat, seriesColor } from '../components/ui'
-import { layoutTree, parseTx, txText, type FPNode } from './e-assoc'
+import { layoutTree, parseTx, txText, type FPNode } from './assoc'
 
 export function TxEditor({ tx, onChange, reset, children }: { tx: string[][]; onChange: (tx: string[][]) => void; reset: () => void; children?: ReactNode }) {
   const [text, setText] = useState(() => txText(tx))

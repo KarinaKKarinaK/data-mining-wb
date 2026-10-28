@@ -219,7 +219,7 @@ export default function Page() {
             <li>Compute min, max, mean and std on the training data only, then apply the same numbers to the test data.</li>
             <li>Min-max is very sensitive to outliers. One extreme value squashes everything else.</li>
             <li>z-scores are not limited to [-1, 1]. A value 3 standard deviations away has z = 3.</li>
-            <li>The z-score uses the standard deviation divided by N in this course.</li>
+            <li>The z-score here uses the population standard deviation (divide by N). Some books divide by N - 1, so check which one is expected.</li>
           </ul>
         </Trap>
       </Section>

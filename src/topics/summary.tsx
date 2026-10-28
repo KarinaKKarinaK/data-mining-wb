@@ -389,7 +389,7 @@ export default function Page() {
       <Section id="traps" title="Common mistakes">
         <Trap>
           <ul>
-            <li>pandas <code>.std()</code> divides by N - 1. The course divides by N, so use <code>ddof=0</code>.</li>
+            <li>pandas <code>.std()</code> divides by N - 1. For the population formula (divide by N), use <code>ddof=0</code>.</li>
             <li>Different tools compute quartiles differently. This site and pandas use linear interpolation between sorted values. State your method if it matters.</li>
             <li>Forgetting to sort before finding the median.</li>
             <li>The same boxplot can hide very different distributions. Check a histogram too.</li>

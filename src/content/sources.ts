@@ -2,7 +2,7 @@ export type Source = { name: string; url: string; kind: string; good: string }
 
 export const SOURCES: Source[] = [
   { name: 'Kaggle Datasets', url: 'https://www.kaggle.com/datasets', kind: 'Community', good: 'Huge range of cleaned datasets with notebooks from other people. Filter by size, file type and license.' },
-  { name: 'UCI Machine Learning Repository', url: 'https://archive.ics.uci.edu/', kind: 'Academic', good: 'The classic course datasets. Small, well documented, with attribute descriptions.' },
+  { name: 'UCI Machine Learning Repository', url: 'https://archive.ics.uci.edu/', kind: 'Academic', good: 'The classic teaching datasets. Small, well documented, with attribute descriptions.' },
   { name: 'OpenML', url: 'https://www.openml.org/', kind: 'Academic', good: 'Datasets with standard tasks and benchmark results, easy to load from Python.' },
   { name: 'Hugging Face Datasets', url: 'https://huggingface.co/datasets', kind: 'Community', good: 'Text, image and audio data. One line to load with the datasets library.' },
   { name: 'Google Dataset Search', url: 'https://datasetsearch.research.google.com/', kind: 'Search', good: 'A search engine for datasets across the web. Good when you have a topic but no source.' },
@@ -18,6 +18,12 @@ export const SOURCES: Source[] = [
   { name: 'MovieLens (GroupLens)', url: 'https://grouplens.org/datasets/movielens/', kind: 'Academic', good: 'Movie ratings in several sizes. The standard dataset for recommender systems.' },
   { name: 'NYC TLC Trip Records', url: 'https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page', kind: 'Government', good: 'Millions of taxi trips with times and zones. Good for big data and spatial clustering.' },
   { name: 'UCR/UEA Time Series archive', url: 'https://www.timeseriesclassification.com/', kind: 'Academic', good: 'Benchmark time series classification datasets, ideal for kNN with DTW.' },
+  { name: 'Kaggle Competitions', url: 'https://www.kaggle.com/competitions', kind: 'Community', good: 'Real problems with a fixed train and test split and a public leaderboard, so you can compare your model with thousands of others.' },
+  { name: 'Hugging Face: tabular datasets', url: 'https://huggingface.co/datasets?modality=modality:tabular', kind: 'Community', good: 'The tabular slice of the Hugging Face hub. Each dataset has a viewer, so you can browse the rows before downloading.' },
+  { name: 'scikit-learn toy datasets', url: 'https://scikit-learn.org/stable/datasets/toy_dataset.html', kind: 'Library', good: 'Iris, wine, breast cancer, digits and diabetes, already inside scikit-learn. No download, one function call.' },
+  { name: 'seaborn-data', url: 'https://github.com/mwaskom/seaborn-data', kind: 'GitHub', good: 'Small CSVs used by the seaborn examples: tips, penguins, titanic, flights, diamonds.' },
+  { name: 'Datahub core datasets', url: 'https://github.com/datasets', kind: 'GitHub', good: 'Clean, maintained reference data as CSV: country codes, GDP, population, stock indices.' },
+  { name: 'vega-datasets', url: 'https://github.com/vega/vega-datasets', kind: 'GitHub', good: 'The datasets behind the Vega and Altair chart galleries: cars, weather, movies, airports.' },
   { name: 'Inside Airbnb', url: 'https://insideairbnb.com/get-the-data/', kind: 'Research', good: 'Listings, prices and reviews by city. Good for regression and clustering neighborhoods.' },
 ]
 
@@ -39,6 +45,17 @@ export const STARTERS: Starter[] = [
   { name: 'Credit Card Fraud (Kaggle)', url: 'https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud', size: '284,807 rows', topics: ['evaluation', 'outliers'], why: 'Extreme class imbalance: 0.17% fraud.' },
   { name: 'Mall Customers (Kaggle)', url: 'https://www.kaggle.com/datasets/vjchoudhary7/customer-segmentation-tutorial-in-python', size: '200 rows', topics: ['kmeans', 'hierarchical'], why: 'Visible clusters in 2D. A gentle first clustering project.' },
   { name: 'Groceries (Kaggle)', url: 'https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset', size: '38,765 rows', topics: ['apriori', 'fp-growth'], why: 'Member and date per item, ready to group into baskets.' },
-  { name: 'Instacart Market Basket (Kaggle)', url: 'https://www.kaggle.com/c/instacart-market-basket-analysis', size: '3M+ orders', topics: ['apriori', 'fp-growth'], why: 'Large real basket data to test how mining scales.' },
+  { name: 'Instacart Market Basket (Kaggle)', url: 'https://www.kaggle.com/datasets/psparks/instacart-market-basket-analysis', size: '3M+ orders', topics: ['apriori', 'fp-growth'], why: 'Large real basket data to test how mining scales.' },
+  { name: 'Telco Customer Churn (Kaggle)', url: 'https://www.kaggle.com/datasets/blastchar/telco-customer-churn', size: '7,043 rows, 21 attributes', topics: ['cleaning', 'decision-trees', 'evaluation'], why: 'TotalCharges has blank strings to clean, and churn is the minority class.' },
+  { name: 'Credit Card customers (Kaggle)', url: 'https://www.kaggle.com/datasets/arjunbhasin2013/ccdata', size: '8,950 rows, 18 numeric', topics: ['kmeans', 'reduction', 'outliers'], why: 'Customer behavior with no labels. Scale, run PCA, then segment.' },
+  { name: 'House Sales in King County (Kaggle)', url: 'https://www.kaggle.com/datasets/harlfoxem/housesalesprediction', size: '21,613 rows', topics: ['regression', 'outliers'], why: 'Price against size and location, with a few extreme houses to find.' },
+  { name: 'IMDB reviews (Hugging Face)', url: 'https://huggingface.co/datasets/stanfordnlp/imdb', size: '50,000 reviews', topics: ['naive-bayes', 'evaluation'], why: 'Balanced positive and negative reviews. Naive Bayes on word counts is a strong baseline.' },
+  { name: 'AG News (Hugging Face)', url: 'https://huggingface.co/datasets/fancyzhx/ag_news', size: '127,600 articles, 4 classes', topics: ['naive-bayes', 'evaluation'], why: 'Multiclass text, a good place to compare macro and micro averages.' },
+  { name: 'Rotten Tomatoes (Hugging Face)', url: 'https://huggingface.co/datasets/cornell-movie-review-data/rotten_tomatoes', size: '10,662 sentences', topics: ['naive-bayes'], why: 'Short review sentences, small enough to train in seconds.' },
+  { name: 'Emotion (Hugging Face)', url: 'https://huggingface.co/datasets/dair-ai/emotion', size: '20,000 messages, 6 classes', topics: ['evaluation', 'naive-bayes'], why: 'Uneven class sizes, so accuracy alone hides the rare emotions.' },
+  { name: 'MNIST (Hugging Face)', url: 'https://huggingface.co/datasets/ylecun/mnist', size: '70,000 images, 28x28', topics: ['knn', 'neural-networks', 'reduction'], why: 'Handwritten digits. kNN gets far with raw pixels; PCA shows how few dimensions are needed.' },
+  { name: 'Fashion-MNIST (Hugging Face)', url: 'https://huggingface.co/datasets/zalando-datasets/fashion_mnist', size: '70,000 images, 28x28', topics: ['knn', 'neural-networks'], why: 'Same format as MNIST but harder, so the gap between models is easier to see.' },
+  { name: 'Palmer Penguins (GitHub)', url: 'https://github.com/allisonhorst/palmerpenguins', size: '344 rows, mixed', topics: ['summary', 'cleaning', 'kmeans', 'decision-trees'], why: 'A modern alternative to Iris, with a few real missing values.' },
+  { name: 'Tips (GitHub, seaborn-data)', url: 'https://github.com/mwaskom/seaborn-data/blob/master/tips.csv', size: '244 rows', topics: ['summary', 'regression'], why: 'Tip against bill size: a first regression with a clear story.' },
   { name: 'Titanic (Kaggle)', url: 'https://www.kaggle.com/c/titanic', size: '891 training rows', topics: ['cleaning', 'decision-trees'], why: 'Missing ages and cabins, a classic cleaning exercise.' },
 ]

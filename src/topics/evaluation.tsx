@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Area, Dot, Line, Plot, VLine } from '../components/Plot'
 import { Legend, Readout, Seg, Slider, Stat, seriesColor } from '../components/ui'
-import { normCdf, normPdf } from '../lib/b-tree'
+import { normCdf, normPdf } from '../lib/stats'
 import { fmt, rng } from '../lib/stats'
 
 const SD = 0.13
@@ -128,7 +128,7 @@ function ImbalanceLab() {
           <Seg label="Model" value={model} onChange={setModel} options={[{ v: 'lazy', label: 'Always non_cancer' }, { v: 'screen', label: 'Screening model' }]} />
         </>
       }
-      notes={['10 cancer cases, always non_cancer: 99.9% accuracy, 0% recall.', 'Raise cases to 5000 (balanced): accuracy and recall now agree.']}
+      notes={['10 cancer cases, always non_cancer: 99.9% accuracy, 0% recall.', 'Raise cases to 5000 (balanced) and pick the screening model: accuracy (94%) and recall (90%) now tell the same story.']}
     >
       <Table
         head={['', 'Predicted cancer', 'Predicted non_cancer', 'Recall per class']}
@@ -232,7 +232,7 @@ function MultiClassLab() {
       </Readout>
       <div style={{ marginTop: 10 }}>
         <button type="button" className="btn sm ghost" onClick={() => setCm(DEFAULT_CM)}>
-          Back to the lecture example
+          Back to the worked example
         </button>
       </div>
     </Lab>
@@ -385,7 +385,7 @@ export default function Page() {
       <Section id="multiclass" title="More than two classes">
         <Formula title="Two ways to average">
           <MB>{'F1_{macro} = \\frac{1}{C}\\sum_{c=1}^{C} F1_c \\qquad P_{micro} = \\frac{\\sum_c TP_c}{\\sum_c (TP_c + FP_c)}'}</MB>
-          <p>Macro weights every class equally, micro every record. Lecture example: macro F1 0.58, micro F1 0.60 (equal to accuracy).</p>
+          <p>Macro weights every class equally, micro every record. In the worked example: macro F1 0.58, micro F1 0.60 (equal to accuracy).</p>
         </Formula>
       </Section>
       <MultiClassLab />

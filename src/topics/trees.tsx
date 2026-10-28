@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Dot, Heat, Line, Plot, Rect, Tip, VLine } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, Toggle, SERIES_HEX, seriesColor } from '../components/ui'
-import { counts, evalSplit, growTree, predictTree, treeSize, type LP } from '../lib/b-tree'
+import { counts, evalSplit, growTree, predictTree, treeSize, type LP } from '../lib/tree'
 import { BUYS_COMPUTER, PLAY_TENNIS, make2D, type Row } from '../lib/datasets'
 import { entropy, fmt, gini } from '../lib/stats'
 

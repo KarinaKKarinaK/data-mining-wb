@@ -327,7 +327,7 @@ function DtwLab() {
           <Slider label="Noise" value={noise} min={0} max={2} step={0.25} onChange={setNoise} />
         </>
       }
-      notes={['Shift 0: DTW equals the L1 distance, the path is the diagonal.', 'Increase the shift: L1 grows fast, DTW stays small as the path bends.', 'Change the amplitude: DTW fixes timing, not height.']}
+      notes={['Shift 0 and noise 0: DTW equals L1 (both 0) and the path is the diagonal. With noise, DTW is a bit below L1.', 'Increase the shift: L1 grows fast, DTW stays small as the path bends.', 'Change the amplitude: DTW fixes timing, not height.']}
     >
       <span className="label">Series and DTW alignment (gray lines join matched points)</span>
       <Plot w={560} h={240} x={[0, n - 1]} y={[-4.2, 2.2]} xLabel="time" xTicks={7} yTicks={4} label="Two time series with DTW matches">

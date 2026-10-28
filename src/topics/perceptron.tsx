@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Dot, Heat, Line, Plot, VLine } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, SERIES_HEX, seriesColor } from '../components/ui'
-import { lineInBox } from '../lib/c-geom'
+import { lineInBox } from '../lib/geom'
 import { fmt, gauss, rng, type Pt } from '../lib/stats'
 
 type Fn = 'AND' | 'OR' | 'NAND' | 'XOR'

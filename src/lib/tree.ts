@@ -88,14 +88,3 @@ export function predictTree(n: CNode, p: { x: number; y: number }): number {
 export function treeSize(n: CNode): number {
   return n.leaf ? 1 : 1 + treeSize(n.left) + treeSize(n.right)
 }
-
-export function erf(x: number) {
-  const s = Math.sign(x)
-  const a = Math.abs(x)
-  const t = 1 / (1 + 0.3275911 * a)
-  const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-a * a)
-  return s * y
-}
-
-export const normCdf = (x: number, m: number, sd: number) => 0.5 * (1 + erf((x - m) / (sd * Math.SQRT2)))
-export const normPdf = (x: number, m: number, sd: number) => Math.exp(-0.5 * ((x - m) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI))

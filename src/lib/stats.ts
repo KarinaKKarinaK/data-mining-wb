@@ -123,7 +123,7 @@ function gammaFn(z: number): number {
 function lowerGamma(s: number, x: number) {
   let term = 1 / s
   let total = term
-  for (let n = 1; n < 500; n++) {
+  for (let n = 1; n < 500 + 2 * x; n++) {
     term *= x / (s + n)
     total += term
     if (term < total * 1e-14) break
@@ -155,3 +155,14 @@ export function fmt(v: number, d = 3) {
   const s = v.toFixed(d)
   return /^-0\.?0*$/.test(s) ? s.slice(1) : s
 }
+
+export function erf(x: number) {
+  const s = Math.sign(x)
+  const a = Math.abs(x)
+  const t = 1 / (1 + 0.3275911 * a)
+  const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-a * a)
+  return s * y
+}
+
+export const normCdf = (x: number, m: number, sd: number) => 0.5 * (1 + erf((x - m) / (sd * Math.SQRT2)))
+export const normPdf = (x: number, m: number, sd: number) => Math.exp(-0.5 * ((x - m) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI))

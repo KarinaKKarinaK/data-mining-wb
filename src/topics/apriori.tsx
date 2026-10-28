@@ -5,8 +5,8 @@ import { M, MB } from '../components/Math'
 import { Dot, HLine, Label, Plot, Rect, Tip } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, Toggle } from '../components/ui'
 import { GROCERIES } from '../lib/datasets'
-import { apriori, closedMaximal, count, itemCounts, key, rules, show, type Level } from '../lib/e-assoc'
-import { TxEditor } from '../lib/e-ui'
+import { apriori, closedMaximal, count, itemCounts, key, rules, show, type Level } from '../lib/assoc'
+import { TxEditor } from '../lib/assoc-ui'
 import { fmt } from '../lib/stats'
 
 const pct = (v: number) => `${Math.round(v * 100)}%`

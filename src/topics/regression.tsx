@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Dot, Line, Plot, Rect, Tip, VLine, usePlot } from '../components/Plot'
 import { Btn, Legend, Readout, Slider, Stat, Toggle, seriesColor } from '../components/ui'
-import { clipSeg } from '../lib/c-geom'
+import { clipSeg } from '../lib/geom'
 import { fmt, gauss, mean, rng, type Pt } from '../lib/stats'
 
 function ols(pts: Pt[]) {

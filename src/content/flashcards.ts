@@ -138,7 +138,7 @@ export const CARDS: Card[] = [
     ['Why is kNN called a lazy learner?', 'It does no work at training time. All the cost is at prediction time.'],
   ]),
   ...c('perceptron', [
-    ['Perceptron output', 'O = 1 if $\\sum_i w_i I_i > \\theta$, otherwise 0 (a threshold unit).'],
+    ['Perceptron output', 'O = 1 if $\\sum_i w_i I_i \\ge \\theta$, otherwise 0 (a threshold unit).'],
     ['Perceptron learning rule', '$w_i \\leftarrow w_i + \\alpha (T - O) I_i$'],
     ['When are weights changed?', 'Only when the prediction is wrong, because then T - O is not 0.'],
     ['Which Boolean functions can one perceptron represent?', 'Linearly separable ones such as AND, OR and NOT.'],

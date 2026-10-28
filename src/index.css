@@ -348,6 +348,22 @@ pre.code { margin: 0; padding: 12px 14px; border-radius: 9px; background: var(--
   .topic-row { grid-template-columns: minmax(0, 1fr) 36px; }
   .tr-blurb { grid-column: 1 / -1; grid-row: 2; }
 }
+/* Motion: short, eased, and switched off by prefers-reduced-motion below */
+.route-enter { animation: rise .42s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.topic-row { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 35ms); transition: background .2s, padding-left .25s cubic-bezier(.2, .7, .2, 1); }
+.topic-row:hover { background: var(--surface-2); padding-left: 12px; }
+.topic-row:hover .tr-lec { color: var(--ink-2); }
+.card.link { transition: border-color .2s, background .2s, transform .25s cubic-bezier(.2, .7, .2, 1); }
+.card.link:hover { transform: translateY(-2px); }
+.btn { transition: background .15s, border-color .15s, opacity .15s, transform .15s; }
+.btn:active { transform: scale(.97); }
+.chip { transition: background .15s, color .15s, border-color .15s, transform .15s; }
+.chip:active { transform: scale(.96); }
+@supports (animation-timeline: view()) {
+  .section { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }

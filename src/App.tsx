@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { GROUPS, TOPICS, topicById } from './topics'
 import { load, save } from './lib/store'
 import Home from './pages/Home'
-import Course from './pages/Course'
+import Guide from './pages/Guide'
 import { Boundary } from './components/Boundary'
 
 const Playground = lazy(() => import('./pages/Playground'))
@@ -18,14 +18,14 @@ type Entry = { to: string; label: string; section: string }
 
 const EXTRA: Entry[] = [
   { to: '/', label: 'Home', section: 'Start' },
-  { to: '/course', label: 'Course guide', section: 'Start' },
+  { to: '/guide', label: 'Study guide', section: 'Start' },
   { to: '/practice/flashcards', label: 'Flashcards', section: 'Practice' },
   { to: '/practice/quiz', label: 'Practice quiz', section: 'Practice' },
   { to: '/playground', label: 'Dataset playground', section: 'Practice' },
   { to: '/examples', label: 'Real-world cases', section: 'Explore' },
   { to: '/projects', label: 'Project ideas', section: 'Explore' },
   { to: '/datasets', label: 'Where to find data', section: 'Explore' },
-  { to: '/resources', label: 'Books, courses, tools', section: 'Explore' },
+  { to: '/resources', label: 'Books, videos, tools', section: 'Explore' },
 ]
 
 const ALL: Entry[] = [...EXTRA.slice(0, 2), ...TOPICS.map((t) => ({ to: `/learn/${t.id}`, label: t.title, section: t.group })), ...EXTRA.slice(2)]
@@ -56,7 +56,7 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
       </Link>
       <div className="label nav-group">Start</div>
       {item('/', 'Home')}
-      {item('/course', 'Course guide')}
+      {item('/guide', 'Study guide')}
       {GROUPS.map((g) => (
         <div key={g}>
           <div className="label nav-group">{g}</div>
@@ -204,11 +204,13 @@ export default function App() {
             Search <kbd>⌘K</kbd>
           </button>
         </header>
+        <div className="route-enter" key={loc.pathname}>
         <Boundary resetKey={loc.pathname}>
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/course" element={<Course />} />
+            <Route path="/guide" element={<Guide />} />
+            <Route path="/course" element={<Navigate to="/guide" replace />} />
             <Route path="/learn/:id" element={<TopicRoute />} />
             <Route path="/playground" element={<Playground />} />
             <Route path="/practice/flashcards" element={<Flashcards />} />
@@ -221,9 +223,10 @@ export default function App() {
           </Routes>
         </Suspense>
         </Boundary>
+        </div>
         <footer className="footer">
-          <span>Independent study resource for COMP 4331 Data Mining at HKUST. Not official course material and not endorsed by the course.</span>
-          <span className="label">Private resource</span>
+          <span>An open, independent study resource for data mining. Explanations follow the standard textbook treatment.</span>
+          <span className="label">Mining Lab</span>
         </footer>
       </div>
       {search && <Search onClose={() => setSearch(false)} />}

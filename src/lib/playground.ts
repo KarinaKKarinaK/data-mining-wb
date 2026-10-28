@@ -1,30 +1,5 @@
 import { dist, mean, std, type Pt } from './stats'
 
-export function dbscan(pts: Pt[], eps: number, minPts: number) {
-  const n = pts.length
-  const labels = new Array<number>(n).fill(-2)
-  const core = pts.map((p) => pts.filter((q) => dist(p, q) <= eps).length >= minPts)
-  let c = 0
-  for (let i = 0; i < n; i++) {
-    if (labels[i] !== -2 || !core[i]) continue
-    labels[i] = c
-    const queue = [i]
-    while (queue.length) {
-      const j = queue.shift()!
-      if (!core[j]) continue
-      for (let m = 0; m < n; m++) {
-        if (dist(pts[j], pts[m]) <= eps && (labels[m] === -2 || labels[m] === -1)) {
-          const fresh = labels[m] === -2
-          labels[m] = c
-          if (fresh && core[m]) queue.push(m)
-        }
-      }
-    }
-    c++
-  }
-  return { labels: labels.map((l) => (l === -2 ? -1 : l)), core, clusters: c }
-}
-
 export type Linkage = 'single' | 'complete' | 'average'
 
 export function agglomerative(pts: Pt[], k: number, linkage: Linkage) {

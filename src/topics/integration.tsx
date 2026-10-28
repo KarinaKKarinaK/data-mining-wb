@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Area, Dot, Label, Line, Plot, VLine, nearestIndex, scales } from '../components/Plot'
 import { Legend, Readout, Seg, Slider, Stat, seriesColor } from '../components/ui'
-import { clipLine } from '../lib/a-geom'
+import { clipLine } from '../lib/geom'
 import { chi2Cdf, chi2Critical, chi2Pdf, clamp, fmt, gauss, mean, pearson, rng, std, type Pt } from '../lib/stats'
 
 type Preset = 'pos' | 'neg' | 'none' | 'ring' | 'x' | 'outlier'

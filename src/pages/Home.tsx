@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { Dot, Line, Plot } from '../components/Plot'
 import { seriesColor } from '../components/ui'
@@ -62,7 +62,7 @@ const MORE = [
   { to: '/playground', t: 'Playground', d: 'Any dataset, any algorithm' },
   { to: '/examples', t: 'Real-world cases', d: 'With sources' },
   { to: '/projects', t: 'Project ideas', d: 'With datasets to use' },
-  { to: '/datasets', t: 'Where to find data', d: 'Kaggle, UCI, GitHub and more' },
+  { to: '/datasets', t: 'Where to find data', d: 'Kaggle, Hugging Face, UCI, GitHub' },
 ]
 
 export default function Home() {
@@ -70,16 +70,16 @@ export default function Home() {
     <div className="page">
       <section className="hero fade-in">
         <div>
-          <span className="label">COMP 4331 Data Mining</span>
+          <span className="label">Data mining, hands on</span>
           <h1 style={{ marginTop: 14 }}>
             Learn data mining
             <br />
             <span>by changing the numbers.</span>
           </h1>
-          <p className="lede">Every topic in the course, with the formulas and a lab where you move the inputs and see what happens.</p>
+          <p className="lede">The core of data mining, from cleaning data to clustering and association rules. Every topic has the formulas and a lab where you move the inputs and see what happens.</p>
           <div className="row" style={{ marginTop: 22 }}>
-            <Link className="btn primary" to="/course">
-              Course guide
+            <Link className="btn primary" to="/guide">
+              Study guide
             </Link>
             <Link className="btn" to="/learn/intro">
               Start at topic 1
@@ -114,11 +114,11 @@ export default function Home() {
             <h2>{g}</h2>
             <span className="label">Module {gi + 1}</span>
           </div>
-          {TOPICS.filter((t) => t.group === g).map((t) => (
-            <Link className="topic-row" to={`/learn/${t.id}`} key={t.id}>
+          {TOPICS.filter((t) => t.group === g).map((t, i) => (
+            <Link className="topic-row" to={`/learn/${t.id}`} key={t.id} style={{ '--i': i } as CSSProperties}>
               <span className="tr-title">{t.title}</span>
               <span className="tr-blurb">{t.blurb}</span>
-              <span className="tr-lec">{t.lecture ?? ''}</span>
+              <span className="tr-lec">{String(TOPICS.indexOf(t) + 1).padStart(2, '0')}</span>
             </Link>
           ))}
         </section>

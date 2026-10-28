@@ -5,7 +5,7 @@ import { M, MB } from '../components/Math'
 import { Dot, HLine, Label, Line, Plot, Tip } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, Toggle, seriesColor } from '../components/ui'
 import { bestKmeans } from '../lib/cluster'
-import { dbscan, kDistances, type PointType } from '../lib/d-cluster'
+import { dbscan, kDistances, type PointType } from '../lib/density'
 import { make2D, type Shape2D } from '../lib/datasets'
 import { fmt, rng, type Pt } from '../lib/stats'
 

@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Dot, HLine, Label, Line, Plot } from '../components/Plot'
 import { Btn, Readout, Seg, Slider, Stat, seriesColor } from '../components/ui'
-import { agglomerate, clustersAfter, labelsFromClusters, leafOrder, linkDist, stepsBelow, type Linkage, type Merge } from '../lib/d-cluster'
+import { agglomerate, clustersAfter, labelsFromClusters, leafOrder, linkDist, stepsBelow, type Linkage, type Merge } from '../lib/hierarchical'
 import { gauss, rng, fmt, type Pt } from '../lib/stats'
 import { make2D, type Shape2D } from '../lib/datasets'
 
@@ -334,7 +334,7 @@ export default function Page() {
         <ul>
           <li>The dendrogram height is the merge distance, not the number of points.</li>
           <li>Single uses the closest pair, complete the farthest. Swapping them is the classic slip.</li>
-          <li>Update with min (single) or max (complete) of the old rows. Only average and centroid need the original points.</li>
+          <li>Update with min (single) or max (complete) of the old rows. Average linkage takes the size-weighted mean of the two old rows; centroid linkage needs the original points.</li>
         </ul>
       </Trap>
 

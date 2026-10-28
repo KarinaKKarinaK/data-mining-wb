@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Dot, Heat, Label, Line, Plot, VLine } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, SERIES_HEX, seriesColor } from '../components/ui'
-import { act, dact, forward, initNet, sig, trainEpoch, type Act, type Net } from '../lib/c-mlp'
+import { act, dact, forward, initNet, sig, trainEpoch, type Act, type Net } from '../lib/mlp'
 import { make2D } from '../lib/datasets'
 import { fmt, gauss, rng } from '../lib/stats'
 

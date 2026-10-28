@@ -160,7 +160,7 @@ export const QUESTIONS: Question[] = [
 
   num('perceptron', 'w = (0.2, -0.1), alpha = 0.5, input I = (1, 1), target T = 1, output O = 0. New w1?', 0.2 + 0.5 * (1 - 0) * 1, 'w1 = 0.2 + 0.5 x (1 - 0) x 1 = 0.7.'),
   num('perceptron', 'Same step. New w2?', -0.1 + 0.5 * (1 - 0) * 1, 'w2 = -0.1 + 0.5 x 1 x 1 = 0.4.'),
-  num('perceptron', 'Weights (1, 1), threshold 1.5, input (1, 1). Output (1 if sum > threshold, else 0)?', 1, '1 + 1 = 2 > 1.5, so the output is 1. These weights implement AND.'),
+  num('perceptron', 'Weights (1, 1), threshold 1.5, input (1, 1). Output (1 if sum >= threshold, else 0)?', 1, '1 + 1 = 2 > 1.5, so the output is 1. These weights implement AND.'),
   num('perceptron', 'The perceptron predicts correctly (T = O). By how much does each weight change?', 0, 'T - O = 0, so the update is 0.'),
   tf('perceptron', 'A single perceptron can represent XOR.', false, 'XOR is not linearly separable.'),
   mc('perceptron', 'Weights (1, 1) and threshold 0.5 implement which function?', ['AND', 'OR', 'NOT', 'XOR'], 1, 'Any input with a 1 gives a sum of at least 1 > 0.5.'),

@@ -4,7 +4,7 @@ import { Lab } from '../components/Lab'
 import { M, MB } from '../components/Math'
 import { Dot, Line, Plot, Rect, nearestIndex, scales } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, Toggle, seriesColor } from '../components/ui'
-import { clipLine } from '../lib/a-geom'
+import { clipLine } from '../lib/geom'
 import { clamp, covariance2, eig2, fmt, gauss, rng, type Pt } from '../lib/stats'
 
 function CurseLab() {

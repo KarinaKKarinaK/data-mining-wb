@@ -115,7 +115,7 @@ function PromptLab() {
       <Readout>
         <Stat k="Mode" v={mode === 'zero' ? 'Zero-shot' : 'Few-shot'} />
         <Stat k="Examples" v={ex.length} />
-        <Stat k="Course suggests" v={t.recommended === 'zero' ? 'Zero-shot' : 'Few-shot'} />
+        <Stat k="Usually best" v={t.recommended === 'zero' ? 'Zero-shot' : 'Few-shot'} />
         <Stat k="Prompt words" v={prompt.split(/\s+/).filter(Boolean).length} />
       </Readout>
     </Lab>

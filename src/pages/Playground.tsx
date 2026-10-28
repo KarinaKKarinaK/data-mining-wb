@@ -5,7 +5,8 @@ import { Dot, Heat, Plot, Tip, nearestIndex, scales } from '../components/Plot'
 import { Btn, Legend, Readout, Seg, Slider, Stat, SERIES_HEX, seriesColor } from '../components/ui'
 import { bestKmeans, kmedoids, silhouette } from '../lib/cluster'
 import { IRIS, IRIS_CLASSES, IRIS_COLUMNS, SHAPES, addOutliers, make2D, type Shape2D } from '../lib/datasets'
-import { agglomerative, dbscan, knnPredict, parseCsv, scale, type Linkage, type Scaling } from '../lib/e-cluster'
+import { dbscan } from '../lib/density'
+import { agglomerative, knnPredict, parseCsv, scale, type Linkage, type Scaling } from '../lib/playground'
 import { fmt, type Pt } from '../lib/stats'
 
 type Source = 'gen' | 'iris' | 'csv'
@@ -183,7 +184,7 @@ function Bench({ d }: { d: ReturnType<typeof useData> }) {
     }
     if (algo === 'dbscan') {
       const r = dbscan(pts, eps, minPts)
-      return { labels: r.labels, centers: [], core: r.core, tooBig: false }
+      return { labels: r.labels, centers: [], core: r.types.map((t) => t === 'core'), tooBig: false }
     }
     if (algo === 'agglo') {
       if (pts.length > MAX_AGGLO) return { labels: pts.map(() => -1), centers: [], core: null, tooBig: true }
