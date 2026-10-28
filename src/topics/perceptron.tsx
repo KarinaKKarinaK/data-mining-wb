@@ -80,7 +80,7 @@ function ManualLab() {
           <Heat res={40} fn={regionFn} />
           <Line pts={boundary(-t, w1, w2, -0.5, 1.5)} color="var(--ink)" width={2} />
           {rows.map((r, i) => (
-            <Dot key={i} x={r.a} y={r.b} r={9} color={seriesColor(r.tg)} shape={r.tg} stroke={r.o === r.tg ? undefined : '#f2f1ee'} strokeWidth={2.5} />
+            <Dot key={i} x={r.a} y={r.b} r={9} color={seriesColor(r.tg)} shape={r.tg} stroke={r.o === r.tg ? undefined : 'var(--ink)'} strokeWidth={2.5} />
           ))}
         </Plot>
         <div style={{ marginTop: 12 }}>
@@ -96,7 +96,7 @@ function ManualLab() {
           </Readout>
         </div>
       </div>
-      <Legend items={[{ label: 'target 0', color: seriesColor(0), shape: 0 }, { label: 'target 1', color: seriesColor(1), shape: 1 }, { label: 'white ring = wrong output', color: '#f2f1ee' }]} />
+      <Legend items={[{ label: 'target 0', color: seriesColor(0), shape: 0 }, { label: 'target 1', color: seriesColor(1), shape: 1 }, { label: 'dark ring = wrong output', color: 'var(--ink)' }]} />
     </Lab>
   )
 }
@@ -202,7 +202,7 @@ function TrainerLab() {
             ))}
             <Line pts={boundary(w[0], w[1], w[2], -0.5, 1.5)} color="var(--ink)" width={2} />
             {INPUTS.map(([a, b], i) => (
-              <Dot key={i} x={a} y={b} r={9} color={seriesColor(TARGET[fn][i])} shape={TARGET[fn][i]} stroke={i === idx && !converged ? '#f2f1ee' : undefined} strokeWidth={2.5} />
+              <Dot key={i} x={a} y={b} r={9} color={seriesColor(TARGET[fn][i])} shape={TARGET[fn][i]} stroke={i === idx && !converged ? 'var(--ink)' : undefined} strokeWidth={2.5} />
             ))}
           </Plot>
           <Readout>

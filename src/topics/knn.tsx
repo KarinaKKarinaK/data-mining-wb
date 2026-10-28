@@ -72,7 +72,7 @@ function MainLab() {
   return (
     <Lab
       title="Classify a point by its neighbors"
-      desc="Drag the white star. The shading shows the prediction at every location."
+      desc="Drag the star. The shading shows the prediction at every location."
       controls={
         <>
           <Seg label="Dataset" value={data} onChange={setData} options={[{ v: 'blobs', label: 'Three blobs' }, { v: 'moons', label: 'Noisy moons' }]} />
@@ -113,7 +113,7 @@ function MainLab() {
         {train.map((t, i) => (
           <Dot key={i} x={t.x} y={t.y} r={nb.some((n) => n.i === i) ? 6 : 4} color={seriesColor(t.label)} shape={t.label} opacity={nb.some((n) => n.i === i) ? 1 : 0.75} />
         ))}
-        <Dot x={q.x} y={q.y} r={8} color="#f2f1ee" shape={6} stroke={seriesColor(v.best)} strokeWidth={2.5} />
+        <Dot x={q.x} y={q.y} r={8} color="var(--ink)" shape={6} stroke={seriesColor(v.best)} strokeWidth={2.5} />
       </Plot>
       <Legend items={Array.from({ length: classes }, (_, c) => ({ label: `Class ${c + 1}`, color: seriesColor(c), shape: c }))} />
       <Readout>
@@ -198,9 +198,9 @@ function ScalingLab() {
         {PEOPLE.map((p, i) => (
           <Dot key={i} x={p.age} y={p.income} r={nb.some((n) => n.i === i) ? 6 : 4} color={seriesColor(p.label)} shape={p.label} opacity={nb.some((n) => n.i === i) ? 1 : 0.6} />
         ))}
-        <Dot x={qa} y={qi} r={8} color="#f2f1ee" shape={6} />
+        <Dot x={qa} y={qi} r={8} color="var(--ink)" shape={6} />
       </Plot>
-      <Legend items={[{ label: 'buys = no', color: seriesColor(0), shape: 0 }, { label: 'buys = yes', color: seriesColor(1), shape: 1 }, { label: 'query', color: '#f2f1ee', shape: 6 }]} />
+      <Legend items={[{ label: 'buys = no', color: seriesColor(0), shape: 0 }, { label: 'buys = yes', color: seriesColor(1), shape: 1 }, { label: 'query', color: 'var(--ink)', shape: 6 }]} />
       <Readout>
         <Stat k="Neighbors yes / no" v={`${yes} / ${k - yes}`} />
         <Stat k="Prediction" v={yes > k / 2 ? 'yes' : 'no'} />
@@ -345,7 +345,7 @@ function DtwLab() {
             {D.flatMap((row, i) =>
               row.map((v, j) => <Rect key={i * n + j} x0={j} x1={j + 1} y0={i} y1={i + 1} color={SERIES_HEX[0]} opacity={0.08 + 0.8 * Math.min(1, v / (maxD * 1.6 + 1e-9))} />),
             )}
-            <Line pts={path.map(([i, j]) => ({ x: j + 0.5, y: i + 0.5 }))} color="#f2f1ee" width={2} />
+            <Line pts={path.map(([i, j]) => ({ x: j + 0.5, y: i + 0.5 }))} color="var(--ink)" width={2} />
           </Plot>
         </div>
         <div>

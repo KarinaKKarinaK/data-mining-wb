@@ -58,9 +58,9 @@ function HeroViz() {
 
 const MORE = [
   { to: '/practice/flashcards', t: 'Flashcards', d: 'By topic, with progress saved' },
-  { to: '/practice/quiz', t: 'Practice quiz', d: 'Calculations and concepts, with worked answers' },
-  { to: '/playground', t: 'Playground', d: 'Any dataset, any algorithm' },
-  { to: '/examples', t: 'Real-world cases', d: 'With sources' },
+  { to: '/practice/quiz', t: 'Practice quiz', d: 'Calculations and concepts with worked answers' },
+  { to: '/playground', t: 'Playground', d: 'Paste a CSV, then cluster or classify it' },
+  { to: '/examples', t: 'Real-world cases', d: 'Documented uses, with sources' },
   { to: '/projects', t: 'Project ideas', d: 'With datasets to use' },
   { to: '/datasets', t: 'Where to find data', d: 'Kaggle, Hugging Face, UCI, GitHub' },
 ]
@@ -70,31 +70,15 @@ export default function Home() {
     <div className="page">
       <section className="hero fade-in">
         <div>
-          <span className="label">Data mining, hands on</span>
-          <h1 style={{ marginTop: 14 }}>
-            Learn data mining
-            <br />
-            <span>by changing the numbers.</span>
-          </h1>
-          <p className="lede">The core of data mining, from cleaning data to clustering and association rules. Every topic has the formulas and a lab where you move the inputs and see what happens.</p>
-          <div className="row" style={{ marginTop: 22 }}>
-            <Link className="btn primary" to="/guide">
+          <h1>Data mining</h1>
+          <p className="lede">Preprocessing, classification, clustering and association rules. Each topic has the idea, the formulas, a worked example and a lab you can change.</p>
+          <div className="row" style={{ marginTop: 24 }}>
+            <Link className="btn primary" to="/learn/intro">
+              Start with topic 1
+            </Link>
+            <Link className="btn ghost" to="/guide">
               Study guide
             </Link>
-            <Link className="btn" to="/learn/intro">
-              Start at topic 1
-            </Link>
-          </div>
-          <div className="hero-meta">
-            <span>
-              <b>{TOPICS.length}</b> topics
-            </span>
-            <span>
-              <b>77</b> labs
-            </span>
-            <span>
-              <b>200+</b> flashcards
-            </span>
           </div>
         </div>
         <div className="card hero-card">
@@ -108,11 +92,11 @@ export default function Home() {
         </div>
       </section>
 
-      {GROUPS.map((g, gi) => (
+      {GROUPS.map((g) => (
         <section className="module" key={g}>
           <div className="module-head">
             <h2>{g}</h2>
-            <span className="label">Module {gi + 1}</span>
+            <span className="label">{TOPICS.filter((t) => t.group === g).length} topics</span>
           </div>
           {TOPICS.filter((t) => t.group === g).map((t, i) => (
             <Link className="topic-row" to={`/learn/${t.id}`} key={t.id} style={{ '--i': i } as CSSProperties}>

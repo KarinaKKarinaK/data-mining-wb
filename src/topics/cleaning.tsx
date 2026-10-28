@@ -262,7 +262,7 @@ export default function Page() {
       <TopicHeader
         group="Preprocessing"
         title="Data cleaning"
-        lede="Real data has missing, wrong and contradictory values. No quality data, no quality results."
+        lede="Real data has missing, wrong and contradictory values. Cleaning finds and fixes them before any mining starts."
       />
 
       <Plain>

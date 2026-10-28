@@ -144,7 +144,7 @@ function StepperLab() {
                 {mat[i].map((d, j) => {
                   const hit = isNext(a) && isNext(sorted[j]) && d !== null
                   return (
-                    <td key={j} className="num" style={hit ? { background: 'rgba(227,167,79,0.22)', color: 'var(--ink)' } : undefined}>
+                    <td key={j} className="num" style={hit ? { background: 'var(--accent-soft)', color: 'var(--ink)' } : undefined}>
                       {d === null ? '' : fmt(d, 3)}
                     </td>
                   )

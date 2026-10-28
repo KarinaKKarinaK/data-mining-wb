@@ -131,7 +131,7 @@ function FitLab() {
         {mine && <Line pts={clipSeg({ x: 0, y: m0 }, { x: 10, y: m0 + m1 * 10 }, 0, 10, 0, 10)} color={seriesColor(2)} width={2} />}
         <Line pts={clipSeg({ x: 0, y: fit.w0 }, { x: 10, y: fit.w0 + fit.w1 * 10 }, 0, 10, 0, 10)} color={seriesColor(0)} width={2.5} />
         {pts.map((p, i) => (
-          <Dot key={i} x={p.x} y={p.y} r={i === hover || i === drag ? 7 : 5.5} color="#f2f1ee" />
+          <Dot key={i} x={p.x} y={p.y} r={i === hover || i === drag ? 7 : 5.5} color="var(--ink)" />
         ))}
         {hover !== null && drag === null && <Tip x={pts[hover].x} y={pts[hover].y} lines={[`(${fmt(pts[hover].x, 2)}, ${fmt(pts[hover].y, 2)})`, `residual ${fmt(pts[hover].y - (fit.w0 + fit.w1 * pts[hover].x), 3)}`]} />}
       </Plot>

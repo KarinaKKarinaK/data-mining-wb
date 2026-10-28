@@ -174,7 +174,7 @@ function LatticeLab({ tx, levels }: { tx: string[][]; levels: Level[] }) {
                 strokeDasharray={kind === 'skipped' ? '3 3' : undefined}
                 strokeWidth={1.5}
               />
-              <text y={4} textAnchor="middle" fontSize={10.5} fontFamily="var(--mono)" fill={kind === 'frequent' ? '#0d0e10' : kind === 'infrequent' ? 'var(--ink)' : 'var(--ink-3)'}>
+              <text y={4} textAnchor="middle" fontSize={10.5} fontFamily="var(--mono)" fill={kind === 'frequent' ? 'var(--bg)' : kind === 'infrequent' ? 'var(--ink)' : 'var(--ink-3)'}>
                 {lab}
               </text>
             </g>
